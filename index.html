@@ -156,6 +156,10 @@
                 <div class="filter-options" id="typeOptions"></div>
             </div>
             <div class="filter-row">
+                <span class="filter-label">画质</span>
+                <div class="filter-options" id="qualityOptions"></div>
+            </div>
+            <div class="filter-row">
                 <span class="filter-label">年份</span>
                 <div class="filter-options" id="yearOptions"></div>
             </div>
@@ -172,13 +176,13 @@
     <script>
         // =====================================================================
         // 🚀 动漫数据列表（以后加新动漫，只需要在下面复制一段 { ... } 改内容即可）
-        // 注意：tags 只放类型标签，年份和月份请填到 year 和 month 字段里！
+        // 注意：4K 和 60帧 请写在 tags 里，同时 year 和 month 独立填写。
         // =====================================================================
         const animeData = [
             {
                 title: "哭泣少女乐队",
                 cover: "images/哭泣少女乐队-封面.jpg",
-                tags: ["音乐", "搞笑", "3D"], 
+                tags: ["60帧", "音乐", "搞笑", "百合"], // 已将 3D 改为 百合
                 year: "2024",
                 month: "4月",
                 links: {
@@ -190,7 +194,7 @@
             {
                 title: "穹庐下的魔女",
                 cover: "images/穹庐下的魔女-封面.jpg",
-                tags: ["历史", "漫画改", "复仇", "战争", "奇幻"],
+                tags: ["4K", "历史", "漫画改", "复仇", "战争", "奇幻"],
                 year: "2026",
                 month: "7月",
                 links: {
@@ -238,32 +242,46 @@
             const grid = document.getElementById('animeGrid');
             const isMobile = /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
             
-            // 核心改变：用数组存储多选的筛选条件
             let activeTypes = []; 
+            let activeQualities = [];
             let activeYears = []; 
 
             function initFilters() {
                 const typeSet = new Set();
+                const qualitySet = new Set();
                 const yearSet = new Set();
+                
                 animeData.forEach(anime => {
-                    anime.tags.forEach(tag => { if (tag !== "4K" && tag !== "60帧") typeSet.add(tag); });
+                    anime.tags.forEach(tag => {
+                        if (tag === "4K" || tag === "60帧") {
+                            qualitySet.add(tag); // 放入画质池
+                        } else {
+                            typeSet.add(tag); // 放入类型池
+                        }
+                    });
                     if (anime.year) yearSet.add(anime.year);
                 });
 
+                // 1. 初始化类型筛选器
                 const typeOptionsEl = document.getElementById('typeOptions');
                 typeOptionsEl.innerHTML = `<button class="filter-option active" data-type="全部">全部</button>`;
                 Array.from(typeSet).sort().forEach(type => { typeOptionsEl.innerHTML += `<button class="filter-option" data-type="${type}">${type}</button>`; });
 
+                // 2. 初始化画质筛选器
+                const qualityOptionsEl = document.getElementById('qualityOptions');
+                qualityOptionsEl.innerHTML = `<button class="filter-option active" data-quality="全部">全部</button>`;
+                Array.from(qualitySet).sort().forEach(quality => { qualityOptionsEl.innerHTML += `<button class="filter-option" data-quality="${quality}">${quality}</button>`; });
+
+                // 3. 初始化年份筛选器
                 const yearOptionsEl = document.getElementById('yearOptions');
                 yearOptionsEl.innerHTML = `<button class="filter-option active" data-year="全部">全部</button>`;
                 Array.from(yearSet).sort((a, b) => parseInt(b) - parseInt(a)).forEach(year => { yearOptionsEl.innerHTML += `<button class="filter-option" data-year="${year}">${year}</button>`; });
 
-                // 绑定类型多选事件
+                // 绑定类型筛选事件（多选 AND 逻辑）
                 document.querySelectorAll('#typeOptions .filter-option').forEach(btn => {
                     btn.addEventListener('click', function() {
                         const val = this.dataset.type;
                         const allBtn = document.querySelector('#typeOptions [data-type="全部"]');
-                        
                         if (val === '全部') {
                             activeTypes = [];
                             document.querySelectorAll('#typeOptions .filter-option').forEach(b => b.classList.remove('active'));
@@ -271,25 +289,39 @@
                         } else {
                             allBtn.classList.remove('active');
                             const index = activeTypes.indexOf(val);
-                            if (index > -1) {
-                                activeTypes.splice(index, 1);
-                                this.classList.remove('active');
-                            } else {
-                                activeTypes.push(val);
-                                this.classList.add('active');
-                            }
+                            if (index > -1) { activeTypes.splice(index, 1); this.classList.remove('active'); } 
+                            else { activeTypes.push(val); this.classList.add('active'); }
                             if (activeTypes.length === 0) allBtn.classList.add('active');
                         }
                         filterCards();
                     });
                 });
 
-                // 绑定年份多选事件
+                // 绑定画质筛选事件（多选 OR 逻辑，因为画质互斥）
+                document.querySelectorAll('#qualityOptions .filter-option').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const val = this.dataset.quality;
+                        const allBtn = document.querySelector('#qualityOptions [data-quality="全部"]');
+                        if (val === '全部') {
+                            activeQualities = [];
+                            document.querySelectorAll('#qualityOptions .filter-option').forEach(b => b.classList.remove('active'));
+                            this.classList.add('active');
+                        } else {
+                            allBtn.classList.remove('active');
+                            const index = activeQualities.indexOf(val);
+                            if (index > -1) { activeQualities.splice(index, 1); this.classList.remove('active'); } 
+                            else { activeQualities.push(val); this.classList.add('active'); }
+                            if (activeQualities.length === 0) allBtn.classList.add('active');
+                        }
+                        filterCards();
+                    });
+                });
+
+                // 绑定年份筛选事件
                 document.querySelectorAll('#yearOptions .filter-option').forEach(btn => {
                     btn.addEventListener('click', function() {
                         const val = this.dataset.year;
                         const allBtn = document.querySelector('#yearOptions [data-year="全部"]');
-                        
                         if (val === '全部') {
                             activeYears = [];
                             document.querySelectorAll('#yearOptions .filter-option').forEach(b => b.classList.remove('active'));
@@ -297,13 +329,8 @@
                         } else {
                             allBtn.classList.remove('active');
                             const index = activeYears.indexOf(val);
-                            if (index > -1) {
-                                activeYears.splice(index, 1);
-                                this.classList.remove('active');
-                            } else {
-                                activeYears.push(val);
-                                this.classList.add('active');
-                            }
+                            if (index > -1) { activeYears.splice(index, 1); this.classList.remove('active'); } 
+                            else { activeYears.push(val); this.classList.add('active'); }
                             if (activeYears.length === 0) allBtn.classList.add('active');
                         }
                         filterCards();
@@ -360,19 +387,25 @@
                     
                     const matchSearch = !keyword || searchString.includes(keyword);
                     
-                    // 多选匹配逻辑：只要符合选中类型中的任意一个即可
+                    // 类型筛选：必须包含所有选中的类型 (AND 逻辑)
                     let matchType = true;
                     if (activeTypes.length > 0) {
-                        matchType = activeTypes.some(t => anime.tags.includes(t));
+                        matchType = activeTypes.every(t => anime.tags.includes(t));
                     }
                     
-                    // 多选匹配逻辑：只要符合选中年代中的任意一个即可
+                    // 画质筛选：只要符合选中画质中的任意一个即可 (OR 逻辑)
+                    let matchQuality = true;
+                    if (activeQualities.length > 0) {
+                        matchQuality = activeQualities.some(q => anime.tags.includes(q));
+                    }
+                    
+                    // 年份筛选
                     let matchYear = true;
                     if (activeYears.length > 0) {
                         matchYear = activeYears.includes(anime.year);
                     }
                     
-                    card.style.display = (matchSearch && matchType && matchYear) ? 'flex' : 'none';
+                    card.style.display = (matchSearch && matchType && matchQuality && matchYear) ? 'flex' : 'none';
                 });
             }
 
