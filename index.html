@@ -5,22 +5,53 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>樱花动漫</title>
     <style>
+        /* 1. 定义深色模式默认变量 */
+        :root {
+            --bg-color: #0d1117;
+            --card-bg: #161b22;
+            --text-color: #c9d1d9;
+            --title-color: #58a6ff;
+            --border-color: #30363d;
+            --btn-bg: #21262d;
+            --btn-text: #c9d1d9;
+            --search-bg: #161b22;
+            --search-border: #30363d;
+            --subtitle-color: #8b949e;
+        }
+
+        /* 2. 自动检测浅色模式并覆盖变量 */
+        @media (prefers-color-scheme: light) {
+            :root {
+                --bg-color: #f6f8fa;
+                --card-bg: #ffffff;
+                --text-color: #24292f;
+                --title-color: #0969da;
+                --border-color: #d0d7de;
+                --btn-bg: #f6f8fa;
+                --btn-text: #24292f;
+                --search-bg: #ffffff;
+                --search-border: #d0d7de;
+                --subtitle-color: #57606a;
+            }
+        }
+
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background-color: #0d1117; 
-            color: #c9d1d9; 
+            background-color: var(--bg-color); 
+            color: var(--text-color); 
             margin: 0; 
             padding: 20px; 
+            transition: background-color 0.3s, color 0.3s; /* 切换模式时平滑过渡 */
         }
         h1 { 
             text-align: center; 
-            color: #58a6ff; 
+            color: var(--title-color); 
             margin-bottom: 10px; 
             font-size: 28px; 
         }
         .subtitle { 
             text-align: center; 
-            color: #8b949e; 
+            color: var(--subtitle-color); 
             margin-bottom: 20px; 
             font-size: 14px; 
         }
@@ -34,15 +65,15 @@
             max-width: 500px; 
             padding: 12px 20px; 
             border-radius: 25px; 
-            border: 1px solid #30363d; 
-            background-color: #161b22; 
-            color: #c9d1d9; 
+            border: 1px solid var(--search-border); 
+            background-color: var(--search-bg); 
+            color: var(--text-color); 
             font-size: 16px; 
             outline: none; 
             transition: border-color 0.3s; 
         }
         #searchInput:focus { 
-            border-color: #58a6ff; 
+            border-color: var(--title-color); 
         }
         
         .grid-container { 
@@ -54,11 +85,11 @@
         }
         
         .anime-card { 
-            background-color: #161b22; 
-            border: 1px solid #30363d; 
+            background-color: var(--card-bg); 
+            border: 1px solid var(--border-color); 
             border-radius: 12px; 
             padding: 12px;
-            transition: transform 0.2s, box-shadow 0.2s; 
+            transition: transform 0.2s, box-shadow 0.2s, background-color 0.3s; 
             display: flex; 
             flex-direction: column; 
         }
@@ -73,40 +104,66 @@
             object-fit: cover; 
             border-radius: 8px; 
             margin-bottom: 10px; 
-            background-color: #21262d; 
+            background-color: var(--btn-bg); 
         }
         
         .anime-title { 
-            color: #58a6ff; 
+            color: var(--title-color); 
             font-size: 15px; 
             font-weight: bold; 
-            margin: 0 0 10px 0; 
+            margin: 0 0 6px 0; 
             text-align: center; 
             line-height: 1.3;
         }
+
+        .tag-group {
+            display: flex;
+            justify-content: center;
+            gap: 4px;
+            margin-bottom: 10px;
+        }
+        .anime-tag {
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+        .tag-60fps { 
+            background-color: #d2a8ff; 
+            color: #0d1117; 
+        }
+        .tag-4k { 
+            background-color: #f2cc60; 
+            color: #000000; 
+        }
         
+        /* 3. 核心修复：让链接组占据剩余空间并垂直居中 */
         .link-group { 
             display: flex; 
             flex-wrap: wrap; 
             gap: 6px;
-            margin-top: auto; 
-            justify-content: center; 
+            flex-grow: 1; /* 占据卡片剩余的垂直空间 */
+            align-items: center; /* 垂直居中 */
+            justify-content: center; /* 水平居中 */
+            margin-top: 10px;
         }
+        
         .link-btn { 
-            background-color: #21262d; 
-            color: #c9d1d9; 
+            background-color: var(--btn-bg); 
+            color: var(--btn-text); 
             text-decoration: none; 
             padding: 5px 10px;
             border-radius: 15px;
             font-size: 12px; 
-            border: 1px solid #30363d; 
+            border: 1px solid var(--border-color); 
             transition: all 0.2s; 
             white-space: nowrap;
         }
         .link-btn:hover { 
-            background-color: #58a6ff; 
-            color: #0d1117; 
-            border-color: #58a6ff; 
+            background-color: var(--title-color); 
+            color: #ffffff; 
+            border-color: var(--title-color); 
         }
         
         @media (max-width: 600px) {
@@ -126,7 +183,11 @@
             }
             .anime-title { 
                 font-size: 13px;
-                margin-bottom: 6px;
+                margin-bottom: 4px;
+            }
+            .anime-tag {
+                font-size: 9px;
+                padding: 1px 6px;
             }
             .link-btn { 
                 padding: 3px 6px;
@@ -150,7 +211,10 @@
         
         <div class="anime-card">
             <img src="images/哭泣少女乐队-封面.jpg" alt="哭泣少女乐队封面">
-            <h3 class="anime-title">【60帧】哭泣少女乐队</h3>
+            <h3 class="anime-title">哭泣少女乐队</h3>
+            <div class="tag-group">
+                <span class="anime-tag tag-60fps">60帧</span>
+            </div>
             <div class="link-group">
                 <a href="https://www.acfun.cn/a/aa6147213" target="_blank" class="link-btn">📺 A站观看</a>
                 <a href="https://www.mfuns.net/video/61328" target="_blank" class="link-btn pc-version">💻 MFuns电脑</a>
@@ -160,7 +224,10 @@
 
         <div class="anime-card">
             <img src="images/穹庐下的魔女-封面.jpg" alt="穹庐下的魔女封面">
-            <h3 class="anime-title">【4K】穹庐下的魔女</h3>
+            <h3 class="anime-title">穹庐下的魔女</h3>
+            <div class="tag-group">
+                <span class="anime-tag tag-4k">4K</span>
+            </div>
             <div class="link-group">
                 <a href="https://www.bilibili.com/video/BV1xMMY6xEPo" target="_blank" class="link-btn">📺 B站观看</a>
                 <a href="https://www.acfun.cn/a/aa6147210" target="_blank" class="link-btn">📺 A站观看</a>
@@ -171,6 +238,7 @@
         <div class="anime-card">
             <img src="images/命运石之门-封面.jpg" alt="命运石之门封面">
             <h3 class="anime-title">命运石之门</h3>
+            <div class="tag-group"></div>
             <div class="link-group">
                 <a href="https://www.acfun.cn/a/aa6147474" target="_blank" class="link-btn">📺 A站观看</a>
                 <a href="" class="link-btn pc-version">💻 MFuns电脑</a>
@@ -181,6 +249,7 @@
         <div class="anime-card">
             <img src="images/死亡笔记-封面.jpg" alt="死亡笔记封面">
             <h3 class="anime-title">死亡笔记</h3>
+            <div class="tag-group"></div>
             <div class="link-group">
                 <a href="https://www.acfun.cn/a/aa6147473" target="_blank" class="link-btn">📺 A站观看</a>
                 <a href="" class="link-btn pc-version">💻 MFuns电脑</a>
