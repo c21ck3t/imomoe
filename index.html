@@ -172,13 +172,13 @@
     <script>
         // =====================================================================
         // 🚀 动漫数据列表（以后加新动漫，只需要在下面复制一段 { ... } 改内容即可）
-        // 封面图请放在 images 文件夹，填上文件名。标签 tags 里只有 4K 和 60帧 会显示在右上角。
+        // 注意：tags 只放类型标签，年份和月份请填到 year 和 month 字段里！
         // =====================================================================
         const animeData = [
             {
                 title: "哭泣少女乐队",
                 cover: "images/哭泣少女乐队-封面.jpg",
-                tags: ["60帧", "音乐", "搞笑", "3D"], 
+                tags: ["音乐", "搞笑", "3D"], 
                 year: "2024",
                 month: "4月",
                 links: {
@@ -190,8 +190,8 @@
             {
                 title: "穹庐下的魔女",
                 cover: "images/穹庐下的魔女-封面.jpg",
-                tags: ["4K", "历史", "漫画改", "复仇", "战争", "奇幻"],
-                year: "2024",
+                tags: ["历史", "漫画改", "复仇", "战争", "奇幻"],
+                year: "2026",
                 month: "7月",
                 links: {
                     b: "https://www.bilibili.com/video/BV1xMMY6xEPo",
@@ -221,9 +221,9 @@
             {
                 title: "尼古喵喵",
                 cover: "images/尼古喵喵-封面.jpg",
-                tags: ["搞笑", "日常", "2024", "4月"],
-                year: "2024",
-                month: "4月",
+                tags: ["搞笑", "日常"],
+                year: "2026",
+                month: "7月",
                 links: {
                     mfunsPc: "https://www.mfuns.net/video/61154",
                     mfunsMobile: "https://m.mfuns.net/video/61154"
@@ -237,8 +237,10 @@
         document.addEventListener("DOMContentLoaded", function() {
             const grid = document.getElementById('animeGrid');
             const isMobile = /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-            let activeType = '全部';
-            let activeYear = '全部';
+            
+            // 核心改变：用数组存储多选的筛选条件
+            let activeTypes = []; 
+            let activeYears = []; 
 
             function initFilters() {
                 const typeSet = new Set();
@@ -254,18 +256,57 @@
 
                 const yearOptionsEl = document.getElementById('yearOptions');
                 yearOptionsEl.innerHTML = `<button class="filter-option active" data-year="全部">全部</button>`;
-                Array.from(yearSet).sort((a, b) => b.localeCompare(a)).forEach(year => { yearOptionsEl.innerHTML += `<button class="filter-option" data-year="${year}">${year}</button>`; });
+                Array.from(yearSet).sort((a, b) => parseInt(b) - parseInt(a)).forEach(year => { yearOptionsEl.innerHTML += `<button class="filter-option" data-year="${year}">${year}</button>`; });
 
+                // 绑定类型多选事件
                 document.querySelectorAll('#typeOptions .filter-option').forEach(btn => {
                     btn.addEventListener('click', function() {
-                        document.querySelectorAll('#typeOptions .filter-option').forEach(b => b.classList.remove('active'));
-                        this.classList.add('active'); activeType = this.dataset.type; filterCards();
+                        const val = this.dataset.type;
+                        const allBtn = document.querySelector('#typeOptions [data-type="全部"]');
+                        
+                        if (val === '全部') {
+                            activeTypes = [];
+                            document.querySelectorAll('#typeOptions .filter-option').forEach(b => b.classList.remove('active'));
+                            this.classList.add('active');
+                        } else {
+                            allBtn.classList.remove('active');
+                            const index = activeTypes.indexOf(val);
+                            if (index > -1) {
+                                activeTypes.splice(index, 1);
+                                this.classList.remove('active');
+                            } else {
+                                activeTypes.push(val);
+                                this.classList.add('active');
+                            }
+                            if (activeTypes.length === 0) allBtn.classList.add('active');
+                        }
+                        filterCards();
                     });
                 });
+
+                // 绑定年份多选事件
                 document.querySelectorAll('#yearOptions .filter-option').forEach(btn => {
                     btn.addEventListener('click', function() {
-                        document.querySelectorAll('#yearOptions .filter-option').forEach(b => b.classList.remove('active'));
-                        this.classList.add('active'); activeYear = this.dataset.year; filterCards();
+                        const val = this.dataset.year;
+                        const allBtn = document.querySelector('#yearOptions [data-year="全部"]');
+                        
+                        if (val === '全部') {
+                            activeYears = [];
+                            document.querySelectorAll('#yearOptions .filter-option').forEach(b => b.classList.remove('active'));
+                            this.classList.add('active');
+                        } else {
+                            allBtn.classList.remove('active');
+                            const index = activeYears.indexOf(val);
+                            if (index > -1) {
+                                activeYears.splice(index, 1);
+                                this.classList.remove('active');
+                            } else {
+                                activeYears.push(val);
+                                this.classList.add('active');
+                            }
+                            if (activeYears.length === 0) allBtn.classList.add('active');
+                        }
+                        filterCards();
                     });
                 });
             }
@@ -303,19 +344,34 @@
             document.querySelectorAll('.anime-card').forEach(card => {
                 card.addEventListener('click', function(e) {
                     if (e.target.closest('.link-btn')) return;
-                    this.classList.toggle('expanded');
+                    const isExpanded = this.classList.contains('expanded');
+                    document.querySelectorAll('.anime-card').forEach(c => c.classList.remove('expanded'));
+                    if (!isExpanded) this.classList.add('expanded');
                 });
             });
 
             function filterCards() {
                 const keyword = document.getElementById('searchInput').value.toLowerCase().trim();
-                document.querySelectorAll('.anime-card').forEach(card => {
-                    const title = card.dataset.title.toLowerCase();
-                    const tags = card.dataset.tags.toLowerCase();
-                    const year = card.dataset.year;
-                    const matchSearch = !keyword || title.includes(keyword) || tags.includes(keyword);
-                    const matchType = activeType === '全部' || tags.includes(activeType.toLowerCase());
-                    const matchYear = activeYear === '全部' || year === activeYear;
+                document.querySelectorAll('.anime-card').forEach((card, index) => {
+                    const anime = animeData[index];
+                    const title = anime.title.toLowerCase();
+                    const tags = anime.tags.join(" ").toLowerCase();
+                    const searchString = `${title} ${tags} ${anime.year} ${anime.month}`;
+                    
+                    const matchSearch = !keyword || searchString.includes(keyword);
+                    
+                    // 多选匹配逻辑：只要符合选中类型中的任意一个即可
+                    let matchType = true;
+                    if (activeTypes.length > 0) {
+                        matchType = activeTypes.some(t => anime.tags.includes(t));
+                    }
+                    
+                    // 多选匹配逻辑：只要符合选中年代中的任意一个即可
+                    let matchYear = true;
+                    if (activeYears.length > 0) {
+                        matchYear = activeYears.includes(anime.year);
+                    }
+                    
                     card.style.display = (matchSearch && matchType && matchYear) ? 'flex' : 'none';
                 });
             }
