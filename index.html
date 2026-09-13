@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>樱花动漫</title>
+    <title>櫻花动漫 b站UID5306996</title>
     <style>
         :root {
             --bg-color: #0d1117;
@@ -45,7 +45,33 @@
             padding: 20px; 
             transition: background-color 0.3s, color 0.3s;
         }
-        h1 { text-align: center; color: var(--title-color); margin-bottom: 10px; font-size: 28px; }
+        
+        h1 { 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            color: var(--title-color); 
+            margin-bottom: 10px; 
+            font-size: 26px; 
+            text-align: center;
+        }
+        
+        h1 img {
+            height: 45px;
+            width: 45px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--border-color);
+            transition: transform 0.2s, border-color 0.2s;
+            cursor: pointer;
+            background-color: transparent;
+        }
+        h1 img:hover {
+            transform: scale(1.1);
+            border-color: var(--title-color);
+        }
+
         .subtitle { text-align: center; color: var(--subtitle-color); margin-bottom: 20px; font-size: 14px; }
         
         .search-container { text-align: center; margin-bottom: 20px; }
@@ -124,7 +150,8 @@
         
         @media (max-width: 600px) {
             body { padding: 12px; }
-            h1 { font-size: 22px; }
+            h1 { font-size: 20px; gap: 8px; }
+            h1 img { height: 35px; width: 35px; border-radius: 50%; }
             .grid-container { grid-template-columns: repeat(3, 1fr); gap: 8px; }
             .anime-card { padding: 6px; border-radius: 8px; }
             .card-cover { border-radius: 6px; margin-bottom: 6px; }
@@ -141,7 +168,12 @@
     </style>
 </head>
 <body>
-    <h1>🎬 樱花动漫</h1>
+    <h1>
+        <a href="https://space.bilibili.com/5306996" target="_blank">
+            <img src="images/櫻花动漫-头像.png" alt="櫻花动漫头像">
+        </a>
+        櫻花动漫 b站UID5306996
+    </h1>
     <p class="subtitle">点击卡片下方的标签即可跳转观看</p>
     
     <div class="search-container">
@@ -163,26 +195,29 @@
                 <span class="filter-label">年份</span>
                 <div class="filter-options" id="yearOptions"></div>
             </div>
+            <div class="filter-row">
+                <span class="filter-label">月份</span>
+                <div class="filter-options" id="monthOptions"></div>
+            </div>
         </div>
     </div>
 
     <div class="grid-container" id="animeGrid"></div>
 
     <footer>
-        <p><a href="https://space.bilibili.com/5306996" target="_blank">👉 我的 B站主页</a></p>
+        <p><a href="https://space.bilibili.com/5306996" target="_blank">👉 我的 B站主页 (UID: 5306996)</a></p>
         <p class="footer-disclaimer">本网站只提供视频检索服务，任何视频资源均采集于互联网，并不提供资源存储。</p>
     </footer>
 
     <script>
         // =====================================================================
-        // 🚀 动漫数据列表（以后加新动漫，只需要在下面复制一段 { ... } 改内容即可）
-        // 注意：4K 和 60帧 请写在 tags 里，同时 year 和 month 独立填写。
+        // 🚀 动漫数据列表
         // =====================================================================
         const animeData = [
             {
                 title: "哭泣少女乐队",
                 cover: "images/哭泣少女乐队-封面.jpg",
-                tags: ["60帧", "音乐", "搞笑", "百合"], // 已将 3D 改为 百合
+                tags: ["60帧", "音乐", "搞笑", "百合"],
                 year: "2024",
                 month: "4月",
                 links: {
@@ -232,6 +267,17 @@
                     mfunsPc: "https://www.mfuns.net/video/61154",
                     mfunsMobile: "https://m.mfuns.net/video/61154"
                 }
+            },
+            {
+                title: "轻音少女",
+                cover: "images/轻音少女-封面.jpg",
+                tags: ["音乐", "日常", "萌系", "校园"],
+                year: "2009",
+                month: "4月",
+                links: {
+                    mfunsPc: "https://www.mfuns.net/video/61104",
+                    mfunsMobile: "https://m.mfuns.net/video/61104"
+                }
             }
         ];
 
@@ -245,39 +291,42 @@
             let activeTypes = []; 
             let activeQualities = [];
             let activeYears = []; 
+            let activeMonths = []; 
 
             function initFilters() {
                 const typeSet = new Set();
                 const qualitySet = new Set();
                 const yearSet = new Set();
+                const monthSet = new Set();
                 
                 animeData.forEach(anime => {
                     anime.tags.forEach(tag => {
                         if (tag === "4K" || tag === "60帧") {
-                            qualitySet.add(tag); // 放入画质池
+                            qualitySet.add(tag); 
                         } else {
-                            typeSet.add(tag); // 放入类型池
+                            typeSet.add(tag); 
                         }
                     });
                     if (anime.year) yearSet.add(anime.year);
+                    if (anime.month) monthSet.add(anime.month);
                 });
 
-                // 1. 初始化类型筛选器
                 const typeOptionsEl = document.getElementById('typeOptions');
                 typeOptionsEl.innerHTML = `<button class="filter-option active" data-type="全部">全部</button>`;
                 Array.from(typeSet).sort().forEach(type => { typeOptionsEl.innerHTML += `<button class="filter-option" data-type="${type}">${type}</button>`; });
 
-                // 2. 初始化画质筛选器
                 const qualityOptionsEl = document.getElementById('qualityOptions');
                 qualityOptionsEl.innerHTML = `<button class="filter-option active" data-quality="全部">全部</button>`;
                 Array.from(qualitySet).sort().forEach(quality => { qualityOptionsEl.innerHTML += `<button class="filter-option" data-quality="${quality}">${quality}</button>`; });
 
-                // 3. 初始化年份筛选器
                 const yearOptionsEl = document.getElementById('yearOptions');
                 yearOptionsEl.innerHTML = `<button class="filter-option active" data-year="全部">全部</button>`;
                 Array.from(yearSet).sort((a, b) => parseInt(b) - parseInt(a)).forEach(year => { yearOptionsEl.innerHTML += `<button class="filter-option" data-year="${year}">${year}</button>`; });
 
-                // 绑定类型筛选事件（多选 AND 逻辑）
+                const monthOptionsEl = document.getElementById('monthOptions');
+                monthOptionsEl.innerHTML = `<button class="filter-option active" data-month="全部">全部</button>`;
+                Array.from(monthSet).sort((a, b) => parseInt(a) - parseInt(b)).forEach(month => { monthOptionsEl.innerHTML += `<button class="filter-option" data-month="${month}">${month}</button>`; });
+
                 document.querySelectorAll('#typeOptions .filter-option').forEach(btn => {
                     btn.addEventListener('click', function() {
                         const val = this.dataset.type;
@@ -297,7 +346,6 @@
                     });
                 });
 
-                // 绑定画质筛选事件（多选 OR 逻辑，因为画质互斥）
                 document.querySelectorAll('#qualityOptions .filter-option').forEach(btn => {
                     btn.addEventListener('click', function() {
                         const val = this.dataset.quality;
@@ -317,7 +365,6 @@
                     });
                 });
 
-                // 绑定年份筛选事件
                 document.querySelectorAll('#yearOptions .filter-option').forEach(btn => {
                     btn.addEventListener('click', function() {
                         const val = this.dataset.year;
@@ -336,6 +383,25 @@
                         filterCards();
                     });
                 });
+
+                document.querySelectorAll('#monthOptions .filter-option').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const val = this.dataset.month;
+                        const allBtn = document.querySelector('#monthOptions [data-month="全部"]');
+                        if (val === '全部') {
+                            activeMonths = [];
+                            document.querySelectorAll('#monthOptions .filter-option').forEach(b => b.classList.remove('active'));
+                            this.classList.add('active');
+                        } else {
+                            allBtn.classList.remove('active');
+                            const index = activeMonths.indexOf(val);
+                            if (index > -1) { activeMonths.splice(index, 1); this.classList.remove('active'); } 
+                            else { activeMonths.push(val); this.classList.add('active'); }
+                            if (activeMonths.length === 0) allBtn.classList.add('active');
+                        }
+                        filterCards();
+                    });
+                });
             }
 
             animeData.forEach(anime => {
@@ -350,7 +416,7 @@
                 let hiddenTagsHTML = '';
                 hiddenTags.forEach(tag => { hiddenTagsHTML += `<span class="anime-tag hidden-tag">${tag}</span>`; });
 
-                let cardHTML = `<div class="anime-card" data-title="${anime.title}" data-tags="${anime.tags.join(',')}" data-year="${anime.year}">`;
+                let cardHTML = `<div class="anime-card" data-title="${anime.title}" data-tags="${anime.tags.join(',')}" data-year="${anime.year}" data-month="${anime.month}">`;
                 cardHTML += `<div class="card-cover">`;
                 cardHTML += `<img src="${anime.cover}" alt="${anime.title}封面">`;
                 if (badgesHTML) cardHTML += `<div class="corner-badge">${badgesHTML}</div>`;
@@ -387,25 +453,27 @@
                     
                     const matchSearch = !keyword || searchString.includes(keyword);
                     
-                    // 类型筛选：必须包含所有选中的类型 (AND 逻辑)
                     let matchType = true;
                     if (activeTypes.length > 0) {
                         matchType = activeTypes.every(t => anime.tags.includes(t));
                     }
                     
-                    // 画质筛选：只要符合选中画质中的任意一个即可 (OR 逻辑)
                     let matchQuality = true;
                     if (activeQualities.length > 0) {
                         matchQuality = activeQualities.some(q => anime.tags.includes(q));
                     }
                     
-                    // 年份筛选
                     let matchYear = true;
                     if (activeYears.length > 0) {
                         matchYear = activeYears.includes(anime.year);
                     }
+
+                    let matchMonth = true;
+                    if (activeMonths.length > 0) {
+                        matchMonth = activeMonths.includes(anime.month);
+                    }
                     
-                    card.style.display = (matchSearch && matchType && matchQuality && matchYear) ? 'flex' : 'none';
+                    card.style.display = (matchSearch && matchType && matchQuality && matchYear && matchMonth) ? 'flex' : 'none';
                 });
             }
 
