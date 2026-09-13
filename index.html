@@ -57,115 +57,57 @@
         }
         #searchInput:focus { border-color: var(--title-color); }
 
-        /* 筛选索引容器 */
-        .filter-container {
-            max-width: 1200px;
-            margin: 0 auto 20px auto;
-        }
+        .filter-container { max-width: 1200px; margin: 0 auto 20px auto; }
         .filter-toggle-btn {
-            display: block;
-            margin: 0 auto;
-            background-color: var(--card-bg);
-            color: var(--text-color);
-            border: 1px solid var(--border-color);
-            padding: 8px 20px;
-            border-radius: 20px;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.2s;
+            display: block; margin: 0 auto; background-color: var(--card-bg);
+            color: var(--text-color); border: 1px solid var(--border-color);
+            padding: 8px 20px; border-radius: 20px; font-size: 14px; cursor: pointer; transition: all 0.2s;
         }
-        .filter-toggle-btn:hover {
-            border-color: var(--filter-active);
-            color: var(--filter-active);
-        }
+        .filter-toggle-btn:hover { border-color: var(--filter-active); color: var(--filter-active); }
         .filter-panel {
-            display: none; /* 默认折叠 */
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 15px;
-            margin-top: 15px;
-            animation: slideDown 0.3s ease;
+            display: none; background-color: var(--card-bg); border: 1px solid var(--border-color);
+            border-radius: 12px; padding: 15px; margin-top: 15px; animation: slideDown 0.3s ease;
         }
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .filter-row {
-            display: flex;
-            align-items: flex-start;
-            margin-bottom: 12px;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-        .filter-row:last-child {
-            margin-bottom: 0;
-        }
-        .filter-label {
-            font-weight: bold;
-            color: var(--subtitle-color);
-            width: 50px;
-            flex-shrink: 0;
-            font-size: 14px;
-            line-height: 28px; /* 与按钮高度对齐 */
-        }
-        .filter-options {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            flex: 1;
-        }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .filter-row { display: flex; align-items: flex-start; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
+        .filter-row:last-child { margin-bottom: 0; }
+        .filter-label { font-weight: bold; color: var(--subtitle-color); width: 50px; flex-shrink: 0; font-size: 14px; line-height: 28px; }
+        .filter-options { display: flex; flex-wrap: wrap; gap: 8px; flex: 1; }
         .filter-option {
-            background: transparent;
-            color: var(--text-color);
-            border: 1px solid transparent;
-            padding: 4px 12px;
-            border-radius: 15px;
-            font-size: 13px;
-            cursor: pointer;
-            transition: all 0.2s;
-            white-space: nowrap;
+            background: transparent; color: var(--text-color); border: 1px solid transparent;
+            padding: 4px 12px; border-radius: 15px; font-size: 13px; cursor: pointer; transition: all 0.2s; white-space: nowrap;
         }
-        .filter-option:hover {
-            color: var(--filter-active);
-        }
-        .filter-option.active {
-            color: var(--filter-active);
-            border-color: var(--filter-active);
-            background-color: var(--filter-active-bg);
-        }
+        .filter-option:hover { color: var(--filter-active); }
+        .filter-option.active { color: var(--filter-active); border-color: var(--filter-active); background-color: var(--filter-active-bg); }
         
         .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; }
         
         .anime-card { 
             background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; 
-            padding: 12px; transition: all 0.3s ease; display: flex; flex-direction: column; 
-            cursor: pointer;
+            padding: 12px; transition: all 0.3s ease; display: flex; flex-direction: column; cursor: pointer;
         }
-        .anime-card:hover, .anime-card.expanded { 
-            transform: translateY(-4px); 
-            box-shadow: 0 6px 12px rgba(0,0,0,0.45); 
-        }
+        .anime-card:hover, .anime-card.expanded { transform: translateY(-4px); box-shadow: 0 6px 12px rgba(0,0,0,0.45); }
         
-        .anime-card img { width: 100%; aspect-ratio: 3/4; object-fit: cover; border-radius: 8px; margin-bottom: 10px; background-color: var(--btn-bg); }
+        .card-cover { position: relative; width: 100%; aspect-ratio: 3/4; border-radius: 8px; overflow: hidden; margin-bottom: 10px; background-color: var(--btn-bg); }
+        .card-cover img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .corner-badge {
+            position: absolute; top: 6px; right: 6px; display: flex; gap: 4px; z-index: 2;
+        }
+        .corner-badge span {
+            font-size: 10px; padding: 2px 6px; border-radius: 6px; font-weight: bold; letter-spacing: 0.5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        .badge-60fps { background-color: #d2a8ff; color: #0d1117; }
+        .badge-4k { background-color: #f2cc60; color: #000000; }
+
         .anime-title { color: var(--title-color); font-size: 15px; font-weight: bold; margin: 0 0 6px 0; text-align: center; line-height: 1.3; }
 
-        .tag-group { display: flex; justify-content: center; flex-wrap: wrap; gap: 4px; margin-bottom: 10px; min-height: 22px; }
-        .anime-tag { font-size: 10px; padding: 2px 8px; border-radius: 10px; font-weight: bold; letter-spacing: 0.5px; }
+        .tag-group { display: flex; justify-content: center; flex-wrap: wrap; gap: 4px; margin-bottom: 10px; min-height: 0; }
+        .anime-tag { font-size: 10px; padding: 2px 8px; border-radius: 10px; font-weight: bold; background-color: var(--btn-bg); color: var(--btn-text); border: 1px solid var(--border-color); }
         
-        .tag-60fps { background-color: #d2a8ff; color: #0d1117; }
-        .tag-4k { background-color: #f2cc60; color: #000000; }
-        
-        .anime-tag.hidden-tag {
-            display: none;
-            background-color: var(--btn-bg);
-            color: var(--btn-text);
-            border: 1px solid var(--border-color);
-        }
-        .anime-card:hover .anime-tag.hidden-tag, 
-        .anime-card.expanded .anime-tag.hidden-tag {
-            display: inline-block;
-        }
+        .anime-tag.hidden-tag { display: none; }
+        .anime-card:hover .anime-tag.hidden-tag, .anime-card.expanded .anime-tag.hidden-tag { display: inline-block; }
         
         .link-group { display: flex; flex-wrap: wrap; gap: 6px; flex-grow: 1; align-items: center; justify-content: center; margin-top: 10px; }
         .link-btn { 
@@ -185,7 +127,7 @@
             h1 { font-size: 22px; }
             .grid-container { grid-template-columns: repeat(3, 1fr); gap: 8px; }
             .anime-card { padding: 6px; border-radius: 8px; }
-            .anime-card img { border-radius: 6px; margin-bottom: 6px; }
+            .card-cover { border-radius: 6px; margin-bottom: 6px; }
             .anime-title { font-size: 13px; margin-bottom: 4px; }
             .anime-tag { font-size: 9px; padding: 1px 6px; }
             .link-btn { padding: 3px 6px; font-size: 10px; border-radius: 10px; }
@@ -206,7 +148,6 @@
         <input type="text" id="searchInput" placeholder="🔍 输入动漫名称、标签或年份搜索...">
     </div>
 
-    <!-- 筛选索引面板 -->
     <div class="filter-container">
         <button class="filter-toggle-btn" id="toggleFilter">🔽 展开筛选索引</button>
         <div class="filter-panel" id="filterPanel">
@@ -221,9 +162,7 @@
         </div>
     </div>
 
-    <div class="grid-container" id="animeGrid">
-        <!-- 页面内容由下方的 JS 自动生成 -->
-    </div>
+    <div class="grid-container" id="animeGrid"></div>
 
     <footer>
         <p><a href="https://space.bilibili.com/5306996" target="_blank">👉 我的 B站主页</a></p>
@@ -231,14 +170,15 @@
     </footer>
 
     <script>
-        // ==========================================
-        // 🚀 动漫数据列表（以后只改这里！）
-        // ==========================================
+        // =====================================================================
+        // 🚀 动漫数据列表（以后加新动漫，只需要在下面复制一段 { ... } 改内容即可）
+        // 封面图请放在 images 文件夹，填上文件名。标签 tags 里只有 4K 和 60帧 会显示在右上角。
+        // =====================================================================
         const animeData = [
             {
                 title: "哭泣少女乐队",
                 cover: "images/哭泣少女乐队-封面.jpg",
-                tags: ["60帧", "音乐", "搞笑", "3D"],
+                tags: ["60帧", "音乐", "搞笑", "3D"], 
                 year: "2024",
                 month: "4月",
                 links: {
@@ -277,11 +217,22 @@
                 links: {
                     a: "https://www.acfun.cn/a/aa6147473"
                 }
+            },
+            {
+                title: "尼古喵喵",
+                cover: "images/尼古喵喵-封面.jpg",
+                tags: ["搞笑", "日常", "2024", "4月"],
+                year: "2024",
+                month: "4月",
+                links: {
+                    mfunsPc: "https://www.mfuns.net/video/61154",
+                    mfunsMobile: "https://m.mfuns.net/video/61154"
+                }
             }
         ];
 
         // ==========================================
-        // 页面渲染逻辑（无需修改）
+        // 页面渲染逻辑（不需要改动）
         // ==========================================
         document.addEventListener("DOMContentLoaded", function() {
             const grid = document.getElementById('animeGrid');
@@ -289,68 +240,55 @@
             let activeType = '全部';
             let activeYear = '全部';
 
-            // 1. 提取并渲染筛选选项
             function initFilters() {
                 const typeSet = new Set();
                 const yearSet = new Set();
-                
                 animeData.forEach(anime => {
-                    anime.tags.forEach(tag => {
-                        // 排除特殊标签，因为它们不是传统的“类型”
-                        if (tag !== "4K" && tag !== "60帧") typeSet.add(tag);
-                    });
+                    anime.tags.forEach(tag => { if (tag !== "4K" && tag !== "60帧") typeSet.add(tag); });
                     if (anime.year) yearSet.add(anime.year);
                 });
 
-                // 类型选项（添加“全部”）
                 const typeOptionsEl = document.getElementById('typeOptions');
                 typeOptionsEl.innerHTML = `<button class="filter-option active" data-type="全部">全部</button>`;
-                Array.from(typeSet).sort().forEach(type => {
-                    typeOptionsEl.innerHTML += `<button class="filter-option" data-type="${type}">${type}</button>`;
-                });
+                Array.from(typeSet).sort().forEach(type => { typeOptionsEl.innerHTML += `<button class="filter-option" data-type="${type}">${type}</button>`; });
 
-                // 年份选项（添加“全部”，按年份倒序排列）
                 const yearOptionsEl = document.getElementById('yearOptions');
                 yearOptionsEl.innerHTML = `<button class="filter-option active" data-year="全部">全部</button>`;
-                Array.from(yearSet).sort((a, b) => b.localeCompare(a)).forEach(year => {
-                    yearOptionsEl.innerHTML += `<button class="filter-option" data-year="${year}">${year}</button>`;
-                });
+                Array.from(yearSet).sort((a, b) => b.localeCompare(a)).forEach(year => { yearOptionsEl.innerHTML += `<button class="filter-option" data-year="${year}">${year}</button>`; });
 
-                // 绑定筛选按钮点击事件
                 document.querySelectorAll('#typeOptions .filter-option').forEach(btn => {
                     btn.addEventListener('click', function() {
                         document.querySelectorAll('#typeOptions .filter-option').forEach(b => b.classList.remove('active'));
-                        this.classList.add('active');
-                        activeType = this.dataset.type;
-                        filterCards();
+                        this.classList.add('active'); activeType = this.dataset.type; filterCards();
                     });
                 });
                 document.querySelectorAll('#yearOptions .filter-option').forEach(btn => {
                     btn.addEventListener('click', function() {
                         document.querySelectorAll('#yearOptions .filter-option').forEach(b => b.classList.remove('active'));
-                        this.classList.add('active');
-                        activeYear = this.dataset.year;
-                        filterCards();
+                        this.classList.add('active'); activeYear = this.dataset.year; filterCards();
                     });
                 });
             }
 
-            // 2. 生成卡片
             animeData.forEach(anime => {
-                let cardHTML = `<div class="anime-card" data-title="${anime.title}" data-tags="${anime.tags.join(',')}" data-year="${anime.year}">`;
-                cardHTML += `<img src="${anime.cover}" alt="${anime.title}封面">`;
-                cardHTML += `<h3 class="anime-title">${anime.title}</h3>`;
-
-                cardHTML += `<div class="tag-group">`;
-                anime.tags.forEach(tag => {
-                    if (tag === "4K" || tag === "60帧") {
-                        const tagClass = tag === "4K" ? "tag-4k" : "tag-60fps";
-                        cardHTML += `<span class="anime-tag ${tagClass}">${tag}</span>`;
-                    } else {
-                        cardHTML += `<span class="anime-tag hidden-tag">${tag}</span>`;
-                    }
+                const badgeTags = anime.tags.filter(tag => tag === "4K" || tag === "60帧");
+                let badgesHTML = '';
+                badgeTags.forEach(tag => {
+                    const badgeClass = tag === "4K" ? "badge-4k" : "badge-60fps";
+                    badgesHTML += `<span class="${badgeClass}">${tag}</span>`;
                 });
+
+                const hiddenTags = anime.tags.filter(tag => tag !== "4K" && tag !== "60帧");
+                let hiddenTagsHTML = '';
+                hiddenTags.forEach(tag => { hiddenTagsHTML += `<span class="anime-tag hidden-tag">${tag}</span>`; });
+
+                let cardHTML = `<div class="anime-card" data-title="${anime.title}" data-tags="${anime.tags.join(',')}" data-year="${anime.year}">`;
+                cardHTML += `<div class="card-cover">`;
+                cardHTML += `<img src="${anime.cover}" alt="${anime.title}封面">`;
+                if (badgesHTML) cardHTML += `<div class="corner-badge">${badgesHTML}</div>`;
                 cardHTML += `</div>`;
+                cardHTML += `<h3 class="anime-title">${anime.title}</h3>`;
+                cardHTML += `<div class="tag-group">${hiddenTagsHTML}</div>`;
 
                 cardHTML += `<div class="link-group">`;
                 if (anime.links.a) cardHTML += `<a href="${anime.links.a}" target="_blank" class="link-btn">📺 A站观看</a>`;
@@ -362,7 +300,6 @@
                 grid.innerHTML += cardHTML;
             });
 
-            // 3. 绑定卡片点击展开标签
             document.querySelectorAll('.anime-card').forEach(card => {
                 card.addEventListener('click', function(e) {
                     if (e.target.closest('.link-btn')) return;
@@ -370,46 +307,29 @@
                 });
             });
 
-            // 4. 核心筛选逻辑
             function filterCards() {
                 const keyword = document.getElementById('searchInput').value.toLowerCase().trim();
                 document.querySelectorAll('.anime-card').forEach(card => {
                     const title = card.dataset.title.toLowerCase();
                     const tags = card.dataset.tags.toLowerCase();
                     const year = card.dataset.year;
-
-                    // 检查搜索词
                     const matchSearch = !keyword || title.includes(keyword) || tags.includes(keyword);
-                    // 检查类型筛选
                     const matchType = activeType === '全部' || tags.includes(activeType.toLowerCase());
-                    // 检查年份筛选
                     const matchYear = activeYear === '全部' || year === activeYear;
-
-                    if (matchSearch && matchType && matchYear) {
-                        card.style.display = 'flex';
-                    } else {
-                        card.style.display = 'none';
-                    }
+                    card.style.display = (matchSearch && matchType && matchYear) ? 'flex' : 'none';
                 });
             }
 
-            // 绑定搜索框输入事件
             document.getElementById('searchInput').addEventListener('input', filterCards);
 
-            // 5. 筛选面板折叠展开
             const toggleBtn = document.getElementById('toggleFilter');
             const filterPanel = document.getElementById('filterPanel');
             toggleBtn.addEventListener('click', function() {
-                if (filterPanel.style.display === 'none' || filterPanel.style.display === '') {
-                    filterPanel.style.display = 'block';
-                    toggleBtn.textContent = '🔼 收起筛选索引';
-                } else {
-                    filterPanel.style.display = 'none';
-                    toggleBtn.textContent = '🔽 展开筛选索引';
-                }
+                const isHidden = filterPanel.style.display === 'none' || filterPanel.style.display === '';
+                filterPanel.style.display = isHidden ? 'block' : 'none';
+                toggleBtn.textContent = isHidden ? '🔼 收起筛选索引' : '🔽 展开筛选索引';
             });
 
-            // 初始化筛选
             initFilters();
         });
     </script>
