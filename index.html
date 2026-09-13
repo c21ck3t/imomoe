@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>动漫链接</title>
+    <title>樱花动漫</title>
     <style>
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
@@ -139,7 +139,7 @@
     </style>
 </head>
 <body>
-    <h1>🎬 我的动漫链接收藏</h1>
+    <h1>🎬 樱花动漫</h1>
     <p class="subtitle">点击卡片下方的标签即可跳转观看</p>
     
     <div class="search-container">
@@ -217,103 +217,6 @@
                 });
             });
 
-            const isMobile = /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-            
-            document.querySelectorAll('.pc-version').forEach(btn => {
-                if (isMobile) btn.style.display = 'none';
-            });
-            
-            document.querySelectorAll('.mobile-version').forEach(btn => {
-                if (!isMobile) btn.style.display = 'none';
-            });
-        });
-    </script>
-</body>
-</html>                padding: 3px 6px;
-                font-size: 10px; 
-                border-radius: 10px;
-            }
-            .search-container { margin-bottom: 20px; }
-            #searchInput { padding: 8px 15px; font-size: 14px; }
-        }
-    </style>
-</head>
-<body>
-    <h1>🎬 动漫链接</h1>
-    <p class="subtitle">点击卡片下方的标签即可跳转观看</p>
-    
-    <div class="search-container">
-        <input type="text" id="searchInput" placeholder="🔍 输入动漫名称搜索...">
-    </div>
-
-    <div class="grid-container" id="animeGrid">
-        
-        <!-- ===== 哭泣少女乐队（60帧标签） ===== -->
-        <div class="anime-card">
-            <img src="images/哭泣少女乐队-封面.jpg" alt="哭泣少女乐队封面">
-            <h3 class="anime-title">【60帧】哭泣少女乐队</h3>
-            <div class="link-group">
-                <a href="https://www.acfun.cn/a/aa6147213" target="_blank" class="link-btn">📺 A站观看</a>
-                <a href="https://www.mfuns.net/video/61328" target="_blank" class="link-btn pc-version">💻 MFuns电脑</a>
-                <a href="https://m.mfuns.net/video/61328" target="_blank" class="link-btn mobile-version">📱 MFuns手机</a>
-            </div>
-        </div>
-
-        <!-- ===== 穹庐下的魔女 ===== -->
-        <div class="anime-card">
-            <img src="images/穹庐下的魔女-封面.jpg" alt="穹庐下的魔女封面">
-            <h3 class="anime-title">【4K】穹庐下的魔女</h3>
-            <div class="link-group">
-                <!-- 新增的B站链接 -->
-                <a href="https://www.bilibili.com/video/BV1xMMY6xEPo" target="_blank" class="link-btn">📺 B站观看</a>
-                <a href="https://www.acfun.cn/a/aa6147210" target="_blank" class="link-btn">📺 A站观看</a>
-                <a href="" class="link-btn mobile-version">📱 MFuns手机</a>
-            </div>
-        </div>
-
-        <!-- ===== 死亡笔记 ===== -->
-        <div class="anime-card">
-            <img src="images/死亡笔记-封面.jpg" alt="死亡笔记封面">
-            <h3 class="anime-title">死亡笔记</h3>
-            <div class="link-group">
-                <a href="https://www.acfun.cn/a/aa6147473" target="_blank" class="link-btn">📺 A站观看</a>
-                <a href="" class="link-btn pc-version">💻 MFuns电脑</a>
-                <a href="" class="link-btn mobile-version">📱 MFuns手机</a>
-            </div>
-        </div>
-        
-    </div>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            // 1. 精确隐藏没填链接的按钮
-            document.querySelectorAll('.link-btn').forEach(btn => {
-                const href = btn.getAttribute('href')?.trim() || '';
-                const isInvalid = 
-                    href === '' || 
-                    href === '#' || 
-                    href.includes('这里') || 
-                    href.includes('放') ||
-                    href.includes('占位符');
-                
-                if (isInvalid) {
-                    btn.style.display = 'none';
-                }
-            });
-
-            // 2. 搜索功能
-            const searchInput = document.getElementById('searchInput');
-            const cards = document.querySelectorAll('.anime-card');
-
-            searchInput.addEventListener('input', function() {
-                const keyword = this.value.toLowerCase().trim();
-                cards.forEach(card => {
-                    const title = card.querySelector('.anime-title').innerText.toLowerCase();
-                    card.style.display = title.includes(keyword) ? 'flex' : 'none';
-                });
-            });
-
-            // 3. UA 检测，自动切换电脑/手机版链接
             const isMobile = /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
             
             document.querySelectorAll('.pc-version').forEach(btn => {
