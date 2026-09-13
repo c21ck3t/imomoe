@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>我的动漫链接收藏</title>
     <style>
-        /* 严格保留您的基础配色 */
+        /* 基础配色 */
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
             background-color: #0d1117; 
@@ -22,8 +22,29 @@
         .subtitle { 
             text-align: center; 
             color: #8b949e; 
-            margin-bottom: 30px; 
+            margin-bottom: 20px; 
             font-size: 14px; 
+        }
+        
+        /* 搜索框样式 */
+        .search-container { 
+            text-align: center; 
+            margin-bottom: 30px; 
+        }
+        #searchInput { 
+            width: 80%; 
+            max-width: 500px; 
+            padding: 12px 20px; 
+            border-radius: 25px; 
+            border: 1px solid #30363d; 
+            background-color: #161b22; 
+            color: #c9d1d9; 
+            font-size: 16px; 
+            outline: none; 
+            transition: border-color 0.3s; 
+        }
+        #searchInput:focus { 
+            border-color: #58a6ff; 
         }
         
         .grid-container { 
@@ -101,18 +122,33 @@
     <h1>🎬 我的动漫链接收藏</h1>
     <p class="subtitle">点击卡片下方的标签即可跳转观看</p>
     
-    <div class="grid-container">
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="🔍 输入动漫名称搜索...">
+    </div>
+
+    <div class="grid-container" id="animeGrid">
         
+        <!-- ===== 新增：哭泣少女乐队 ===== -->
+        <div class="anime-card">
+            <!-- 注意：请确保 images 文件夹里有名为“哭泣少女乐队-封面.jpg”的图片 -->
+            <img src="images/哭泣少女乐队-封面.jpg" alt="哭泣少女乐队封面">
+            <h3 class="anime-title">【60帧】哭泣少女乐队</h3>
+            <div class="link-group">
+                <a href="https://www.acfun.cn/a/aa6147213" target="_blank" class="link-btn">📺 A站观看</a>
+                <!-- 给电脑版和手机版加上专属 class -->
+                <a href="https://www.mfuns.net/video/61328" target="_blank" class="link-btn pc-version">💻 MFuns电脑</a>
+                <a href="https://m.mfuns.net/video/61328" target="_blank" class="link-btn mobile-version">📱 MFuns手机</a>
+            </div>
+        </div>
+
         <!-- ===== 死亡笔记 ===== -->
         <div class="anime-card">
             <img src="images/死亡笔记-封面.jpg" alt="死亡笔记封面">
             <h3 class="anime-title">死亡笔记</h3>
             <div class="link-group">
-                <!-- 您填了链接的按钮才会显示 -->
                 <a href="https://www.acfun.cn/a/aa6147473" target="_blank" class="link-btn">📺 A站观看</a>
-                <!-- 其他平台没填链接，会自动隐藏 -->
-                <a href="" class="link-btn">💻 MFuns电脑</a>
-                <a href="" class="link-btn">📱 MFuns手机</a>
+                <a href="" class="link-btn pc-version">💻 MFuns电脑</a>
+                <a href="" class="link-btn mobile-version">📱 MFuns手机</a>
                 <a href="" class="link-btn">📺 B站观看</a>
             </div>
         </div>
@@ -122,6 +158,70 @@
             <img src="images/穹庐下的魔女-封面.jpg" alt="穹庐下的魔女封面">
             <h3 class="anime-title">穹庐下的魔女</h3>
             <div class="link-group">
+                <a href="https://www.acfun.cn/a/aa6147210" target="_blank" class="link-btn">📺 A站观看</a>
+                <a href="" class="link-btn mobile-version">📱 MFuns手机</a>
+            </div>
+        </div>
+
+        <!-- ===== 命运石之门 ===== -->
+        <div class="anime-card">
+            <img src="images/命运石之门-封面.jpg" alt="命运石之门封面">
+            <h3 class="anime-title">命运石之门</h3>
+            <div class="link-group">
+                <a href="https://www.acfun.cn/a/aa6147474" target="_blank" class="link-btn">📺 A站观看</a>
+                <a href="" class="link-btn pc-version">💻 MFuns电脑</a>
+            </div>
+        </div>
+        
+    </div>
+
+    <footer>
+        <p>Made with ❤️ on GitHub Pages</p>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // 1. 精确隐藏没填链接的按钮
+            document.querySelectorAll('.link-btn').forEach(btn => {
+                const href = btn.getAttribute('href')?.trim() || '';
+                const isInvalid = 
+                    href === '' || 
+                    href === '#' || 
+                    href.includes('这里') || 
+                    href.includes('放') ||
+                    href.includes('占位符');
+                
+                if (isInvalid) {
+                    btn.style.display = 'none';
+                }
+            });
+
+            // 2. 搜索功能
+            const searchInput = document.getElementById('searchInput');
+            const cards = document.querySelectorAll('.anime-card');
+
+            searchInput.addEventListener('input', function() {
+                const keyword = this.value.toLowerCase().trim();
+                cards.forEach(card => {
+                    const title = card.querySelector('.anime-title').innerText.toLowerCase();
+                    card.style.display = title.includes(keyword) ? 'flex' : 'none';
+                });
+            });
+
+            // 3. 新增：UA 检测，自动切换电脑/手机版链接
+            const isMobile = /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            
+            document.querySelectorAll('.pc-version').forEach(btn => {
+                if (isMobile) btn.style.display = 'none'; // 手机端隐藏电脑版链接
+            });
+            
+            document.querySelectorAll('.mobile-version').forEach(btn => {
+                if (!isMobile) btn.style.display = 'none'; // 电脑端隐藏手机版链接
+            });
+        });
+    </script>
+</body>
+</html>            <div class="link-group">
                 <a href="https://www.acfun.cn/a/aa6147210" target="_blank" class="link-btn">📺 A站观看</a>
                 <!-- 这两个没填链接，会自动隐藏 -->
                 <a href="" class="link-btn">📱 MFuns手机</a>
