@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>樱花动漫</title>
     <style>
-        /* 1. 定义深色模式默认变量 */
         :root {
             --bg-color: #0d1117;
             --card-bg: #161b22;
@@ -17,9 +16,10 @@
             --search-bg: #161b22;
             --search-border: #30363d;
             --subtitle-color: #8b949e;
+            --filter-active: #f78166;
+            --filter-active-bg: #f781661a;
         }
 
-        /* 2. 自动检测浅色模式并覆盖变量 */
         @media (prefers-color-scheme: light) {
             :root {
                 --bg-color: #f6f8fa;
@@ -32,6 +32,8 @@
                 --search-bg: #ffffff;
                 --search-border: #d0d7de;
                 --subtitle-color: #57606a;
+                --filter-active: #d1491a;
+                --filter-active-bg: #d1491a1a;
             }
         }
 
@@ -41,161 +43,158 @@
             color: var(--text-color); 
             margin: 0; 
             padding: 20px; 
-            transition: background-color 0.3s, color 0.3s; /* 切换模式时平滑过渡 */
+            transition: background-color 0.3s, color 0.3s;
         }
-        h1 { 
-            text-align: center; 
-            color: var(--title-color); 
-            margin-bottom: 10px; 
-            font-size: 28px; 
-        }
-        .subtitle { 
-            text-align: center; 
-            color: var(--subtitle-color); 
-            margin-bottom: 20px; 
-            font-size: 14px; 
-        }
+        h1 { text-align: center; color: var(--title-color); margin-bottom: 10px; font-size: 28px; }
+        .subtitle { text-align: center; color: var(--subtitle-color); margin-bottom: 20px; font-size: 14px; }
         
-        .search-container { 
-            text-align: center; 
-            margin-bottom: 30px; 
-        }
+        .search-container { text-align: center; margin-bottom: 20px; }
         #searchInput { 
-            width: 80%; 
-            max-width: 500px; 
-            padding: 12px 20px; 
-            border-radius: 25px; 
-            border: 1px solid var(--search-border); 
-            background-color: var(--search-bg); 
-            color: var(--text-color); 
-            font-size: 16px; 
-            outline: none; 
+            width: 80%; max-width: 500px; padding: 12px 20px; border-radius: 25px; 
+            border: 1px solid var(--search-border); background-color: var(--search-bg); 
+            color: var(--text-color); font-size: 16px; outline: none; 
             transition: border-color 0.3s; 
         }
-        #searchInput:focus { 
-            border-color: var(--title-color); 
+        #searchInput:focus { border-color: var(--title-color); }
+
+        /* 筛选索引容器 */
+        .filter-container {
+            max-width: 1200px;
+            margin: 0 auto 20px auto;
+        }
+        .filter-toggle-btn {
+            display: block;
+            margin: 0 auto;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .filter-toggle-btn:hover {
+            border-color: var(--filter-active);
+            color: var(--filter-active);
+        }
+        .filter-panel {
+            display: none; /* 默认折叠 */
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 15px;
+            animation: slideDown 0.3s ease;
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .filter-row {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .filter-row:last-child {
+            margin-bottom: 0;
+        }
+        .filter-label {
+            font-weight: bold;
+            color: var(--subtitle-color);
+            width: 50px;
+            flex-shrink: 0;
+            font-size: 14px;
+            line-height: 28px; /* 与按钮高度对齐 */
+        }
+        .filter-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            flex: 1;
+        }
+        .filter-option {
+            background: transparent;
+            color: var(--text-color);
+            border: 1px solid transparent;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .filter-option:hover {
+            color: var(--filter-active);
+        }
+        .filter-option.active {
+            color: var(--filter-active);
+            border-color: var(--filter-active);
+            background-color: var(--filter-active-bg);
         }
         
-        .grid-container { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); 
-            gap: 20px;
-            max-width: 1200px; 
-            margin: 0 auto; 
-        }
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; }
         
         .anime-card { 
-            background-color: var(--card-bg); 
-            border: 1px solid var(--border-color); 
-            border-radius: 12px; 
-            padding: 12px;
-            transition: transform 0.2s, box-shadow 0.2s, background-color 0.3s; 
-            display: flex; 
-            flex-direction: column; 
+            background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; 
+            padding: 12px; transition: all 0.3s ease; display: flex; flex-direction: column; 
+            cursor: pointer;
         }
-        .anime-card:hover { 
+        .anime-card:hover, .anime-card.expanded { 
             transform: translateY(-4px); 
             box-shadow: 0 6px 12px rgba(0,0,0,0.45); 
         }
         
-        .anime-card img { 
-            width: 100%; 
-            aspect-ratio: 3/4; 
-            object-fit: cover; 
-            border-radius: 8px; 
-            margin-bottom: 10px; 
-            background-color: var(--btn-bg); 
-        }
-        
-        .anime-title { 
-            color: var(--title-color); 
-            font-size: 15px; 
-            font-weight: bold; 
-            margin: 0 0 6px 0; 
-            text-align: center; 
-            line-height: 1.3;
-        }
+        .anime-card img { width: 100%; aspect-ratio: 3/4; object-fit: cover; border-radius: 8px; margin-bottom: 10px; background-color: var(--btn-bg); }
+        .anime-title { color: var(--title-color); font-size: 15px; font-weight: bold; margin: 0 0 6px 0; text-align: center; line-height: 1.3; }
 
-        .tag-group {
-            display: flex;
-            justify-content: center;
-            gap: 4px;
-            margin-bottom: 10px;
+        .tag-group { display: flex; justify-content: center; flex-wrap: wrap; gap: 4px; margin-bottom: 10px; min-height: 22px; }
+        .anime-tag { font-size: 10px; padding: 2px 8px; border-radius: 10px; font-weight: bold; letter-spacing: 0.5px; }
+        
+        .tag-60fps { background-color: #d2a8ff; color: #0d1117; }
+        .tag-4k { background-color: #f2cc60; color: #000000; }
+        
+        .anime-tag.hidden-tag {
+            display: none;
+            background-color: var(--btn-bg);
+            color: var(--btn-text);
+            border: 1px solid var(--border-color);
         }
-        .anime-tag {
-            font-size: 10px;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-weight: bold;
-            letter-spacing: 0.5px;
-        }
-        .tag-60fps { 
-            background-color: #d2a8ff; 
-            color: #0d1117; 
-        }
-        .tag-4k { 
-            background-color: #f2cc60; 
-            color: #000000; 
+        .anime-card:hover .anime-tag.hidden-tag, 
+        .anime-card.expanded .anime-tag.hidden-tag {
+            display: inline-block;
         }
         
-        /* 3. 核心修复：让链接组占据剩余空间并垂直居中 */
-        .link-group { 
-            display: flex; 
-            flex-wrap: wrap; 
-            gap: 6px;
-            flex-grow: 1; /* 占据卡片剩余的垂直空间 */
-            align-items: center; /* 垂直居中 */
-            justify-content: center; /* 水平居中 */
-            margin-top: 10px;
-        }
-        
+        .link-group { display: flex; flex-wrap: wrap; gap: 6px; flex-grow: 1; align-items: center; justify-content: center; margin-top: 10px; }
         .link-btn { 
-            background-color: var(--btn-bg); 
-            color: var(--btn-text); 
-            text-decoration: none; 
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 12px; 
-            border: 1px solid var(--border-color); 
-            transition: all 0.2s; 
-            white-space: nowrap;
+            background-color: var(--btn-bg); color: var(--btn-text); text-decoration: none; 
+            padding: 5px 10px; border-radius: 15px; font-size: 12px; border: 1px solid var(--border-color); 
+            transition: all 0.2s; white-space: nowrap; 
         }
-        .link-btn:hover { 
-            background-color: var(--title-color); 
-            color: #ffffff; 
-            border-color: var(--title-color); 
-        }
+        .link-btn:hover { background-color: var(--title-color); color: #ffffff; border-color: var(--title-color); }
+        
+        footer { text-align: center; margin-top: 50px; padding-top: 20px; border-top: 1px solid var(--border-color); color: var(--subtitle-color); font-size: 13px; line-height: 1.8; }
+        footer a { color: var(--title-color); text-decoration: none; font-weight: bold; }
+        footer a:hover { text-decoration: underline; }
+        .footer-disclaimer { font-size: 12px; margin-top: 8px; opacity: 0.8; }
         
         @media (max-width: 600px) {
             body { padding: 12px; }
             h1 { font-size: 22px; }
-            .grid-container { 
-                grid-template-columns: repeat(3, 1fr);
-                gap: 8px;
-            }
-            .anime-card { 
-                padding: 6px;
-                border-radius: 8px;
-            }
-            .anime-card img { 
-                border-radius: 6px; 
-                margin-bottom: 6px;
-            }
-            .anime-title { 
-                font-size: 13px;
-                margin-bottom: 4px;
-            }
-            .anime-tag {
-                font-size: 9px;
-                padding: 1px 6px;
-            }
-            .link-btn { 
-                padding: 3px 6px;
-                font-size: 10px; 
-                border-radius: 10px;
-            }
-            .search-container { margin-bottom: 20px; }
+            .grid-container { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+            .anime-card { padding: 6px; border-radius: 8px; }
+            .anime-card img { border-radius: 6px; margin-bottom: 6px; }
+            .anime-title { font-size: 13px; margin-bottom: 4px; }
+            .anime-tag { font-size: 9px; padding: 1px 6px; }
+            .link-btn { padding: 3px 6px; font-size: 10px; border-radius: 10px; }
+            .search-container { margin-bottom: 15px; }
             #searchInput { padding: 8px 15px; font-size: 14px; }
+            .filter-label { font-size: 12px; line-height: 24px; width: 40px; }
+            .filter-option { padding: 3px 8px; font-size: 12px; }
+            footer { font-size: 12px; margin-top: 30px; }
+            .footer-disclaimer { font-size: 11px; }
         }
     </style>
 </head>
@@ -204,97 +203,214 @@
     <p class="subtitle">点击卡片下方的标签即可跳转观看</p>
     
     <div class="search-container">
-        <input type="text" id="searchInput" placeholder="🔍 输入动漫名称搜索...">
+        <input type="text" id="searchInput" placeholder="🔍 输入动漫名称、标签或年份搜索...">
+    </div>
+
+    <!-- 筛选索引面板 -->
+    <div class="filter-container">
+        <button class="filter-toggle-btn" id="toggleFilter">🔽 展开筛选索引</button>
+        <div class="filter-panel" id="filterPanel">
+            <div class="filter-row">
+                <span class="filter-label">类型</span>
+                <div class="filter-options" id="typeOptions"></div>
+            </div>
+            <div class="filter-row">
+                <span class="filter-label">年份</span>
+                <div class="filter-options" id="yearOptions"></div>
+            </div>
+        </div>
     </div>
 
     <div class="grid-container" id="animeGrid">
-        
-        <div class="anime-card">
-            <img src="images/哭泣少女乐队-封面.jpg" alt="哭泣少女乐队封面">
-            <h3 class="anime-title">哭泣少女乐队</h3>
-            <div class="tag-group">
-                <span class="anime-tag tag-60fps">60帧</span>
-            </div>
-            <div class="link-group">
-                <a href="https://www.acfun.cn/a/aa6147213" target="_blank" class="link-btn">📺 A站观看</a>
-                <a href="https://www.mfuns.net/video/61328" target="_blank" class="link-btn pc-version">💻 MFuns电脑</a>
-                <a href="https://m.mfuns.net/video/61328" target="_blank" class="link-btn mobile-version">📱 MFuns手机</a>
-            </div>
-        </div>
-
-        <div class="anime-card">
-            <img src="images/穹庐下的魔女-封面.jpg" alt="穹庐下的魔女封面">
-            <h3 class="anime-title">穹庐下的魔女</h3>
-            <div class="tag-group">
-                <span class="anime-tag tag-4k">4K</span>
-            </div>
-            <div class="link-group">
-                <a href="https://www.bilibili.com/video/BV1xMMY6xEPo" target="_blank" class="link-btn">📺 B站观看</a>
-                <a href="https://www.acfun.cn/a/aa6147210" target="_blank" class="link-btn">📺 A站观看</a>
-                <a href="" class="link-btn mobile-version">📱 MFuns手机</a>
-            </div>
-        </div>
-
-        <div class="anime-card">
-            <img src="images/命运石之门-封面.jpg" alt="命运石之门封面">
-            <h3 class="anime-title">命运石之门</h3>
-            <div class="tag-group"></div>
-            <div class="link-group">
-                <a href="https://www.acfun.cn/a/aa6147474" target="_blank" class="link-btn">📺 A站观看</a>
-                <a href="" class="link-btn pc-version">💻 MFuns电脑</a>
-                <a href="" class="link-btn mobile-version">📱 MFuns手机</a>
-            </div>
-        </div>
-
-        <div class="anime-card">
-            <img src="images/死亡笔记-封面.jpg" alt="死亡笔记封面">
-            <h3 class="anime-title">死亡笔记</h3>
-            <div class="tag-group"></div>
-            <div class="link-group">
-                <a href="https://www.acfun.cn/a/aa6147473" target="_blank" class="link-btn">📺 A站观看</a>
-                <a href="" class="link-btn pc-version">💻 MFuns电脑</a>
-                <a href="" class="link-btn mobile-version">📱 MFuns手机</a>
-            </div>
-        </div>
-        
+        <!-- 页面内容由下方的 JS 自动生成 -->
     </div>
 
+    <footer>
+        <p><a href="https://space.bilibili.com/5306996" target="_blank">👉 我的 B站主页</a></p>
+        <p class="footer-disclaimer">本网站只提供视频检索服务，任何视频资源均采集于互联网，并不提供资源存储。</p>
+    </footer>
+
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            document.querySelectorAll('.link-btn').forEach(btn => {
-                const href = btn.getAttribute('href')?.trim() || '';
-                const isInvalid = 
-                    href === '' || 
-                    href === '#' || 
-                    href.includes('这里') || 
-                    href.includes('放') ||
-                    href.includes('占位符');
-                
-                if (isInvalid) {
-                    btn.style.display = 'none';
+        // ==========================================
+        // 🚀 动漫数据列表（以后只改这里！）
+        // ==========================================
+        const animeData = [
+            {
+                title: "哭泣少女乐队",
+                cover: "images/哭泣少女乐队-封面.jpg",
+                tags: ["60帧", "音乐", "搞笑", "3D"],
+                year: "2024",
+                month: "4月",
+                links: {
+                    a: "https://www.acfun.cn/a/aa6147213",
+                    mfunsPc: "https://www.mfuns.net/video/61328",
+                    mfunsMobile: "https://m.mfuns.net/video/61328"
                 }
+            },
+            {
+                title: "穹庐下的魔女",
+                cover: "images/穹庐下的魔女-封面.jpg",
+                tags: ["4K", "历史", "漫画改", "复仇", "战争", "奇幻"],
+                year: "2024",
+                month: "7月",
+                links: {
+                    b: "https://www.bilibili.com/video/BV1xMMY6xEPo",
+                    a: "https://www.acfun.cn/a/aa6147210"
+                }
+            },
+            {
+                title: "命运石之门",
+                cover: "images/命运石之门-封面.jpg",
+                tags: ["科幻", "悬疑", "经典", "游戏改"],
+                year: "2011",
+                month: "4月",
+                links: {
+                    a: "https://www.acfun.cn/a/aa6147474"
+                }
+            },
+            {
+                title: "死亡笔记",
+                cover: "images/死亡笔记-封面.jpg",
+                tags: ["悬疑", "智斗", "经典", "漫画改"],
+                year: "2006",
+                month: "10月",
+                links: {
+                    a: "https://www.acfun.cn/a/aa6147473"
+                }
+            }
+        ];
+
+        // ==========================================
+        // 页面渲染逻辑（无需修改）
+        // ==========================================
+        document.addEventListener("DOMContentLoaded", function() {
+            const grid = document.getElementById('animeGrid');
+            const isMobile = /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            let activeType = '全部';
+            let activeYear = '全部';
+
+            // 1. 提取并渲染筛选选项
+            function initFilters() {
+                const typeSet = new Set();
+                const yearSet = new Set();
+                
+                animeData.forEach(anime => {
+                    anime.tags.forEach(tag => {
+                        // 排除特殊标签，因为它们不是传统的“类型”
+                        if (tag !== "4K" && tag !== "60帧") typeSet.add(tag);
+                    });
+                    if (anime.year) yearSet.add(anime.year);
+                });
+
+                // 类型选项（添加“全部”）
+                const typeOptionsEl = document.getElementById('typeOptions');
+                typeOptionsEl.innerHTML = `<button class="filter-option active" data-type="全部">全部</button>`;
+                Array.from(typeSet).sort().forEach(type => {
+                    typeOptionsEl.innerHTML += `<button class="filter-option" data-type="${type}">${type}</button>`;
+                });
+
+                // 年份选项（添加“全部”，按年份倒序排列）
+                const yearOptionsEl = document.getElementById('yearOptions');
+                yearOptionsEl.innerHTML = `<button class="filter-option active" data-year="全部">全部</button>`;
+                Array.from(yearSet).sort((a, b) => b.localeCompare(a)).forEach(year => {
+                    yearOptionsEl.innerHTML += `<button class="filter-option" data-year="${year}">${year}</button>`;
+                });
+
+                // 绑定筛选按钮点击事件
+                document.querySelectorAll('#typeOptions .filter-option').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        document.querySelectorAll('#typeOptions .filter-option').forEach(b => b.classList.remove('active'));
+                        this.classList.add('active');
+                        activeType = this.dataset.type;
+                        filterCards();
+                    });
+                });
+                document.querySelectorAll('#yearOptions .filter-option').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        document.querySelectorAll('#yearOptions .filter-option').forEach(b => b.classList.remove('active'));
+                        this.classList.add('active');
+                        activeYear = this.dataset.year;
+                        filterCards();
+                    });
+                });
+            }
+
+            // 2. 生成卡片
+            animeData.forEach(anime => {
+                let cardHTML = `<div class="anime-card" data-title="${anime.title}" data-tags="${anime.tags.join(',')}" data-year="${anime.year}">`;
+                cardHTML += `<img src="${anime.cover}" alt="${anime.title}封面">`;
+                cardHTML += `<h3 class="anime-title">${anime.title}</h3>`;
+
+                cardHTML += `<div class="tag-group">`;
+                anime.tags.forEach(tag => {
+                    if (tag === "4K" || tag === "60帧") {
+                        const tagClass = tag === "4K" ? "tag-4k" : "tag-60fps";
+                        cardHTML += `<span class="anime-tag ${tagClass}">${tag}</span>`;
+                    } else {
+                        cardHTML += `<span class="anime-tag hidden-tag">${tag}</span>`;
+                    }
+                });
+                cardHTML += `</div>`;
+
+                cardHTML += `<div class="link-group">`;
+                if (anime.links.a) cardHTML += `<a href="${anime.links.a}" target="_blank" class="link-btn">📺 A站观看</a>`;
+                if (anime.links.b) cardHTML += `<a href="${anime.links.b}" target="_blank" class="link-btn">📺 B站观看</a>`;
+                if (anime.links.mfunsPc) cardHTML += `<a href="${anime.links.mfunsPc}" target="_blank" class="link-btn pc-version" style="display: ${isMobile ? 'none' : 'inline-block'}">💻 MFuns电脑</a>`;
+                if (anime.links.mfunsMobile) cardHTML += `<a href="${anime.links.mfunsMobile}" target="_blank" class="link-btn mobile-version" style="display: ${isMobile ? 'inline-block' : 'none'}">📱 MFuns手机</a>`;
+                cardHTML += `</div></div>`;
+
+                grid.innerHTML += cardHTML;
             });
 
-            const searchInput = document.getElementById('searchInput');
-            const cards = document.querySelectorAll('.anime-card');
-
-            searchInput.addEventListener('input', function() {
-                const keyword = this.value.toLowerCase().trim();
-                cards.forEach(card => {
-                    const title = card.querySelector('.anime-title').innerText.toLowerCase();
-                    card.style.display = title.includes(keyword) ? 'flex' : 'none';
+            // 3. 绑定卡片点击展开标签
+            document.querySelectorAll('.anime-card').forEach(card => {
+                card.addEventListener('click', function(e) {
+                    if (e.target.closest('.link-btn')) return;
+                    this.classList.toggle('expanded');
                 });
             });
 
-            const isMobile = /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-            
-            document.querySelectorAll('.pc-version').forEach(btn => {
-                if (isMobile) btn.style.display = 'none';
+            // 4. 核心筛选逻辑
+            function filterCards() {
+                const keyword = document.getElementById('searchInput').value.toLowerCase().trim();
+                document.querySelectorAll('.anime-card').forEach(card => {
+                    const title = card.dataset.title.toLowerCase();
+                    const tags = card.dataset.tags.toLowerCase();
+                    const year = card.dataset.year;
+
+                    // 检查搜索词
+                    const matchSearch = !keyword || title.includes(keyword) || tags.includes(keyword);
+                    // 检查类型筛选
+                    const matchType = activeType === '全部' || tags.includes(activeType.toLowerCase());
+                    // 检查年份筛选
+                    const matchYear = activeYear === '全部' || year === activeYear;
+
+                    if (matchSearch && matchType && matchYear) {
+                        card.style.display = 'flex';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            }
+
+            // 绑定搜索框输入事件
+            document.getElementById('searchInput').addEventListener('input', filterCards);
+
+            // 5. 筛选面板折叠展开
+            const toggleBtn = document.getElementById('toggleFilter');
+            const filterPanel = document.getElementById('filterPanel');
+            toggleBtn.addEventListener('click', function() {
+                if (filterPanel.style.display === 'none' || filterPanel.style.display === '') {
+                    filterPanel.style.display = 'block';
+                    toggleBtn.textContent = '🔼 收起筛选索引';
+                } else {
+                    filterPanel.style.display = 'none';
+                    toggleBtn.textContent = '🔽 展开筛选索引';
+                }
             });
-            
-            document.querySelectorAll('.mobile-version').forEach(btn => {
-                if (!isMobile) btn.style.display = 'none';
-            });
+
+            // 初始化筛选
+            initFilters();
         });
     </script>
 </body>
