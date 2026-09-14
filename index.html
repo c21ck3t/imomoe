@@ -111,9 +111,18 @@
         .anime-card { 
             background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; 
             padding: 12px; transition: all 0.3s ease; display: flex; flex-direction: column; 
-            cursor: pointer; padding-bottom: 12px;
+            cursor: pointer; /* 恢复干净的内边距，不再加多余的底部留白 */
         }
         
+        /* 仅对支持悬停的设备（电脑端）启用鼠标悬停特效，避免手机点击链接时误触发 */
+        @media (hover: hover) and (pointer: fine) {
+            .anime-card:hover { 
+                transform: translateY(-4px); 
+                box-shadow: 0 6px 12px rgba(0,0,0,0.45); 
+            }
+        }
+        
+        /* 点击卡片触发的悬浮效果（手机端和电脑端通用） */
         .anime-card.expanded { 
             transform: translateY(-4px); 
             box-shadow: 0 6px 12px rgba(0,0,0,0.45); 
@@ -132,7 +141,7 @@
         .badge-60fps { background-color: #d2a8ff; color: #0d1117; }
         .badge-4k { background-color: #f2cc60; color: #000000; }
         
-        /* 核心修复：禁角标。深色模式白字，浅色模式黑字 */
+        /* 禁角标：深色模式白字，浅色模式黑字 */
         .badge-banned { background-color: #da3633; color: #ffffff; }
         @media (prefers-color-scheme: light) {
             .badge-banned { color: #000000; }
@@ -164,7 +173,7 @@
             h1 { font-size: 18px; gap: 8px; }
             h1 img { height: 32px; width: 32px; border-radius: 50%; }
             .grid-container { grid-template-columns: repeat(3, 1fr); gap: 8px; }
-            .anime-card { padding: 6px; border-radius: 8px; padding-bottom: 8px; }
+            .anime-card { padding: 6px; border-radius: 8px; }
             .card-cover { border-radius: 6px; margin-bottom: 6px; }
             .anime-title { font-size: 13px; margin-bottom: 4px; }
             .anime-tag { font-size: 9px; padding: 1px 6px; }
@@ -181,7 +190,6 @@
 <body>
     <h1>
         <a href="https://space.bilibili.com/5306996" target="_blank">
-            <!-- 注意：这里已经改成了 .jpg，请确保 images 文件夹里有这张 JPG 头像 -->
             <img src="images/櫻花动漫-头像.jpg" alt="櫻花动漫头像">
         </a>
         櫻花动漫 b站UID5306996
@@ -453,12 +461,22 @@
                 grid.innerHTML += cardHTML;
             });
 
+            // 核心恢复：点击卡片中间的空白处触发悬浮/取消悬浮，点击链接按钮直接跳转
             document.querySelectorAll('.anime-card').forEach(card => {
                 card.addEventListener('click', function(e) {
+                    // 如果点击的是链接按钮，直接跳转，不切换卡片状态
                     if (e.target.closest('.link-btn')) return;
+                    
+                    // 检查当前卡片是否已经展开
                     const isExpanded = this.classList.contains('expanded');
+                    
+                    // 先移除所有卡片的展开状态（手风琴效果）
                     document.querySelectorAll('.anime-card').forEach(c => c.classList.remove('expanded'));
-                    if (!isExpanded) this.classList.add('expanded');
+                    
+                    // 如果点击前是收起状态，则展开当前卡片；如果是展开状态，则保持收起（点击后收起）
+                    if (!isExpanded) {
+                        this.classList.add('expanded');
+                    }
                 });
             });
 
