@@ -2,522 +2,828 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>櫻花动漫 b站UID5306996</title>
+    <meta name="viewport" content="width=1000">
+    <title>櫻花动漫 - 番剧索引</title>
     <style>
-        :root {
-            --bg-color: #0d1117;
-            --card-bg: #161b22;
-            --text-color: #c9d1d9;
-            --title-color: #58a6ff;
-            --border-color: #30363d;
-            --btn-bg: #21262d;
-            --btn-text: #c9d1d9;
-            --search-bg: #161b22;
-            --search-border: #30363d;
-            --subtitle-color: #8b949e;
-            --filter-active: #f78166;
-            --filter-active-bg: #f781661a;
+        /* 基础重置与旧版B站网页风格设定 */
+        body {
+            margin: 0; padding: 0; background-color: #f6f6f6; color: #333;
+            font-family: Arial, "Microsoft YaHei", "微软雅黑", SimSun, sans-serif;
+            font-size: 12px; line-height: 1.5;
+            overflow-x: auto;
+        }
+        a { color: #333; text-decoration: none; }
+        a:hover { color: #f00; text-decoration: underline; }
+        ul, li { margin: 0; padding: 0; list-style: none; }
+        input, button { font-family: inherit; outline: none; }
+
+        #wrapper {
+            width: 1000px;
+            margin: 0 auto;
+            background-color: #fff;
+            border-left: 1px solid #e2e2e2;
+            border-right: 1px solid #e2e2e2;
+            padding: 0 10px 20px 10px;
+            min-height: 800px;
+            box-shadow: 0 0 5px rgba(0,0,0,0.05);
+            box-sizing: border-box;
         }
 
-        @media (prefers-color-scheme: light) {
-            :root {
-                --bg-color: #f6f8fa;
-                --card-bg: #ffffff;
-                --text-color: #24292f;
-                --title-color: #0969da;
-                --border-color: #d0d7de;
-                --btn-bg: #f6f8fa;
-                --btn-text: #24292f;
-                --search-bg: #ffffff;
-                --search-border: #d0d7de;
-                --subtitle-color: #57606a;
-                --filter-active: #d1491a;
-                --filter-active-bg: #d1491a1a;
-            }
+        /* 顶部 Header */
+        .header {
+            padding: 10px 0; display: flex; justify-content: space-between;
+            align-items: flex-end; border-bottom: 1px solid #e2e2e2;
+        }
+        .logo-area { display: flex; align-items: center; }
+        .logo {
+            font-size: 32px; font-weight: bold; color: #ff6699;
+            font-family: "Comic Sans MS", cursive, sans-serif;
+            letter-spacing: -1px; text-shadow: 2px 2px 0 #ffccdd;
         }
 
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background-color: var(--bg-color); 
-            color: var(--text-color); 
-            margin: 0; 
-            padding: 20px; 
-            transition: background-color 0.3s, color 0.3s;
+        /* 搜索框 */
+        .search-area { display: flex; flex-direction: row; align-items: center; padding-bottom: 5px; flex-wrap: nowrap; }
+        .search-area input {
+            border: 1px solid #cccccc; padding: 4px 8px; width: 220px; height: 28px;
+            box-sizing: border-box; background: #fff; box-shadow: inset 1px 1px 2px rgba(0,0,0,0.05);
         }
-        
-        h1 { 
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 12px;
-            color: var(--title-color); 
-            margin-bottom: 10px; 
-            font-size: 26px; 
-            text-align: center;
+        .search-area button {
+            background: #4a90e2; color: #fff; border: 1px solid #3672bc;
+            padding: 0 15px; margin-left: -1px; cursor: pointer; height: 28px; box-sizing: border-box; white-space: nowrap;
         }
-        
-        h1 img {
-            height: 45px;
-            width: 45px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: none;
-            background-color: transparent;
-            transition: transform 0.2s;
-            cursor: pointer;
-            flex-shrink: 0;
-            forced-color-adjust: none;
-            mix-blend-mode: normal;
-        }
+        .search-area button:hover { background: #3672bc; }
 
-        .subtitle { text-align: center; color: var(--subtitle-color); margin-bottom: 20px; font-size: 14px; }
-        
-        .search-container { text-align: center; margin-bottom: 20px; }
-        #searchInput { 
-            width: 80%; max-width: 500px; padding: 12px 20px; border-radius: 25px; 
-            border: 1px solid var(--search-border); background-color: var(--search-bg); 
-            color: var(--text-color); font-size: 16px; outline: none; 
-            transition: border-color 0.3s; 
+        /* 导航栏 */
+        .nav {
+            height: 34px; background: linear-gradient(to bottom, #fff, #f1f1f1);
+            border-bottom: 1px solid #ddd; border-top: 1px solid #ddd;
+            margin-bottom: 15px; display: flex; align-items: center; padding: 0 10px;
         }
-        #searchInput:focus { border-color: var(--title-color); }
+        .nav a {
+            color: #333; font-weight: bold; padding: 0 25px;
+            line-height: 34px; display: inline-block; cursor: pointer;
+        }
+        .nav a:hover { background: #fff; color: #f00; text-decoration: none; }
+        .nav a.active { color: #00a1d6; }
 
-        .filter-container { max-width: 1200px; margin: 0 auto 20px auto; }
-        .filter-toggle-btn {
-            display: block; margin: 0 auto; background-color: var(--card-bg);
-            color: var(--text-color); border: 1px solid var(--border-color);
-            padding: 8px 20px; border-radius: 20px; font-size: 14px; cursor: pointer; transition: all 0.2s;
+        /* 主体双栏 */
+        .main-container { display: flex; gap: 20px; width: 100%; }
+        .content-left { width: 720px; flex-shrink: 0; }
+        .sidebar-right { width: 240px; flex-shrink: 0; }
+
+        .section-title {
+            border-bottom: 2px solid #00a1d6; padding-bottom: 5px; margin-bottom: 10px;
+            font-size: 14px; font-weight: bold; color: #333;
+            display: flex; justify-content: space-between; align-items: flex-end;
         }
-        .filter-toggle-btn:hover { border-color: var(--filter-active); color: var(--filter-active); }
-        .filter-panel {
-            display: none; background-color: var(--card-bg); border: 1px solid var(--border-color);
-            border-radius: 12px; padding: 15px; margin-top: 15px; animation: slideDown 0.3s ease;
-        }
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-        .filter-row { display: flex; align-items: flex-start; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
-        .filter-row:last-child { margin-bottom: 0; }
-        .filter-label { font-weight: bold; color: var(--subtitle-color); width: 50px; flex-shrink: 0; font-size: 14px; line-height: 28px; }
-        .filter-options { display: flex; flex-wrap: wrap; gap: 8px; flex: 1; }
+        .section-title span { font-size: 12px; color: #999; font-weight: normal; }
+
+        /* 筛选折叠与筛选区 */
+        .filter-toggle { text-align: right; font-size: 12px; color: #333; cursor: pointer; margin-bottom: 5px; user-select: none; }
+        .filter-toggle:hover { text-decoration: underline; }
+        .filter-area { background: #f9f9f9; border: 1px solid #e2e2e2; padding: 8px 10px; margin-bottom: 15px; }
+        .filter-area.hidden { display: none; }
+        .filter-row { display: flex; align-items: flex-start; padding: 3px 0; border-bottom: 1px dashed #eee; }
+        .filter-row:last-child { border-bottom: none; }
+        .filter-label { color: #999; width: 45px; flex-shrink: 0; line-height: 22px; }
+        .filter-options { flex: 1; display: flex; flex-wrap: wrap; }
         .filter-option {
-            background: transparent; color: var(--text-color); border: 1px solid transparent;
-            padding: 4px 12px; border-radius: 15px; font-size: 13px; cursor: pointer; transition: all 0.2s; white-space: nowrap;
+            color: #333; padding: 0 8px; line-height: 22px;
+            cursor: pointer; border-radius: 2px; margin-right: 5px;
         }
-        .filter-option:hover { color: var(--filter-active); }
-        .filter-option.active { color: var(--filter-active); border-color: var(--filter-active); background-color: var(--filter-active-bg); }
+        .filter-option:hover { color: #f00; text-decoration: underline; }
+        .filter-option.active { background: #00a1d6; color: #fff; font-weight: bold; }
+        .filter-option.active:hover { color: #fff; text-decoration: none; }
 
-        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; }
-        
-        .anime-card { 
-            background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; 
-            padding: 12px; transition: all 0.3s ease; display: flex; flex-direction: column; 
-            cursor: pointer; /* 恢复干净的内边距，不再加多余的底部留白 */
+        /* 视频卡片网格 - 强制每行4个 */
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            width: 100%;
         }
-        
-        /* 仅对支持悬停的设备（电脑端）启用鼠标悬停特效，避免手机点击链接时误触发 */
-        @media (hover: hover) and (pointer: fine) {
-            .anime-card:hover { 
-                transform: translateY(-4px); 
-                box-shadow: 0 6px 12px rgba(0,0,0,0.45); 
-            }
+        .video-card { width: 100%; cursor: pointer; }
+        .video-card:hover .title { color: #f00; text-decoration: underline; }
+        .cover-box {
+            width: 100%; height: 96px; border: 1px solid #ccc; padding: 2px;
+            background: #fff; position: relative; margin-bottom: 4px;
+            box-shadow: 1px 1px 3px rgba(0,0,0,0.1); box-sizing: border-box;
         }
-        
-        /* 点击卡片触发的悬浮效果（手机端和电脑端通用） */
-        .anime-card.expanded { 
-            transform: translateY(-4px); 
-            box-shadow: 0 6px 12px rgba(0,0,0,0.45); 
+        .cover-box img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .cover-box .duration {
+            position: absolute; right: 2px; bottom: 2px;
+            background: rgba(0,0,0,0.6); color: #fff; font-size: 10px; padding: 0 3px; line-height: 14px;
         }
-        
-        .card-cover { position: relative; width: 100%; aspect-ratio: 3/4; border-radius: 8px; overflow: hidden; margin-bottom: 10px; background-color: var(--btn-bg); }
-        .card-cover img { width: 100%; height: 100%; object-fit: cover; }
-        
-        .corner-badge {
-            position: absolute; top: 6px; right: 6px; display: flex; gap: 4px; z-index: 2;
+        .cover-box .badge {
+            position: absolute; left: 2px; top: 2px;
+            background: #ff6699; color: #fff; font-size: 10px; padding: 0 3px; line-height: 14px; border-radius: 2px;
         }
-        .corner-badge span {
-            font-size: 10px; padding: 2px 6px; border-radius: 6px; font-weight: bold; letter-spacing: 0.5px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        .cover-box .badge.blue { background: #00a1d6; }
+
+        .card-info { font-size: 12px; }
+        .card-info .title {
+            display: block; color: #333; line-height: 16px;
+            height: 32px; overflow: hidden; margin-bottom: 2px; word-break: break-all;
         }
-        .badge-60fps { background-color: #d2a8ff; color: #0d1117; }
-        .badge-4k { background-color: #f2cc60; color: #000000; }
-        
-        /* 禁角标：深色模式白字，浅色模式黑字 */
-        .badge-banned { background-color: #da3633; color: #ffffff; }
-        @media (prefers-color-scheme: light) {
-            .badge-banned { color: #000000; }
+        .stats { color: #999; font-size: 11px; display: flex; justify-content: space-between; margin-top: 2px; }
+
+        /* 更多按钮 */
+        .load-more-btn {
+            display: block; width: 200px; margin: 20px auto; padding: 8px 0;
+            text-align: center; background: #f9f9f9; border: 1px solid #ddd;
+            border-radius: 2px; color: #333; cursor: pointer; font-size: 13px;
+        }
+        .load-more-btn:hover { background: #00a1d6; color: #fff; border-color: #00a1d6; }
+
+        /* 右侧边栏 */
+        .sidebar-box { border: 1px solid #e2e2e2; margin-bottom: 15px; background: #fff; }
+        .sidebar-header { background: #f6f6f6; border-bottom: 1px solid #e2e2e2; padding: 6px 10px; font-weight: bold; color: #333; }
+        .sidebar-content { padding: 10px; }
+        .online-info { font-size: 11px; color: #666; line-height: 20px; }
+        .online-info span { color: #00a1d6; font-weight: bold; }
+
+        .rank-list li { display: flex; align-items: center; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px dashed #eee; }
+        .rank-list li:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+        .rank-num {
+            width: 16px; height: 16px; line-height: 16px; text-align: center;
+            background: #ccc; color: #fff; font-size: 10px; margin-right: 8px; border-radius: 2px; flex-shrink: 0;
+        }
+        .rank-num.n1 { background: #ff6699; } .rank-num.n2 { background: #ff9933; } .rank-num.n3 { background: #ffcc33; }
+        .rank-list img { width: 50px; height: 32px; object-fit: cover; margin-right: 8px; border: 1px solid #ddd; flex-shrink: 0; }
+        .rank-title { flex: 1; font-size: 12px; line-height: 16px; height: 32px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; color: #333; }
+
+        /* 页脚 */
+        .footer { margin-top: 30px; padding-top: 15px; border-top: 1px solid #e2e2e2; font-size: 12px; color: #999; text-align: center; line-height: 22px; }
+        .footer a { color: #666; margin: 0 5px; }
+        .footer .copyright {
+            color: #ff6699;
+            font-weight: bold;
+            margin-top: 5px;
         }
 
-        .anime-title { color: var(--title-color); font-size: 15px; font-weight: bold; margin: 0 0 6px 0; text-align: center; line-height: 1.3; }
+        /* 空状态 */
+        .empty-state { display: none; text-align: center; padding: 50px 0; color: #999; width: 100%; }
+        .empty-state p { margin-bottom: 15px; }
+        .empty-state button { padding: 4px 15px; background: #00a1d6; color: #fff; border: none; cursor: pointer; border-radius: 2px; }
 
-        .tag-group { display: flex; justify-content: center; flex-wrap: wrap; gap: 4px; margin-bottom: 10px; min-height: 0; }
-        .anime-tag { font-size: 10px; padding: 2px 8px; border-radius: 10px; font-weight: bold; background-color: var(--btn-bg); color: var(--btn-text); border: 1px solid var(--border-color); }
-        
-        .anime-tag.hidden-tag { display: none; }
-        .anime-card:hover .anime-tag.hidden-tag, .anime-card.expanded .anime-tag.hidden-tag { display: inline-block; }
-        
-        .link-group { display: flex; flex-wrap: wrap; gap: 6px; flex-grow: 1; align-items: center; justify-content: center; margin-top: 10px; }
-        .link-btn { 
-            background-color: var(--btn-bg); color: var(--btn-text); text-decoration: none; 
-            padding: 5px 10px; border-radius: 15px; font-size: 12px; border: 1px solid var(--border-color); 
-            transition: all 0.2s; white-space: nowrap; 
+        /* 弹窗样式 */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; }
+        .modal-box { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; width: 320px; border: 1px solid #ccc; box-shadow: 2px 2px 10px rgba(0,0,0,0.3); border-radius: 3px; overflow: hidden; }
+        .modal-header { background: #f6f6f6; border-bottom: 1px solid #e2e2e2; padding: 10px 15px; font-weight: bold; font-size: 14px; color: #333; display: flex; justify-content: space-between; align-items: center; }
+        .modal-close { cursor: pointer; color: #999; font-size: 16px; line-height: 1; }
+        .modal-close:hover { color: #f00; }
+        .modal-body { padding: 15px; }
+        .modal-btn { display: block; width: 100%; padding: 8px 0; margin-bottom: 10px; text-align: center; background: #f9f9f9; border: 1px solid #ddd; border-radius: 2px; color: #333; cursor: pointer; font-size: 13px; box-sizing: border-box; }
+        .modal-btn:last-child { margin-bottom: 0; }
+        .modal-btn:hover { background: #00a1d6; color: #fff; border-color: #00a1d6; text-decoration: none; }
+
+        #backToTop { position: fixed; right: 20px; bottom: 20px; width: 40px; height: 40px; background: #e2e2e2; color: #666; border: 1px solid #ccc; text-align: center; line-height: 40px; font-size: 20px; cursor: pointer; display: none; text-decoration: none; }
+        #backToTop:hover { background: #ddd; color: #333; text-decoration: none; }
+
+        /* ==================== 新番表三列布局 ==================== */
+        .bangumi-panel {
+            display: flex;
+            flex-wrap: nowrap;
+            background: #fff;
+            border: 1px solid #e2e2e2;
+            margin-top: 25px;
+            width: 720px;
+            box-sizing: border-box;
+            overflow: hidden;
         }
-        .link-btn:hover { background-color: var(--title-color); color: #ffffff; border-color: var(--title-color); }
-        
-        footer { text-align: center; margin-top: 50px; padding-top: 20px; border-top: 1px solid var(--border-color); color: var(--subtitle-color); font-size: 13px; line-height: 1.8; }
-        footer a { color: var(--title-color); text-decoration: none; font-weight: bold; }
-        footer a:hover { text-decoration: underline; }
-        .footer-disclaimer { font-size: 12px; margin-top: 8px; opacity: 0.8; }
-        
-        @media (max-width: 600px) {
-            body { padding: 12px; }
-            h1 { font-size: 18px; gap: 8px; }
-            h1 img { height: 32px; width: 32px; border-radius: 50%; }
-            .grid-container { grid-template-columns: repeat(3, 1fr); gap: 8px; }
-            .anime-card { padding: 6px; border-radius: 8px; }
-            .card-cover { border-radius: 6px; margin-bottom: 6px; }
-            .anime-title { font-size: 13px; margin-bottom: 4px; }
-            .anime-tag { font-size: 9px; padding: 1px 6px; }
-            .link-btn { padding: 3px 6px; font-size: 10px; border-radius: 10px; }
-            .search-container { margin-bottom: 15px; }
-            #searchInput { padding: 8px 15px; font-size: 14px; }
-            .filter-label { font-size: 12px; line-height: 24px; width: 40px; }
-            .filter-option { padding: 3px 8px; font-size: 12px; }
-            footer { font-size: 12px; margin-top: 30px; }
-            .footer-disclaimer { font-size: 11px; }
+
+        .bangumi-left {
+            width: 360px;
+            flex-shrink: 0;
+            border-right: 1px solid #e2e2e2;
+            padding: 8px;
+            box-sizing: border-box;
         }
+        .bangumi-left-title { font-size: 14px; font-weight: bold; color: #333; padding-bottom: 5px; border-bottom: 2px solid #00a1d6; margin-bottom: 10px; }
+        .bangumi-left-title span { font-size: 12px; color: #999; font-weight: normal; }
+        .bangumi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .bangumi-item { cursor: pointer; }
+        .bangumi-item:hover .title { color: #f00; text-decoration: underline; }
+        .bangumi-cover { width: 100%; height: 76px; position: relative; margin-bottom: 4px; border: 1px solid #ccc; }
+        .bangumi-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .bangumi-cover .time { position: absolute; right: 3px; bottom: 3px; background: rgba(0,0,0,0.6); color: #fff; font-size: 10px; padding: 0 3px; line-height: 14px; }
+        .bangumi-item .title { font-size: 12px; color: #333; line-height: 16px; height: 32px; overflow: hidden; margin-bottom: 2px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+        .bangumi-item .meta { font-size: 11px; color: #999; display: flex; justify-content: space-between; }
+
+        .bangumi-center {
+            width: 180px;
+            flex-shrink: 0;
+            border-right: 1px solid #e2e2e2;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        .tab-header { display: flex; justify-content: center; margin-bottom: 8px; }
+        .tab-item { padding: 4px 8px; cursor: pointer; font-size: 12px; font-weight: bold; color: #333; position: relative; white-space: nowrap; }
+        .tab-item.active { color: #333; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .rank-item { display: flex; align-items: center; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px dashed #eee; cursor: pointer; }
+        .rank-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .rank-item img { width: 48px; height: 30px; object-fit: cover; margin-right: 6px; border: 1px solid #ddd; flex-shrink: 0; }
+        .rank-info { flex: 1; font-size: 12px; min-width: 0; }
+        .rank-info .title { color: #333; line-height: 16px; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .rank-info .meta { color: #999; font-size: 11px; display: flex; gap: 8px; }
+        .more-link { text-align: right; font-size: 12px; margin-top: 6px; padding-top: 4px; }
+        .more-link a { color: #333; }
+        .more-link a:hover { color: #f00; text-decoration: underline; }
+
+        .bangumi-right {
+            width: 180px;
+            flex-shrink: 0;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        .schedule-week { display: flex; margin-bottom: 8px; gap: 2px; }
+        .schedule-week .day-tab {
+            flex: 1;
+            text-align: center;
+            padding: 3px 0;
+            font-size: 11px;
+            cursor: pointer;
+            color: #333;
+            border-radius: 2px;
+            white-space: nowrap;
+        }
+        .schedule-week .day-tab.active { background: #ff6699; color: #fff; font-weight: bold; }
+        .schedule-list { padding-left: 2px; }
+        .schedule-list li { font-size: 12px; line-height: 20px; color: #333; display: flex; justify-content: space-between; cursor: pointer; border-bottom: 1px dotted #eee; padding: 2px 0; }
+        .schedule-list li:last-child { border-bottom: none; }
+        .schedule-list li:hover { color: #f00; }
+        .schedule-list li .ep { color: #999; font-size: 11px; }
+
+        /* 主页推荐样式 */
+        .home-title { font-size: 16px; font-weight: bold; margin-bottom: 15px; color: #333; border-bottom: 2px solid #00a1d6; padding-bottom: 5px; }
+
+        /* 评分排行榜页面样式 */
+        .rank-page-item { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px dashed #eee; cursor: pointer; }
+        .rank-page-item img { width: 100px; height: 65px; object-fit: cover; margin: 0 10px; border: 1px solid #ddd; }
     </style>
 </head>
 <body>
-    <h1>
-        <a href="https://space.bilibili.com/5306996" target="_blank">
-            <img src="images/櫻花动漫-头像.jpg" alt="櫻花动漫头像">
-        </a>
-        櫻花动漫 b站UID5306996
-    </h1>
-    <p class="subtitle">点击卡片下方的标签即可跳转观看</p>
-    
-    <div class="search-container">
-        <input type="text" id="searchInput" placeholder="🔍 输入动漫名称、标签或年份搜索...">
+
+<div id="wrapper">
+    <!-- 顶部 -->
+    <div class="header">
+        <div class="logo-area"><div class="logo">櫻花动漫</div></div>
+        <div class="search-area">
+            <input type="text" id="searchInput" placeholder="搜索番剧、别名或年份...">
+            <button type="button" id="searchBtn">搜索</button>
+        </div>
     </div>
 
-    <div class="filter-container">
-        <button class="filter-toggle-btn" id="toggleFilter">🔽 展开筛选索引</button>
-        <div class="filter-panel" id="filterPanel">
-            <div class="filter-row">
-                <span class="filter-label">类型</span>
-                <div class="filter-options" id="typeOptions"></div>
+    <!-- 导航 -->
+    <div class="nav">
+        <a href="javascript:;" id="navHome">主页</a>
+        <a href="javascript:;" id="navAnime" class="active">动画</a>
+        <a href="javascript:;" id="navSpecial">专题</a>
+    </div>
+
+    <!-- 主体双栏 -->
+    <div class="main-container">
+        <!-- 左侧内容区 -->
+        <div class="content-left">
+
+            <!-- 0. 主页视图 -->
+            <div id="viewHome" style="display: none;">
+                <div class="home-title">主页推荐</div>
+                <div class="video-grid" id="homeGrid"></div>
             </div>
-            <div class="filter-row">
-                <span class="filter-label">画质</span>
-                <div class="filter-options" id="qualityOptions"></div>
+
+            <!-- 1. 动画页视图 -->
+            <div id="viewAnime">
+                <div class="filter-toggle" id="filterToggleBtn"><span>收起筛选索引 ▲</span></div>
+
+                <div class="filter-area" id="filterPanel">
+                    <div class="filter-row"><span class="filter-label">类型：</span><div class="filter-options" id="typeOptions"></div></div>
+                    <div class="filter-row"><span class="filter-label">画质：</span><div class="filter-options" id="qualityOptions"></div></div>
+                    <div class="filter-row"><span class="filter-label">年份：</span><div class="filter-options" id="yearOptions"></div></div>
+                    <div class="filter-row"><span class="filter-label">月份：</span><div class="filter-options" id="monthOptions"></div></div>
+                </div>
+
+                <div class="section-title">
+                    <div>番剧</div>
+                    <span id="resultCount">共 0 部</span>
+                </div>
+
+                <div class="video-grid" id="animeGrid"></div>
+                <div id="moreBtnArea" style="text-align: center;"></div>
+
+                <div class="empty-state" id="emptyState">
+                    <p>没有找到符合条件的番剧 (´；ω；`)</p>
+                    <button type="button" id="resetAll">重置全部筛选</button>
+                </div>
+
+                <!-- 合并面板 -->
+                <div class="bangumi-panel" id="animeBangumiPanel">
+                    <div class="bangumi-left">
+                        <div class="bangumi-left-title">新番 <span>Bangumi</span></div>
+                        <div class="bangumi-grid" id="animeBangumiGrid"></div>
+                    </div>
+
+                    <div class="bangumi-center">
+                        <div class="tab-header">
+                            <div class="tab-item active" data-tab="animeTopRate">最高评分</div>
+                            <div class="tab-item" data-tab="animeNewPost">最新投稿</div>
+                        </div>
+                        <div class="tab-content active" id="tabAnimeTopRate">
+                            <div id="animeTopRateList"></div>
+                            <div class="more-link"><a href="javascript:;" class="goRankPage">更多 &gt;</a></div>
+                        </div>
+                        <div class="tab-content" id="tabAnimeNewPost">
+                            <div id="animeNewPostList"></div>
+                        </div>
+                    </div>
+
+                    <div class="bangumi-right">
+                        <div class="schedule-week" id="scheduleWeek"></div>
+                        <div class="schedule-list" id="animeScheduleList"></div>
+                    </div>
+                </div>
             </div>
-            <div class="filter-row">
-                <span class="filter-label">年份</span>
-                <div class="filter-options" id="yearOptions"></div>
+
+            <!-- 2. 专题页视图 -->
+            <div id="viewSpecial" style="display: none;">
+                <div class="section-title"><div>专题</div><span>内容建设中</span></div>
+                <div class="sidebar-box" style="margin-top: 20px; border: 1px solid #e2e2e2;">
+                    <div class="sidebar-header">关于我们</div>
+                    <div class="sidebar-content" style="font-size: 13px; line-height: 2; padding: 20px;">
+                        <p>櫻花动漫 b站 UID: 5306996</p>
+                        <p style="color: #999; margin-top: 15px;">专题内容尚未构想，敬请期待...</p>
+                    </div>
+                </div>
             </div>
-            <div class="filter-row">
-                <span class="filter-label">月份</span>
-                <div class="filter-options" id="monthOptions"></div>
+
+            <!-- 3. 评分排行榜视图 -->
+            <div id="viewRank" style="display: none;">
+                <div class="section-title"><div>评分排行榜</div><span>按用户评分排序</span></div>
+                <div id="rankPageList"></div>
+            </div>
+
+        </div>
+
+        <!-- 右侧边栏 -->
+        <div class="sidebar-right">
+            <div class="sidebar-box">
+                <div class="sidebar-header">当前在线</div>
+                <div class="sidebar-content online-info">当前在线: <span>1</span> 正在观看: <span>1</span></div>
+            </div>
+            <div class="sidebar-box">
+                <div class="sidebar-header">🔥 最热门 (Top 15)</div>
+                <div class="sidebar-content"><ul class="rank-list" id="rankList"></ul></div>
             </div>
         </div>
     </div>
 
-    <div class="grid-container" id="animeGrid"></div>
+    <!-- 页脚 -->
+    <div class="footer">
+        <div class="links">
+            <a href="#">关于我们</a> | <a href="#">获取帮助</a> | <a href="#">相关合作</a> | <a href="#">友情链接</a>
+        </div>
+        <div class="copyright">
+            声明:本站不提供任何视听上传服务，所有内容均来自正规视频站点所提供的公开引用资源
+        </div>
+    </div>
+</div>
 
-    <footer>
-        <p><a href="https://space.bilibili.com/5306996" target="_blank">👉 我的 B站主页 (UID: 5306996)</a></p>
-        <p class="footer-disclaimer">本网站只提供视频检索服务，任何视频资源均采集于互联网，并不提供资源存储。</p>
-    </footer>
+<!-- 观看方式选择弹窗 -->
+<div class="modal-overlay" id="watchModal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <span>选择观看地址</span>
+            <span class="modal-close" onclick="document.getElementById('watchModal').style.display='none'">✕</span>
+        </div>
+        <div class="modal-body" id="modalBody"></div>
+    </div>
+</div>
 
-    <script>
-        // =====================================================================
-        // 🚀 动漫数据列表
-        // =====================================================================
-        const animeData = [
-            {
-                title: "哭泣少女乐队",
-                cover: "images/哭泣少女乐队-封面.jpg",
-                tags: ["60帧", "音乐", "搞笑", "百合"],
-                year: "2024",
-                month: "4月",
-                links: { a: "https://www.acfun.cn/a/aa6147213", mfunsPc: "https://www.mfuns.net/video/61328", mfunsMobile: "https://m.mfuns.net/video/61328" }
-            },
-            {
-                title: "穹庐下的魔女",
-                cover: "images/穹庐下的魔女-封面.jpg",
-                tags: ["4K", "历史", "漫画改", "复仇", "战争", "奇幻"],
-                year: "2026",
-                month: "7月",
-                links: { b: "https://www.bilibili.com/video/BV1xMMY6xEPo", a: "https://www.acfun.cn/a/aa6147210" }
-            },
-            {
-                title: "命运石之门",
-                cover: "images/命运石之门-封面.jpg",
-                tags: ["科幻", "悬疑", "经典", "游戏改"],
-                year: "2011",
-                month: "4月",
-                links: { a: "https://www.acfun.cn/a/aa6147474" }
-            },
-            {
-                title: "死亡笔记",
-                cover: "images/死亡笔记-封面.jpg",
-                tags: ["禁", "悬疑", "智斗", "经典", "漫画改"],
-                year: "2006",
-                month: "10月",
-                links: { a: "https://www.acfun.cn/a/aa6147473" }
-            },
-            {
-                title: "尼古喵喵",
-                cover: "images/尼古喵喵-封面.jpg",
-                tags: ["搞笑", "日常"],
-                year: "2026",
-                month: "7月",
-                links: { mfunsPc: "https://www.mfuns.net/video/61154", mfunsMobile: "https://m.mfuns.net/video/61154" }
-            },
-            {
-                title: "轻音少女",
-                cover: "images/轻音少女-封面.jpg",
-                tags: ["音乐", "日常", "萌系", "校园"],
-                year: "2009",
-                month: "4月",
-                links: { mfunsPc: "https://www.mfuns.net/video/61104", mfunsMobile: "https://m.mfuns.net/video/61104" }
-            },
-            {
-                title: "86不存在的战区",
-                cover: "images/86不存在的战区-封面.jpg",
-                tags: ["禁", "科幻", "战争", "机战"],
-                year: "2021",
-                month: "10月",
-                links: { a: "https://www.acfun.cn/a/aa6147218" }
-            },
-            {
-                title: "我的狐仙女友",
-                cover: "images/我的狐仙女友-封面.jpg",
-                tags: ["禁", "卖肉", "恋爱", "奇幻", "后宫"],
-                year: "2008",
-                month: "4月",
-                links: { mfunsPc: "https://www.mfuns.net/video/61830", mfunsMobile: "https://m.mfuns.net/video/61830" }
+<a href="javascript:;" id="backToTop">↑</a>
+
+<!-- ============ 数据文件（只需要改这个） ============ -->
+<script src="data.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    // ===== 0. 读取数据 =====
+    const animeData = window.ANIME_DATA || [];
+    const CONFIG = window.SITE_CONFIG || {};
+
+    const HOME_TITLES       = CONFIG.homeTitles || [];
+    const EXCLUDE_FROM_INDEX= CONFIG.excludeFromIndex || [];
+    const TOP_RATE_ORDER    = CONFIG.topRateOrder || [];
+    const NEW_POST_ORDER    = CONFIG.newPostOrder || [];
+    const SCHEDULE_DATA     = CONFIG.schedule || [];
+    const TOP_N             = CONFIG.topN || 15;
+
+    // 动画页数据（排除主页专属的）
+    const animeGridData = animeData.filter(item => !EXCLUDE_FROM_INDEX.includes(item.title));
+
+    // 占位图（封面加载失败时用）
+    const PLACEHOLDER = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(
+        '<svg xmlns="http://www.w3.org/2000/svg" width="160" height="96">' +
+        '<rect width="100%" height="100%" fill="#f0f0f0"/>' +
+        '<text x="50%" y="50%" font-size="13" fill="#bbb" text-anchor="middle" dominant-baseline="middle">暂无封面</text></svg>'
+    );
+
+    // 全局兜底：任何图片加载失败自动替换
+    document.addEventListener('error', function (e) {
+        const t = e.target;
+        if (t && t.tagName === 'IMG' && !t.dataset.fallback) {
+            t.dataset.fallback = '1';
+            t.src = PLACEHOLDER;
+        }
+    }, true);
+
+    const watchModal = document.getElementById('watchModal');
+    const modalBody = document.getElementById('modalBody');
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+    const formatNumber = (num) => num > 10000 ? (num / 10000).toFixed(1) + '万' : num;
+    const getAnimeByTitle = (title) => animeData.find(item => item.title === title);
+
+    // ===== 1. 导航切换 =====
+    const navHome = document.getElementById('navHome');
+    const navAnime = document.getElementById('navAnime');
+    const navSpecial = document.getElementById('navSpecial');
+    const viewHome = document.getElementById('viewHome');
+    const viewAnime = document.getElementById('viewAnime');
+    const viewSpecial = document.getElementById('viewSpecial');
+    const viewRank = document.getElementById('viewRank');
+
+    const NAV_MAP = {
+        navHome: viewHome,
+        navAnime: viewAnime,
+        navSpecial: viewSpecial,
+        navRank: viewRank
+    };
+
+    function switchNav(activeId) {
+        [navHome, navAnime, navSpecial].forEach(n => n && n.classList.remove('active'));
+        const activeNav = document.getElementById(activeId);
+        if (activeNav && activeNav.classList.contains('nav-link')) activeNav.classList.add('active');
+        // 排行榜是二级页面，没有对应导航项时保持“动画”高亮
+        if (activeId === 'navRank' && navAnime) navAnime.classList.add('active');
+
+        [viewHome, viewAnime, viewSpecial, viewRank].forEach(v => v.style.display = 'none');
+        const target = NAV_MAP[activeId];
+        if (target) target.style.display = 'block';
+    }
+    if (navHome) navHome.onclick = () => switchNav('navHome');
+    if (navAnime) navAnime.onclick = () => switchNav('navAnime');
+    if (navSpecial) navSpecial.onclick = () => switchNav('navSpecial');
+    document.querySelectorAll('.goRankPage').forEach(btn => btn.onclick = () => switchNav('navRank'));
+
+    // ===== 2. 观看链接与弹窗 =====
+    function getAvailableLinks(anime) {
+        const links = [];
+        const L = anime.links || {};
+        if (L.a) links.push({ name: 'A站观看', url: L.a });
+        if (L.b) links.push({ name: 'B站观看', url: L.b });
+        if (L.mfunsPc || L.mfunsMobile) {
+            const mfunsUrl = isMobile ? (L.mfunsMobile || L.mfunsPc) : (L.mfunsPc || L.mfunsMobile);
+            if (mfunsUrl) links.push({ name: `MFuns观看 (${isMobile ? '手机' : '电脑'})`, url: mfunsUrl });
+        }
+        return links;
+    }
+
+    function openAnimeDetail(title) {
+        const anime = getAnimeByTitle(title);
+        if (!anime) return;
+        const links = getAvailableLinks(anime);
+        if (links.length === 0) {
+            alert('暂无观看地址');
+        } else if (links.length === 1) {
+            window.open(links[0].url, '_blank');
+        } else {
+            modalBody.innerHTML = links.map(l =>
+                `<a href="${l.url}" target="_blank" class="modal-btn">${l.name}</a>`
+            ).join('');
+            watchModal.style.display = 'block';
+        }
+    }
+    watchModal.onclick = function (e) { if (e.target === this) this.style.display = 'none'; };
+
+    // ===== 3. 筛选逻辑 =====
+    const SPECIAL_TAGS = ['4K', '60帧', '禁', 'HDR'];
+    const QUALITY_TAGS = ['4K', '60帧', 'HDR'];
+    const filters = { type: [], quality: [], year: [], month: [] };
+    let cards = [];
+    let displayLimit = 16;
+    const totalAnime = animeGridData.length;
+
+    function buildFilterGroup(containerId, key, values) {
+        const box = document.getElementById(containerId);
+        box.innerHTML = `<span class="filter-option active" data-value="全部">全部</span>` +
+            values.map(v => `<span class="filter-option" data-value="${v}">${v}</span>`).join('');
+
+        box.onclick = function (e) {
+            const btn = e.target.closest('.filter-option');
+            if (!btn) return;
+            const val = btn.dataset.value;
+            const allBtn = box.querySelector('[data-value="全部"]');
+
+            if (val === '全部') {
+                filters[key] = [];
+                box.querySelectorAll('.filter-option').forEach(b => b.classList.remove('active'));
+                allBtn.classList.add('active');
+            } else {
+                allBtn.classList.remove('active');
+                const idx = filters[key].indexOf(val);
+                if (idx > -1) { filters[key].splice(idx, 1); btn.classList.remove('active'); }
+                else { filters[key].push(val); btn.classList.add('active'); }
+                if (filters[key].length === 0) allBtn.classList.add('active');
             }
-        ];
+            applyFilters();
+        };
+    }
 
-        // ==========================================
-        // 页面渲染逻辑
-        // ==========================================
-        document.addEventListener("DOMContentLoaded", function() {
-            const grid = document.getElementById('animeGrid');
-            const isMobile = /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-            
-            let activeTypes = []; 
-            let activeQualities = [];
-            let activeYears = []; 
-            let activeMonths = []; 
-
-            function initFilters() {
-                const typeSet = new Set();
-                const qualitySet = new Set();
-                const yearSet = new Set();
-                const monthSet = new Set();
-                
-                animeData.forEach(anime => {
-                    anime.tags.forEach(tag => {
-                        if (tag === "4K" || tag === "60帧") qualitySet.add(tag); 
-                        else typeSet.add(tag); 
-                    });
-                    if (anime.year) yearSet.add(anime.year);
-                    if (anime.month) monthSet.add(anime.month);
-                });
-
-                const typeOptionsEl = document.getElementById('typeOptions');
-                typeOptionsEl.innerHTML = `<button class="filter-option active" data-type="全部">全部</button>`;
-                
-                const typeArray = Array.from(typeSet);
-                const bannedIndex = typeArray.indexOf("禁");
-                if (bannedIndex > -1) typeArray.splice(bannedIndex, 1); 
-                typeArray.sort(); 
-                if (bannedIndex > -1) typeArray.unshift("禁"); 
-
-                typeArray.forEach(type => {
-                    typeOptionsEl.innerHTML += `<button class="filter-option" data-type="${type}">${type}</button>`;
-                });
-
-                const qualityOptionsEl = document.getElementById('qualityOptions');
-                qualityOptionsEl.innerHTML = `<button class="filter-option active" data-quality="全部">全部</button>`;
-                Array.from(qualitySet).sort().forEach(quality => { qualityOptionsEl.innerHTML += `<button class="filter-option" data-quality="${quality}">${quality}</button>`; });
-
-                const yearOptionsEl = document.getElementById('yearOptions');
-                yearOptionsEl.innerHTML = `<button class="filter-option active" data-year="全部">全部</button>`;
-                Array.from(yearSet).sort((a, b) => parseInt(b) - parseInt(a)).forEach(year => { yearOptionsEl.innerHTML += `<button class="filter-option" data-year="${year}">${year}</button>`; });
-
-                const monthOptionsEl = document.getElementById('monthOptions');
-                monthOptionsEl.innerHTML = `<button class="filter-option active" data-month="全部">全部</button>`;
-                Array.from(monthSet).sort((a, b) => parseInt(a) - parseInt(b)).forEach(month => { monthOptionsEl.innerHTML += `<button class="filter-option" data-month="${month}">${month}</button>`; });
-
-                document.querySelectorAll('#typeOptions .filter-option').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const val = this.dataset.type;
-                        const allBtn = document.querySelector('#typeOptions [data-type="全部"]');
-                        if (val === '全部') {
-                            activeTypes = [];
-                            document.querySelectorAll('#typeOptions .filter-option').forEach(b => b.classList.remove('active'));
-                            this.classList.add('active');
-                        } else {
-                            allBtn.classList.remove('active');
-                            const index = activeTypes.indexOf(val);
-                            if (index > -1) { activeTypes.splice(index, 1); this.classList.remove('active'); } 
-                            else { activeTypes.push(val); this.classList.add('active'); }
-                            if (activeTypes.length === 0) allBtn.classList.add('active');
-                        }
-                        filterCards();
-                    });
-                });
-
-                document.querySelectorAll('#qualityOptions .filter-option').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const val = this.dataset.quality;
-                        const allBtn = document.querySelector('#qualityOptions [data-quality="全部"]');
-                        if (val === '全部') {
-                            activeQualities = [];
-                            document.querySelectorAll('#qualityOptions .filter-option').forEach(b => b.classList.remove('active'));
-                            this.classList.add('active');
-                        } else {
-                            allBtn.classList.remove('active');
-                            const index = activeQualities.indexOf(val);
-                            if (index > -1) { activeQualities.splice(index, 1); this.classList.remove('active'); } 
-                            else { activeQualities.push(val); this.classList.add('active'); }
-                            if (activeQualities.length === 0) allBtn.classList.add('active');
-                        }
-                        filterCards();
-                    });
-                });
-
-                document.querySelectorAll('#yearOptions .filter-option').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const val = this.dataset.year;
-                        const allBtn = document.querySelector('#yearOptions [data-year="全部"]');
-                        if (val === '全部') {
-                            activeYears = [];
-                            document.querySelectorAll('#yearOptions .filter-option').forEach(b => b.classList.remove('active'));
-                            this.classList.add('active');
-                        } else {
-                            allBtn.classList.remove('active');
-                            const index = activeYears.indexOf(val);
-                            if (index > -1) { activeYears.splice(index, 1); this.classList.remove('active'); } 
-                            else { activeYears.push(val); this.classList.add('active'); }
-                            if (activeYears.length === 0) allBtn.classList.add('active');
-                        }
-                        filterCards();
-                    });
-                });
-
-                document.querySelectorAll('#monthOptions .filter-option').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const val = this.dataset.month;
-                        const allBtn = document.querySelector('#monthOptions [data-month="全部"]');
-                        if (val === '全部') {
-                            activeMonths = [];
-                            document.querySelectorAll('#monthOptions .filter-option').forEach(b => b.classList.remove('active'));
-                            this.classList.add('active');
-                        } else {
-                            allBtn.classList.remove('active');
-                            const index = activeMonths.indexOf(val);
-                            if (index > -1) { activeMonths.splice(index, 1); this.classList.remove('active'); } 
-                            else { activeMonths.push(val); this.classList.add('active'); }
-                            if (activeMonths.length === 0) allBtn.classList.add('active');
-                        }
-                        filterCards();
-                    });
-                });
-            }
-
-            animeData.forEach(anime => {
-                const badgeTags = anime.tags.filter(tag => tag === "4K" || tag === "60帧" || tag === "禁");
-                let badgesHTML = '';
-                badgeTags.forEach(tag => {
-                    let badgeClass = "badge-banned";
-                    if (tag === "4K") badgeClass = "badge-4k";
-                    else if (tag === "60帧") badgeClass = "badge-60fps";
-                    badgesHTML += `<span class="${badgeClass}">${tag}</span>`;
-                });
-
-                const hiddenTags = anime.tags.filter(tag => tag !== "4K" && tag !== "60帧" && tag !== "禁");
-                let hiddenTagsHTML = '';
-                hiddenTags.forEach(tag => { hiddenTagsHTML += `<span class="anime-tag hidden-tag">${tag}</span>`; });
-
-                let cardHTML = `<div class="anime-card" data-title="${anime.title}" data-tags="${anime.tags.join(',')}" data-year="${anime.year}" data-month="${anime.month}">`;
-                cardHTML += `<div class="card-cover">`;
-                cardHTML += `<img src="${anime.cover}" alt="${anime.title}封面">`;
-                if (badgesHTML) cardHTML += `<div class="corner-badge">${badgesHTML}</div>`;
-                cardHTML += `</div>`;
-                cardHTML += `<h3 class="anime-title">${anime.title}</h3>`;
-                cardHTML += `<div class="tag-group">${hiddenTagsHTML}</div>`;
-
-                cardHTML += `<div class="link-group">`;
-                if (anime.links.a) cardHTML += `<a href="${anime.links.a}" target="_blank" class="link-btn">📺 A站观看</a>`;
-                if (anime.links.b) cardHTML += `<a href="${anime.links.b}" target="_blank" class="link-btn">📺 B站观看</a>`;
-                if (anime.links.mfunsPc) cardHTML += `<a href="${anime.links.mfunsPc}" target="_blank" class="link-btn pc-version" style="display: ${isMobile ? 'none' : 'inline-block'}">💻 MFuns电脑</a>`;
-                if (anime.links.mfunsMobile) cardHTML += `<a href="${anime.links.mfunsMobile}" target="_blank" class="link-btn mobile-version" style="display: ${isMobile ? 'inline-block' : 'none'}">📱 MFuns手机</a>`;
-                cardHTML += `</div></div>`;
-
-                grid.innerHTML += cardHTML;
+    function initFilters() {
+        const typeSet = new Set(), qualitySet = new Set(), yearSet = new Set(), monthSet = new Set();
+        animeGridData.forEach(a => {
+            (a.tags || []).forEach(t => {
+                if (QUALITY_TAGS.includes(t)) qualitySet.add(t);
+                else typeSet.add(t);
             });
-
-            // 核心恢复：点击卡片中间的空白处触发悬浮/取消悬浮，点击链接按钮直接跳转
-            document.querySelectorAll('.anime-card').forEach(card => {
-                card.addEventListener('click', function(e) {
-                    // 如果点击的是链接按钮，直接跳转，不切换卡片状态
-                    if (e.target.closest('.link-btn')) return;
-                    
-                    // 检查当前卡片是否已经展开
-                    const isExpanded = this.classList.contains('expanded');
-                    
-                    // 先移除所有卡片的展开状态（手风琴效果）
-                    document.querySelectorAll('.anime-card').forEach(c => c.classList.remove('expanded'));
-                    
-                    // 如果点击前是收起状态，则展开当前卡片；如果是展开状态，则保持收起（点击后收起）
-                    if (!isExpanded) {
-                        this.classList.add('expanded');
-                    }
-                });
-            });
-
-            function filterCards() {
-                const keyword = document.getElementById('searchInput').value.toLowerCase().trim();
-                document.querySelectorAll('.anime-card').forEach((card, index) => {
-                    const anime = animeData[index];
-                    const title = anime.title.toLowerCase();
-                    const tags = anime.tags.join(" ").toLowerCase();
-                    const searchString = `${title} ${tags} ${anime.year} ${anime.month}`;
-                    
-                    const matchSearch = !keyword || searchString.includes(keyword);
-                    
-                    let matchType = true;
-                    if (activeTypes.length > 0) matchType = activeTypes.every(t => anime.tags.includes(t));
-                    
-                    let matchQuality = true;
-                    if (activeQualities.length > 0) matchQuality = activeQualities.some(q => anime.tags.includes(q));
-                    
-                    let matchYear = true;
-                    if (activeYears.length > 0) matchYear = activeYears.includes(anime.year);
-
-                    let matchMonth = true;
-                    if (activeMonths.length > 0) matchMonth = activeMonths.includes(anime.month);
-                    
-                    card.style.display = (matchSearch && matchType && matchQuality && matchYear && matchMonth) ? 'flex' : 'none';
-                });
-            }
-
-            document.getElementById('searchInput').addEventListener('input', filterCards);
-
-            const toggleBtn = document.getElementById('toggleFilter');
-            const filterPanel = document.getElementById('filterPanel');
-            toggleBtn.addEventListener('click', function() {
-                const isHidden = filterPanel.style.display === 'none' || filterPanel.style.display === '';
-                filterPanel.style.display = isHidden ? 'block' : 'none';
-                toggleBtn.textContent = isHidden ? '🔼 收起筛选索引' : '🔽 展开筛选索引';
-            });
-
-            initFilters();
+            if (a.year) yearSet.add(a.year);
+            if (a.month) monthSet.add(a.month);
         });
-    </script>
+
+        const types = Array.from(typeSet);
+        const banIdx = types.indexOf('禁');
+        if (banIdx > -1) types.splice(banIdx, 1);
+        types.sort();
+        if (banIdx > -1) types.unshift('禁');
+
+        buildFilterGroup('typeOptions', 'type', types);
+        buildFilterGroup('qualityOptions', 'quality', Array.from(qualitySet).sort());
+        buildFilterGroup('yearOptions', 'year', Array.from(yearSet).sort((a, b) => parseInt(b) - parseInt(a)));
+        buildFilterGroup('monthOptions', 'month', Array.from(monthSet).sort((a, b) => parseInt(a) - parseInt(b)));
+    }
+
+    // ===== 4. 渲染番剧网格 =====
+    function renderAnimeGrid() {
+        const displayData = animeGridData.slice(0, displayLimit);
+
+        document.getElementById('animeGrid').innerHTML = displayData.map((anime, i) => {
+            const badgeHTML = (anime.tags || [])
+                .filter(t => SPECIAL_TAGS.includes(t))
+                .map(t => {
+                    const cls = (t === '4K' || t === 'HDR') ? '' : (t === '60帧' ? 'blue' : '');
+                    return `<span class="badge ${cls}">${t}</span>`;
+                }).join('');
+
+            return `<div class="video-card" data-index="${i}">
+                <div class="cover-box">
+                    <img src="${anime.cover}" alt="${anime.title}" loading="lazy">${badgeHTML}
+                    <span class="duration">${anime.duration || '24:00'}</span>
+                </div>
+                <div class="card-info">
+                    <a href="javascript:;" class="title">${anime.title}</a>
+                    <div class="stats">
+                        <span>▶ ${formatNumber(anime.views || 0)}</span>
+                        <span>💬 ${formatNumber(anime.comments || 0)}</span>
+                    </div>
+                </div>
+            </div>`;
+        }).join('');
+
+        cards = Array.from(document.querySelectorAll('#animeGrid .video-card'));
+        cards.forEach(card => {
+            card.onclick = function () {
+                openAnimeDetail(displayData[Number(this.dataset.index)].title);
+            };
+        });
+
+        const moreBtnArea = document.getElementById('moreBtnArea');
+        if (totalAnime > displayLimit) {
+            moreBtnArea.innerHTML = `<div class="load-more-btn" id="loadMoreBtn">点击查看更多 (剩余 ${totalAnime - displayLimit} 部)</div>`;
+            document.getElementById('loadMoreBtn').onclick = function () {
+                displayLimit = totalAnime;
+                renderAnimeGrid();
+            };
+        } else {
+            moreBtnArea.innerHTML = '';
+        }
+        applyFilters();
+    }
+
+    function applyFilters() {
+        const keywords = document.getElementById('searchInput').value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+        let visible = 0;
+
+        cards.forEach(card => {
+            const anime = animeGridData[Number(card.dataset.index)];
+            if (!anime) return;
+
+            const haystack = [anime.title, ...(anime.alias || []), ...(anime.tags || []), anime.year, anime.month]
+                .join(' ').toLowerCase();
+
+            const match =
+                keywords.every(k => haystack.includes(k)) &&
+                (!filters.type.length    || filters.type.some(t => (anime.tags || []).includes(t))) &&
+                (!filters.quality.length || filters.quality.some(q => (anime.tags || []).includes(q))) &&
+                (!filters.year.length    || filters.year.includes(anime.year)) &&
+                (!filters.month.length   || filters.month.includes(anime.month));
+
+            card.style.display = match ? 'block' : 'none';
+            if (match) visible++;
+        });
+
+        document.getElementById('resultCount').textContent = `共 ${visible} 部`;
+        document.getElementById('emptyState').style.display = visible === 0 ? 'block' : 'none';
+    }
+
+    renderAnimeGrid();
+
+    // ===== 5. 右侧最热门 =====
+    document.getElementById('rankList').innerHTML = animeData
+        .slice()
+        .sort((a, b) => (b.views || 0) - (a.views || 0))
+        .slice(0, TOP_N)
+        .map((anime, index) => `
+            <li data-title="${anime.title}">
+                <span class="rank-num ${index < 3 ? 'n' + (index + 1) : ''}">${index + 1}</span>
+                <img src="${anime.cover}">
+                <a href="javascript:;" class="rank-title">${anime.title}</a>
+            </li>
+        `).join('');
+
+    document.querySelectorAll('#rankList li').forEach(li => {
+        li.onclick = () => openAnimeDetail(li.dataset.title);
+    });
+
+    // ===== 6. 新番面板 =====
+    function renderBangumiPanel() {
+        // 左侧随机 6 部
+        const randomAnimes = [...animeGridData].sort(() => 0.5 - Math.random()).slice(0, 6);
+        document.getElementById('animeBangumiGrid').innerHTML = randomAnimes.map(anime => `
+            <div class="bangumi-item" data-title="${anime.title}">
+                <div class="bangumi-cover">
+                    <img src="${anime.cover}" alt="${anime.title}">
+                    <span class="time">${anime.duration || '24:00'}</span>
+                </div>
+                <div class="title">[${anime.month || ''}] ${anime.title}</div>
+                <div class="meta">
+                    <span>▶ ${formatNumber(anime.views || 0)}</span>
+                    <span>💬 ${formatNumber(anime.comments || 0)}</span>
+                </div>
+            </div>
+        `).join('');
+
+        document.querySelectorAll('#animeBangumiGrid .bangumi-item').forEach(item => {
+            item.onclick = () => openAnimeDetail(item.dataset.title);
+        });
+
+        const buildRankItem = (title) => {
+            const anime = getAnimeByTitle(title);
+            if (!anime) return '';
+            return `<div class="rank-item" data-title="${title}">
+                <img src="${anime.cover}">
+                <div class="rank-info">
+                    <div class="title">${title}</div>
+                    <div class="meta">
+                        <span>▶ ${formatNumber(anime.views || 0)}</span>
+                        <span>💬 ${formatNumber(anime.comments || 0)}</span>
+                    </div>
+                </div>
+            </div>`;
+        };
+
+        document.getElementById('animeTopRateList').innerHTML = TOP_RATE_ORDER.map(buildRankItem).join('');
+        document.getElementById('animeNewPostList').innerHTML = NEW_POST_ORDER.map(buildRankItem).join('');
+
+        document.querySelectorAll('.bangumi-center .rank-item').forEach(item => {
+            item.onclick = () => openAnimeDetail(item.dataset.title);
+        });
+
+        // Tab 切换
+        document.querySelectorAll('.bangumi-center .tab-item').forEach(tab => {
+            tab.onclick = function () {
+                document.querySelectorAll('.bangumi-center .tab-item').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                document.querySelectorAll('.bangumi-center .tab-content').forEach(c => c.classList.remove('active'));
+                const id = 'tab' + this.dataset.tab.charAt(0).toUpperCase() + this.dataset.tab.slice(1);
+                const el = document.getElementById(id);
+                if (el) el.classList.add('active');
+            };
+        });
+
+        // 放送表
+        const todayIdx = new Date().getDay();            // 0=周日
+        const todayDayIndex = todayIdx === 0 ? 6 : todayIdx - 1; // 周一=0 ... 周日=6
+
+        document.getElementById('scheduleWeek').innerHTML = SCHEDULE_DATA
+            .map((d, i) => `<span class="day-tab ${i === todayDayIndex ? 'active' : ''}" data-index="${i}">${d.day}</span>`)
+            .join('');
+
+        const renderScheduleList = (idx) => {
+            const data = SCHEDULE_DATA[idx];
+            if (!data) return;
+            document.getElementById('animeScheduleList').innerHTML = data.items.map(item => `
+                <li data-title="${item.name}"><span>${item.name}</span><span class="ep">${item.ep}</span></li>
+            `).join('');
+
+            document.querySelectorAll('#animeScheduleList li').forEach(li => {
+                li.onclick = () => openAnimeDetail(li.dataset.title);
+            });
+        };
+
+        renderScheduleList(todayDayIndex);
+
+        document.querySelectorAll('.day-tab').forEach(tab => {
+            tab.onclick = function () {
+                document.querySelectorAll('.day-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                renderScheduleList(Number(this.dataset.index));
+            };
+        });
+    }
+    renderBangumiPanel();
+
+    // ===== 7. 评分排行榜页面 =====
+    const sortedRank = [...animeData].sort((a, b) => (b.score || 0) - (a.score || 0));
+    document.getElementById('rankPageList').innerHTML = sortedRank.map((anime, index) => `
+        <div class="rank-page-item" data-title="${anime.title}">
+            <div style="width:30px; text-align:center; font-weight:bold; font-size:16px; color:${index < 3 ? '#ff6699' : '#999'};">${index + 1}</div>
+            <img src="${anime.cover}">
+            <div style="flex:1;">
+                <div style="font-size:14px; font-weight:bold; color:#333; margin-bottom:5px;">${anime.title}</div>
+                <div style="color:#ff6600; font-size:13px; margin-bottom:3px;">评分：${anime.score ? anime.score.toFixed(1) : '暂无评分'}</div>
+                <div style="color:#999; font-size:12px;">${(anime.tags || []).join(' / ')} · ${anime.year}年${anime.month}</div>
+            </div>
+        </div>
+    `).join('');
+
+    document.querySelectorAll('.rank-page-item').forEach(item => {
+        item.onclick = () => openAnimeDetail(item.dataset.title);
+    });
+
+    // ===== 8. 主页推荐 =====
+    function renderHomePage() {
+        const container = document.getElementById('homeGrid');
+        container.innerHTML = HOME_TITLES.map(title => {
+            const anime = getAnimeByTitle(title);
+            if (!anime) return '';
+            return `<div class="video-card" data-title="${anime.title}">
+                <div class="cover-box">
+                    <img src="${anime.cover}">
+                    <span class="duration">${anime.duration || '24:00'}</span>
+                </div>
+                <div class="card-info">
+                    <a href="javascript:;" class="title">${anime.title}</a>
+                    <div class="stats">
+                        <span>▶ ${formatNumber(anime.views || 0)}</span>
+                        <span>💬 ${formatNumber(anime.comments || 0)}</span>
+                    </div>
+                </div>
+            </div>`;
+        }).join('');
+
+        container.querySelectorAll('.video-card').forEach(card => {
+            card.onclick = () => openAnimeDetail(card.dataset.title);
+        });
+    }
+    renderHomePage();
+
+    // ===== 9. 搜索 / 重置 / 折叠 =====
+    initFilters();
+
+    const searchInput = document.getElementById('searchInput');
+    searchInput.oninput = () => {
+        clearTimeout(window.searchTimer);
+        window.searchTimer = setTimeout(applyFilters, 200);
+    };
+    document.getElementById('searchBtn').onclick = () => {
+        switchNav('navAnime');
+        applyFilters();
+    };
+
+    document.getElementById('resetAll').onclick = () => {
+        searchInput.value = '';
+        filters.type = []; filters.quality = []; filters.year = []; filters.month = [];
+        initFilters();
+        applyFilters();
+    };
+
+    document.getElementById('filterToggleBtn').onclick = function () {
+        const panel = document.getElementById('filterPanel');
+        const hidden = panel.classList.toggle('hidden');
+        this.innerHTML = hidden ? '<span>展开筛选索引 ▼</span>' : '<span>收起筛选索引 ▲</span>';
+    };
+
+    // ===== 10. 回到顶部 =====
+    window.onscroll = () => {
+        document.getElementById('backToTop').style.display = window.scrollY > 300 ? 'block' : 'none';
+    };
+    document.getElementById('backToTop').onclick = (e) => {
+        e.preventDefault();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+});
+</script>
 </body>
 </html>
