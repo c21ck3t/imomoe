@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>播放 - 櫻花动漫</title>
+<title>AcFun 播放 - 櫻花动漫</title>
 <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js"></script>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
@@ -16,12 +16,25 @@ body { font:14px/1.6 "Microsoft YaHei",Arial,sans-serif; background:#0d0d0d; col
 video { width:100%; height:100%; display:block; background:#000; }
 .info { margin-top:14px; padding:14px 18px; background:#1a1a1a; border-radius:6px; }
 .info h2 { font-size:15px; color:#fff; margin-bottom:8px; }
-.info .meta { font-size:12px; color:#888; }
+.info .meta { font-size:12px; color:#888; margin-bottom:10px; }
 .status { padding:40px 0; text-align:center; color:#666; }
 .quality-list { display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; }
 .quality-btn { padding:5px 12px; background:#2a2a2a; color:#ccc; border:1px solid #444; border-radius:3px; cursor:pointer; font-size:12px; }
 .quality-btn:hover { background:#333; color:#fff; }
 .quality-btn.on { background:#00a1d6; color:#fff; border-color:#00a1d6; }
+
+/* 分P选择器 */
+.pages-section { margin-top:16px; padding:14px 18px; background:#1a1a1a; border-radius:6px; }
+.pages-section h3 { font-size:14px; color:#fff; margin-bottom:10px; }
+.pages-list { display:flex; flex-wrap:wrap; gap:8px; }
+.page-btn {
+    padding:6px 14px; background:#2a2a2a; color:#ccc;
+    border:1px solid #444; border-radius:3px; cursor:pointer;
+    font-size:12px; font-family:inherit;
+    max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.page-btn:hover { background:#333; color:#fff; }
+.page-btn.on { background:#00a1d6; color:#fff; border-color:#00a1d6; }
 </style>
 </head>
 <body>
@@ -41,6 +54,10 @@ video { width:100%; height:100%; display:block; background:#000; }
         <div class="meta" id="videoMeta"></div>
         <div class="quality-list" id="qualityList"></div>
     </div>
+    <div class="pages-section" id="pagesSection" style="display:none;">
+        <h3>📚 选集</h3>
+        <div class="pages-list" id="pagesList"></div>
+    </div>
 </div>
 
 <script>
@@ -49,6 +66,7 @@ const API_BASE = 'https://api.imomoe.dpdns.org';
 const params = new URLSearchParams(location.search);
 const videoId = params.get('id');
 const title = params.get('title') || '';
+let currentP = parseInt(params.get('p')) || 1;
 
 let hls = null;
 
@@ -57,26 +75,44 @@ if (!videoId) {
 } else {
     document.title = (title || 'AcFun') + ' - 櫻花动漫';
     document.getElementById('pageTitle').textContent = title || 'AcFun 视频 ' + videoId;
-
-    fetch(API_BASE + '/api/acfun/' + videoId)
-        .then(r => r.json())
-        .then(data => {
-            if (!data.ok || !data.urls || !data.urls.length) {
-                document.getElementById('status').textContent = '未找到视频：' + (data.error || '未知错误');
-                return;
-            }
-            setupPlayer(data.urls);
-        })
-        .catch(err => {
-            document.getElementById('status').textContent = '获取失败：' + err.message;
-        });
+    loadVideo(videoId, currentP);
 }
 
-function setupPlayer(urls) {
+async function loadVideo(videoId, p) {
+    const status = document.getElementById('status');
+    status.textContent = '正在获取视频地址...';
+    status.style.display = 'block';
+
+    const video = document.getElementById('video');
+    if (hls) { hls.destroy(); hls = null; }
+    video.removeAttribute('src');
+    video.load();
+
+    try {
+        const res = await fetch(`${API_BASE}/api/acfun/${videoId}?p=${p}`);
+        const data = await res.json();
+
+        if (!data.ok || !data.urls || !data.urls.length) {
+            status.textContent = '未找到视频：' + (data.error || '未知错误');
+            return;
+        }
+
+        currentP = data.currentP || p;
+        setupPlayer(data.urls, data.pages || [], currentP);
+    } catch (err) {
+        status.textContent = '获取失败：' + err.message;
+    }
+}
+
+function setupPlayer(urls, pages, curP) {
     const video = document.getElementById('video');
     const status = document.getElementById('status');
     const info = document.getElementById('info');
     const qualityList = document.getElementById('qualityList');
+    const pagesSection = document.getElementById('pagesSection');
+    const pagesList = document.getElementById('pagesList');
+
+    qualityList.innerHTML = '';
 
     function getLevel(q) {
         const s = (q || '').toLowerCase();
@@ -95,22 +131,19 @@ function setupPlayer(urls) {
         if (!seen.has(name)) { seen.add(name); unique.push(item); }
     }
 
-    console.log('清晰度列表：', unique.map(x => x.quality));
+    let currentQuality = null;
 
     function playAt(item, btn) {
         const proxy = API_BASE + '/api/video-proxy?url=' + encodeURIComponent(item.url);
         const isM3u8 = item.url.includes('.m3u8');
 
-        // 销毁旧的 hls 实例
         if (hls) { hls.destroy(); hls = null; }
 
         if (isM3u8 && window.Hls && Hls.isSupported()) {
             hls = new Hls({ enableWorker: true });
             hls.loadSource(proxy);
             hls.attachMedia(video);
-            hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                video.play().catch(() => {});
-            });
+            hls.on(Hls.Events.MANIFEST_PARSED, () => video.play().catch(() => {}));
             hls.on(Hls.Events.ERROR, (e, data) => {
                 console.error('HLS 错误：', data);
             });
@@ -119,10 +152,12 @@ function setupPlayer(urls) {
             video.play().catch(() => {});
         }
 
+        currentQuality = item.quality || '默认';
         status.style.display = 'none';
         info.style.display = 'block';
         document.getElementById('videoTitle').textContent = title || 'AcFun ' + videoId;
-        document.getElementById('videoMeta').textContent = '来源：AcFun · 当前清晰度：' + (item.quality || '默认');
+        document.getElementById('videoMeta').textContent =
+            '来源：AcFun · 第 ' + curP + ' 集 · 清晰度：' + currentQuality;
 
         if (btn) {
             qualityList.querySelectorAll('.quality-btn').forEach(b => b.classList.remove('on'));
@@ -137,6 +172,33 @@ function setupPlayer(urls) {
         btn.onclick = () => playAt(item, btn);
         qualityList.appendChild(btn);
     });
+
+    // 渲染分P
+    if (pages.length > 1) {
+        pagesSection.style.display = 'block';
+        pagesList.innerHTML = '';
+        pages.forEach(pg => {
+            const btn = document.createElement('button');
+            btn.className = 'page-btn' + (pg.p === curP ? ' on' : '');
+            btn.textContent = pg.title || ('第' + pg.p + 'P');
+            btn.title = pg.title || '';
+            btn.onclick = () => {
+                // 切换分P：更新 URL 并重新加载
+                const newUrl = new URL(location.href);
+                newUrl.searchParams.set('p', pg.p);
+                history.replaceState({}, '', newUrl);
+
+                pagesList.querySelectorAll('.page-btn').forEach(b => b.classList.remove('on'));
+                btn.classList.add('on');
+
+                loadVideo(videoId, pg.p);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            };
+            pagesList.appendChild(btn);
+        });
+    } else {
+        pagesSection.style.display = 'none';
+    }
 
     playAt(unique[0]);
 }
