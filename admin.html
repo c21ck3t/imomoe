@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>管理后台 - 添加番剧</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font:14px/1.6 "Microsoft YaHei",Arial,sans-serif; background:#f4f4f4; color:#333; padding:20px; }
+.wrap { max-width:900px; margin:0 auto; }
+h1 { font-size:22px; margin-bottom:20px; color:#00a1d6; }
+.card { background:#fff; border:1px solid #e2e2e2; border-radius:4px; padding:20px; margin-bottom:20px; }
+.card h2 { font-size:16px; margin-bottom:15px; color:#333; border-left:4px solid #00a1d6; padding-left:10px; }
+.row { margin-bottom:14px; }
+.row label { display:block; font-size:13px; color:#666; margin-bottom:5px; }
+.row label .req { color:#f00; }
+.row input[type=text], .row input[type=number], .row select, .row textarea {
+    width:100%; padding:8px 10px; border:1px solid #ccc; border-radius:3px;
+    font-size:14px; font-family:inherit;
+}
+.row input:focus, .row select:focus, .row textarea:focus { border-color:#00a1d6; outline:none; }
+.row-flex { display:flex; gap:12px; }
+.row-flex > div { flex:1; }
+.hint { font-size:12px; color:#999; margin-top:4px; }
+.chk-group { display:flex; gap:16px; margin-top:6px; }
+.chk-group label { display:inline-flex; align-items:center; gap:4px; font-size:13px; cursor:pointer; }
+.btn {
+    display:inline-block; padding:10px 22px; background:#00a1d6; color:#fff;
+    border:none; border-radius:3px; font-size:14px; cursor:pointer;
+    font-family:inherit; margin-right:8px;
+}
+.btn:hover { background:#0088b8; }
+.btn.gray { background:#999; }
+.btn.gray:hover { background:#777; }
+.btn.green { background:#22aa55; }
+.btn.green:hover { background:#1a8844; }
+#output { width:100%; height:400px; font-family:Consolas,Monaco,monospace; font-size:12px; padding:12px; border:1px solid #ccc; border-radius:3px; background:#fafafa; }
+.msg { padding:10px 15px; border-radius:3px; margin-bottom:15px; display:none; }
+.msg.ok { background:#e6f7e6; color:#22aa55; border:1px solid #22aa55; display:block; }
+.msg.err { background:#ffe6e6; color:#f00; border:1px solid #f00; display:block; }
+.count { font-size:13px; color:#666; margin-bottom:10px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>🌸 番剧管理后台</h1>
+
+<div id="msg" class="msg"></div>
+
+<div class="card">
+    <h2>添加新番剧</h2>
+    <div class="row">
+        <label>标题 <span class="req">*</span></label>
+        <input type="text" id="f-title" placeholder="例如：玲音">
+    </div>
+    <div class="row">
+        <label>别名（英文逗号分隔，可留空）</label>
+        <input type="text" id="f-alias" placeholder="例如：lain, 铃音">
+    </div>
+    <div class="row">
+        <label>显示位置 <span class="req">*</span></label>
+        <select id="f-scope">
+            <option value="bangumi">只在番剧页显示</option>
+            <option value="home">只在首页显示</option>
+            <option value="both">首页和番剧页都显示</option>
+        </select>
+    </div>
+    <div class="row">
+        <label>首页显示标题（可留空）</label>
+        <input type="text" id="f-homeTitle">
+    </div>
+    <div class="row">
+        <label>番剧页显示标题（可留空）</label>
+        <input type="text" id="f-bangumiTitle">
+    </div>
+    <div class="row row-flex">
+        <div>
+            <label>竖版封面链接 <span class="req">*</span></label>
+            <input type="text" id="f-coverV" placeholder="https://...jpg">
+        </div>
+        <div>
+            <label>横版封面链接</label>
+            <input type="text" id="f-coverH" placeholder="https://...jpg">
+        </div>
+    </div>
+    <div class="row">
+        <label>标签（英文逗号分隔）</label>
+        <input type="text" id="f-tags" placeholder="例如：4K, 悬疑, 科幻">
+    </div>
+    <div class="row row-flex">
+        <div><label>年份</label><input type="text" id="f-year" placeholder="1998"></div>
+        <div><label>月份</label><input type="text" id="f-month" placeholder="7月"></div>
+        <div><label>总集数</label><input type="number" id="f-totalEp" placeholder="13"></div>
+        <div><label>时长</label><input type="text" id="f-duration" placeholder="23:59"></div>
+    </div>
+    <div class="row row-flex">
+        <div><label>评分</label><input type="text" id="f-score" placeholder="9.7"></div>
+        <div><label>播放量</label><input type="number" id="f-views" placeholder="423000"></div>
+        <div><label>弹幕数</label><input type="number" id="f-danmu" placeholder="25600"></div>
+    </div>
+</div>
+
+<div class="card">
+    <h2>观看链接</h2>
+    <div class="row">
+        <label>B 站链接</label>
+        <input type="text" id="f-b" placeholder="https://www.bilibili.com/video/BV...">
+    </div>
+    <div class="row">
+        <label>A 站链接</label>
+        <input type="text" id="f-a" placeholder="https://www.acfun.cn/a/...">
+    </div>
+    <div class="row">
+        <label>MFuns 链接</label>
+        <input type="text" id="f-mfuns" placeholder="https://www.mfuns.net/video/...">
+    </div>
+    <div class="row">
+        <label>首页只显示哪些链接？（不选则默认只显示 B 站）</label>
+        <div class="chk-group">
+            <label><input type="checkbox" class="hl-chk" value="a"> A 站</label>
+            <label><input type="checkbox" class="hl-chk" value="b"> B 站</label>
+            <label><input type="checkbox" class="hl-chk" value="mfuns"> MFuns</label>
+        </div>
+    </div>
+    <div class="row">
+        <label>番剧页只显示哪些链接？（不选则默认显示全部）</label>
+        <div class="chk-group">
+            <label><input type="checkbox" class="bl-chk" value="a"> A 站</label>
+            <label><input type="checkbox" class="bl-chk" value="b"> B 站</label>
+            <label><input type="checkbox" class="bl-chk" value="mfuns"> MFuns</label>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <h2>操作</h2>
+    <button class="btn green" onclick="addAnime()">➕ 添加到列表</button>
+    <button class="btn" onclick="generateDataJs()">📄 生成 data.js</button>
+    <button class="btn gray" onclick="resetForm()">🔄 清空表单</button>
+    <div class="count" id="count" style="margin-top:15px;"></div>
+</div>
+
+<div class="card">
+    <h2>生成的 data.js 内容</h2>
+    <div class="hint" style="margin-bottom:10px;">
+        复制下面的内容，粘贴到项目里的 <b>data.js</b> 文件（全部覆盖），然后上传 GitHub 即可。
+    </div>
+    <textarea id="output" readonly placeholder="点击"生成 data.js"按钮后，内容会出现在这里"></textarea>
+    <div style="margin-top:10px;">
+        <button class="btn" onclick="copyOutput()">📋 复制全部</button>
+        <button class="btn gray" onclick="downloadDataJs()">💾 下载 data.js</button>
+    </div>
+</div>
+
+</div>
+
+<script src="data.js"></script>
+
+<script>
+let currentList = JSON.parse(JSON.stringify(animeData));
+
+function updateCount() {
+    document.getElementById('count').textContent = '当前列表共 ' + currentList.length + ' 部番剧';
+}
+updateCount();
+
+function showMsg(text, type) {
+    const el = document.getElementById('msg');
+    el.textContent = text;
+    el.className = 'msg ' + type;
+    setTimeout(() => { el.className = 'msg'; }, 3000);
+}
+
+function getFormData() {
+    const title = document.getElementById('f-title').value.trim();
+    if (!title) { showMsg('标题必填', 'err'); return null; }
+    const coverV = document.getElementById('f-coverV').value.trim();
+    if (!coverV) { showMsg('竖版封面链接必填', 'err'); return null; }
+    const aliasRaw = document.getElementById('f-alias').value.trim();
+    const tagsRaw  = document.getElementById('f-tags').value.trim();
+
+    const links = {};
+    const b = document.getElementById('f-b').value.trim();
+    const a = document.getElementById('f-a').value.trim();
+    const mfuns = document.getElementById('f-mfuns').value.trim();
+    if (b) links.b = b;
+    if (a) links.a = a;
+    if (mfuns) links.mfuns = mfuns;
+    if (Object.keys(links).length === 0) { showMsg('至少要填一个观看链接', 'err'); return null; }
+
+    const obj = {
+        title: title,
+        scope: document.getElementById('f-scope').value,
+        coverV: coverV,
+        tags: tagsRaw ? tagsRaw.split(',').map(s => s.trim()).filter(Boolean) : [],
+        year: document.getElementById('f-year').value.trim(),
+        month: document.getElementById('f-month').value.trim(),
+        totalEp: parseInt(document.getElementById('f-totalEp').value) || 0,
+        views: parseInt(document.getElementById('f-views').value) || 0,
+        danmu: parseInt(document.getElementById('f-danmu').value) || 0,
+        duration: document.getElementById('f-duration').value.trim() || '24:00',
+        score: parseFloat(document.getElementById('f-score').value) || 0,
+        links: links
+    };
+
+    const coverH = document.getElementById('f-coverH').value.trim();
+    if (coverH) obj.coverH = coverH;
+    const aliasArr = aliasRaw ? aliasRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
+    if (aliasArr.length) obj.alias = aliasArr;
+    const homeTitle = document.getElementById('f-homeTitle').value.trim();
+    if (homeTitle) obj.homeTitle = homeTitle;
+    const bangumiTitle = document.getElementById('f-bangumiTitle').value.trim();
+    if (bangumiTitle) obj.bangumiTitle = bangumiTitle;
+    const hl = Array.from(document.querySelectorAll('.hl-chk:checked')).map(c => c.value);
+    if (hl.length) obj.homeLinks = hl;
+    const bl = Array.from(document.querySelectorAll('.bl-chk:checked')).map(c => c.value);
+    if (bl.length) obj.bangumiLinks = bl;
+
+    return obj;
+}
+
+function addAnime() {
+    const obj = getFormData();
+    if (!obj) return;
+    if (currentList.find(x => x.title === obj.title)) {
+        if (!confirm('已存在同名番剧「' + obj.title + '」，仍然添加？')) return;
+    }
+    currentList.push(obj);
+    updateCount();
+    showMsg('✅ 已添加「' + obj.title + '」到列表', 'ok');
+}
+
+function resetForm() {
+    document.querySelectorAll('.card input, .card select, .card textarea').forEach(el => {
+        if (el.type === 'checkbox') el.checked = false;
+        else el.value = '';
+    });
+    document.getElementById('f-scope').value = 'bangumi';
+    showMsg('表单已清空', 'ok');
+}
+
+function generateDataJs() {
+    if (currentList.length === 0) { showMsg('列表为空', 'err'); return; }
+    const content = 'const animeData = ' + JSON.stringify(currentList, null, 4) + ';\n';
+    document.getElementById('output').value = content;
+    showMsg('✅ 已生成，请复制或下载', 'ok');
+}
+
+function copyOutput() {
+    const ta = document.getElementById('output');
+    if (!ta.value) { showMsg('还没有内容', 'err'); return; }
+    ta.select();
+    document.execCommand('copy');
+    showMsg('📋 已复制到剪贴板', 'ok');
+}
+
+function downloadDataJs() {
+    const ta = document.getElementById('output');
+    if (!ta.value) { showMsg('还没有内容', 'err'); return; }
+    const blob = new Blob([ta.value], { type: 'text/javascript;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'data.js';
+    a.click();
+    URL.revokeObjectURL(url);
+    showMsg('💾 已下载 data.js', 'ok');
+}
+</script>
+
+</body>
+</html>
