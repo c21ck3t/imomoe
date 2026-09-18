@@ -120,6 +120,24 @@ function idxCardHTML(a) {
         '<div class="idx-meta"><span>' + epText + '</span><span>' + ymText + '</span></div>' + linksHTML + '</div>';
 }
 
+/* ============================================================
+   判断链接是否可内嵌播放（MFuns）
+   ============================================================ */
+function getMfunsVideoId(url) {
+    if (!url) return null;
+    const m = url.match(/mfuns\.net\/video\/(\d+)/);
+    return m ? m[1] : null;
+}
+
+function tryInlinePlay(url, title) {
+    const vid = getMfunsVideoId(url);
+    if (vid) {
+        location.href = './player.html?id=' + vid + '&title=' + encodeURIComponent(title || '');
+        return true;
+    }
+    return false;
+}
+
 function bindVideoCardEvents(scope) {
     scope.querySelectorAll('.v').forEach(function (v) {
         const title = v.getAttribute('data-title');
@@ -128,6 +146,8 @@ function bindVideoCardEvents(scope) {
         const isSingle = v.classList.contains('single-link');
         const a = getAnime(title); if (!a) return;
         const links = getLinksForPage(a, page);
+        const cardTitle = v.querySelector('.t')?.textContent || title;
+
         if (isMulti) {
             if (supportsHover) {
                 v.addEventListener('mouseenter', () => v.classList.add('show-links'));
@@ -142,12 +162,23 @@ function bindVideoCardEvents(scope) {
         if (isSingle && links.length === 1) {
             v.addEventListener('click', function (e) {
                 if (e.target.closest('a')) return;
-                window.open(links[0].url, '_blank', 'noopener');
+                const url = links[0].url;
+                if (tryInlinePlay(url, cardTitle)) return;
+                window.open(url, '_blank', 'noopener');
             });
         }
     });
     scope.querySelectorAll('.watch-link').forEach(function (a) {
-        a.addEventListener('click', function (e) { e.stopPropagation(); });
+        a.addEventListener('click', function (e) {
+            const url = a.getAttribute('href');
+            const cardTitle = a.closest('.v')?.querySelector('.t')?.textContent || '';
+            if (tryInlinePlay(url, cardTitle)) {
+                e.preventDefault();
+                e.stopPropagation();
+                return;
+            }
+            e.stopPropagation();
+        });
     });
     scope.querySelectorAll('.rlist li, .r-list-pmt li').forEach(function (el) {
         el.addEventListener('click', function () {
@@ -156,6 +187,7 @@ function bindVideoCardEvents(scope) {
             const a = getAnime(title); if (!a) return;
             const links = getLinksForPage(a, page);
             if (links.length === 0) { alert('暂无观看地址'); return; }
+            if (tryInlinePlay(links[0].url, title)) return;
             window.open(links[0].url, '_blank', 'noopener');
         });
     });
@@ -182,12 +214,22 @@ function bindIdxCardEvents(scope) {
         if (isSingle && links.length === 1) {
             card.addEventListener('click', function (e) {
                 if (e.target.closest('a')) return;
+                if (tryInlinePlay(links[0].url, title)) return;
                 window.open(links[0].url, '_blank', 'noopener');
             });
         }
     });
     scope.querySelectorAll('.watch-link').forEach(function (a) {
-        a.addEventListener('click', function (e) { e.stopPropagation(); });
+        a.addEventListener('click', function (e) {
+            const url = a.getAttribute('href');
+            const cardTitle = a.closest('.idx-card')?.querySelector('.idx-title')?.textContent || '';
+            if (tryInlinePlay(url, cardTitle)) {
+                e.preventDefault();
+                e.stopPropagation();
+                return;
+            }
+            e.stopPropagation();
+        });
     });
 }
 
