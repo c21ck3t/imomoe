@@ -62,6 +62,55 @@ function getLinksForPage(a, page) {
 }
 function getLinks(a) { return getLinksForPage(a, 'all'); }
 
+/* ============================================================
+   内嵌播放：识别 MFuns / AcFun 链接
+   ============================================================ */
+function getMfunsVideoId(url) {
+    if (!url) return null;
+    const m = url.match(/mfuns\.net\/video\/(\d+)/);
+    return m ? m[1] : null;
+}
+
+function getAcfunVideoInfo(url) {
+    if (!url) return null;
+    // 合集链接：https://www.acfun.cn/a/aa6147213
+    let m = url.match(/acfun\.cn\/a\/aa(\d+)/);
+    if (m) return { type: 'collection', id: m[1] };
+    // 单视频：https://www.acfun.cn/v/ac48710213 或 _3
+    m = url.match(/acfun\.cn\/v\/ac(\d+)(?:_(\d+))?/);
+    if (m) return { type: 'video', id: m[1], p: m[2] ? parseInt(m[2]) : 1 };
+    return null;
+}
+
+// 返回内嵌播放 URL，返回 '' 表示不能内嵌
+function buildInlineUrl(url, title) {
+    const mfunsId = getMfunsVideoId(url);
+    if (mfunsId) {
+        return './player.html?id=' + mfunsId + '&title=' + encodeURIComponent(title || '');
+    }
+    const acInfo = getAcfunVideoInfo(url);
+    if (acInfo) {
+        if (acInfo.type === 'collection') {
+            return './acfun-player.html?album=' + acInfo.id + '&title=' + encodeURIComponent(title || '');
+        } else {
+            let dest = './acfun-player.html?id=' + acInfo.id;
+            if (acInfo.p > 1) dest += '&p=' + acInfo.p;
+            dest += '&title=' + encodeURIComponent(title || '');
+            return dest;
+        }
+    }
+    return '';
+}
+
+function tryInlinePlay(url, title) {
+    const inlineUrl = buildInlineUrl(url, title);
+    if (inlineUrl) {
+        location.href = inlineUrl;
+        return true;
+    }
+    return false;
+}
+
 function cardHTML(a, forHome, forSearch) {
     let page, displayTitle, views, danmu;
     if (forSearch) {
@@ -80,16 +129,27 @@ function cardHTML(a, forHome, forSearch) {
     const links = getLinksForPage(a, page);
     const isMulti = links.length > 1;
     const cover = a.coverH || a.coverV;
+
+    // 计算第一个可内嵌播放的 URL
+    let inlineUrl = '';
+    for (const l of links) {
+        const u = buildInlineUrl(l.url, displayTitle);
+        if (u) { inlineUrl = u; break; }
+    }
+
     let maskHTML = '', linksHTML = '';
     if (isMulti) {
         maskHTML = '<div class="mask"><span>选择观看地址</span></div>';
         linksHTML = '<div class="links-box">' + links.map(l => '<a href="' + l.url + '" target="_blank" rel="noopener" class="watch-link">' + l.name + '</a>').join('') + '</div>';
     }
-    return '<li><div class="v' + (isMulti ? ' multi-links' : ' single-link') + '" data-title="' + a.title + '" data-page="' + page + '">' +
+
+    const inlineAttr = inlineUrl ? ' data-inline="' + escapeHtml(inlineUrl) + '"' : '';
+
+    return '<li><div class="v' + (isMulti ? ' multi-links' : ' single-link') + '" data-title="' + a.title + '" data-page="' + page + '"' + inlineAttr + '>' +
         '<div class="preview"><div class="border"></div><img src="' + cover + '" alt="' + escapeHtml(displayTitle) + '" loading="lazy">' +
         '<div class="x"><b class="x2">' + (a.duration || '24:00') + '</b></div>' + maskHTML + '</div>' +
         '<div class="t">' + escapeHtml(displayTitle) + '</div>' +
-        '<div class="i"><b class="i1">▶ ' + fmt(views) + '</b><b class="i2 danmu-count">' + DM_ICON + fmt(danmu) + '</b></div>' + linksHTML + '</div></li>';
+        '<div class="i"><b class="i1">▶ ' + fmt(views) + '</b><b class="i2">' + DM_ICON + fmt(danmu) + '</b></div>' + linksHTML + '</div></li>';
 }
 
 function rankHTML(a, i, withNum, forHome) {
@@ -109,33 +169,25 @@ function idxCardHTML(a) {
     const isMulti = links.length > 1;
     const epText = a.totalEp ? ('全' + a.totalEp + '话') : '';
     const ymText = (a.year || '') + '年' + (a.month || '');
+
+    let inlineUrl = '';
+    for (const l of links) {
+        const u = buildInlineUrl(l.url, a.title);
+        if (u) { inlineUrl = u; break; }
+    }
+
     let maskHTML = '', linksHTML = '';
     if (isMulti) {
         maskHTML = '<div class="mask"><span>选择观看地址</span></div>';
         linksHTML = '<div class="links-box">' + links.map(l => '<a href="' + l.url + '" target="_blank" rel="noopener" class="watch-link">' + l.name + '</a>').join('') + '</div>';
     }
-    return '<div class="idx-card' + (isMulti ? ' multi-links' : ' single-link') + '" data-title="' + a.title + '">' +
+
+    const inlineAttr = inlineUrl ? ' data-inline="' + escapeHtml(inlineUrl) + '"' : '';
+
+    return '<div class="idx-card' + (isMulti ? ' multi-links' : ' single-link') + '" data-title="' + a.title + '"' + inlineAttr + '>' +
         '<div class="idx-cover"><img src="' + a.coverV + '" alt="' + escapeHtml(a.title) + '" loading="lazy">' + maskHTML + '</div>' +
         '<div class="idx-title">' + escapeHtml(a.title) + '</div>' +
         '<div class="idx-meta"><span>' + epText + '</span><span>' + ymText + '</span></div>' + linksHTML + '</div>';
-}
-
-/* ============================================================
-   判断链接是否可内嵌播放（MFuns）
-   ============================================================ */
-function getMfunsVideoId(url) {
-    if (!url) return null;
-    const m = url.match(/mfuns\.net\/video\/(\d+)/);
-    return m ? m[1] : null;
-}
-
-function tryInlinePlay(url, title) {
-    const vid = getMfunsVideoId(url);
-    if (vid) {
-        location.href = './player.html?id=' + vid + '&title=' + encodeURIComponent(title || '');
-        return true;
-    }
-    return false;
 }
 
 function bindVideoCardEvents(scope) {
@@ -144,42 +196,49 @@ function bindVideoCardEvents(scope) {
         const page = v.getAttribute('data-page') || 'bangumi';
         const isMulti = v.classList.contains('multi-links');
         const isSingle = v.classList.contains('single-link');
+        const inlineUrl = v.getAttribute('data-inline');
         const a = getAnime(title); if (!a) return;
         const links = getLinksForPage(a, page);
-        const cardTitle = v.querySelector('.t')?.textContent || title;
 
-        if (isMulti) {
-            if (supportsHover) {
-                v.addEventListener('mouseenter', () => v.classList.add('show-links'));
-                v.addEventListener('mouseleave', () => v.classList.remove('show-links'));
-            } else {
-                v.addEventListener('click', function (e) {
-                    if (e.target.closest('.links-box')) return;
-                    v.classList.toggle('show-links');
-                });
+        v.addEventListener('click', function (e) {
+            if (e.target.closest('.links-box')) return;
+
+            if (inlineUrl) {
+                location.href = inlineUrl;
+                return;
             }
-        }
-        if (isSingle && links.length === 1) {
-            v.addEventListener('click', function (e) {
-                if (e.target.closest('a')) return;
-                const url = links[0].url;
-                if (tryInlinePlay(url, cardTitle)) return;
-                window.open(url, '_blank', 'noopener');
-            });
+
+            if (isSingle && links.length === 1) {
+                window.open(links[0].url, '_blank', 'noopener');
+                return;
+            }
+
+            if (isMulti) {
+                v.classList.toggle('show-links');
+            }
+        });
+
+        if (isMulti && supportsHover && !inlineUrl) {
+            v.addEventListener('mouseenter', () => v.classList.add('show-links'));
+            v.addEventListener('mouseleave', () => v.classList.remove('show-links'));
         }
     });
+
     scope.querySelectorAll('.watch-link').forEach(function (a) {
         a.addEventListener('click', function (e) {
             const url = a.getAttribute('href');
-            const cardTitle = a.closest('.v')?.querySelector('.t')?.textContent || '';
-            if (tryInlinePlay(url, cardTitle)) {
+            const cardTitle = a.closest('.v, .idx-card')?.querySelector('.t, .idx-title')?.textContent || '';
+            const inlineUrl = buildInlineUrl(url, cardTitle);
+            if (inlineUrl) {
                 e.preventDefault();
                 e.stopPropagation();
+                location.href = inlineUrl;
                 return;
             }
             e.stopPropagation();
         });
     });
+
     scope.querySelectorAll('.rlist li, .r-list-pmt li').forEach(function (el) {
         el.addEventListener('click', function () {
             const title = el.getAttribute('data-title');
@@ -187,7 +246,12 @@ function bindVideoCardEvents(scope) {
             const a = getAnime(title); if (!a) return;
             const links = getLinksForPage(a, page);
             if (links.length === 0) { alert('暂无观看地址'); return; }
-            if (tryInlinePlay(links[0].url, title)) return;
+
+            const inlineUrl = buildInlineUrl(links[0].url, title);
+            if (inlineUrl) {
+                location.href = inlineUrl;
+                return;
+            }
             window.open(links[0].url, '_blank', 'noopener');
         });
     });
@@ -198,34 +262,43 @@ function bindIdxCardEvents(scope) {
         const title = card.getAttribute('data-title');
         const isMulti = card.classList.contains('multi-links');
         const isSingle = card.classList.contains('single-link');
+        const inlineUrl = card.getAttribute('data-inline');
         const a = getAnime(title); if (!a) return;
         const links = getLinksForPage(a, 'all');
-        if (isMulti) {
-            if (supportsHover) {
-                card.addEventListener('mouseenter', () => card.classList.add('show-links'));
-                card.addEventListener('mouseleave', () => card.classList.remove('show-links'));
-            } else {
-                card.addEventListener('click', function (e) {
-                    if (e.target.closest('.links-box')) return;
-                    card.classList.toggle('show-links');
-                });
+
+        card.addEventListener('click', function (e) {
+            if (e.target.closest('.links-box')) return;
+
+            if (inlineUrl) {
+                location.href = inlineUrl;
+                return;
             }
-        }
-        if (isSingle && links.length === 1) {
-            card.addEventListener('click', function (e) {
-                if (e.target.closest('a')) return;
-                if (tryInlinePlay(links[0].url, title)) return;
+
+            if (isSingle && links.length === 1) {
                 window.open(links[0].url, '_blank', 'noopener');
-            });
+                return;
+            }
+
+            if (isMulti) {
+                card.classList.toggle('show-links');
+            }
+        });
+
+        if (isMulti && supportsHover && !inlineUrl) {
+            card.addEventListener('mouseenter', () => card.classList.add('show-links'));
+            card.addEventListener('mouseleave', () => card.classList.remove('show-links'));
         }
     });
+
     scope.querySelectorAll('.watch-link').forEach(function (a) {
         a.addEventListener('click', function (e) {
             const url = a.getAttribute('href');
             const cardTitle = a.closest('.idx-card')?.querySelector('.idx-title')?.textContent || '';
-            if (tryInlinePlay(url, cardTitle)) {
+            const inlineUrl = buildInlineUrl(url, cardTitle);
+            if (inlineUrl) {
                 e.preventDefault();
                 e.stopPropagation();
+                location.href = inlineUrl;
                 return;
             }
             e.stopPropagation();
@@ -552,7 +625,7 @@ window.addEventListener('scroll', function () { $('#backToTop').style.display = 
 $('#backToTop').addEventListener('click', function (e) { e.preventDefault(); window.scrollTo({ top:0, behavior:'smooth' }); });
 
 /* ============================================================
-   用户系统：登录 / 注册 / 登出
+   用户系统
    ============================================================ */
 const API_BASE = 'https://api.imomoe.dpdns.org';
 
