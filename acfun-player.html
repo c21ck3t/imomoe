@@ -33,6 +33,8 @@ video { width:100%; height:100%; display:block; background:#000; }
 }
 .page-btn:hover { background:#333; color:#fff; }
 .page-btn.on { background:#00a1d6; color:#fff; border-color:#00a1d6; }
+.sub-p-btn { background:#1a1a1a; }
+.sub-p-btn.on { background:#22aa55; border-color:#22aa55; }
 </style>
 </head>
 <body>
@@ -52,6 +54,10 @@ video { width:100%; height:100%; display:block; background:#000; }
         <div class="meta" id="videoMeta"></div>
         <div class="quality-list" id="qualityList"></div>
     </div>
+    <div class="pages-section" id="subPSection" style="display:none;">
+        <h3>🎞️ 分P</h3>
+        <div class="pages-list" id="subPList"></div>
+    </div>
     <div class="pages-section" id="pagesSection" style="display:none;">
         <h3>📚 选集</h3>
         <div class="pages-list" id="pagesList"></div>
@@ -62,38 +68,36 @@ video { width:100%; height:100%; display:block; background:#000; }
 const API_BASE = 'https://api.imomoe.dpdns.org';
 
 const params = new URLSearchParams(location.search);
-const videoId = params.get('id');         // 单视频模式
-const albumId = params.get('album');       // 合集模式
+const videoId = params.get('id');
+const albumId = params.get('album');
 const title = params.get('title') || '';
 let currentP = parseInt(params.get('p')) || 1;
+let currentSubP = parseInt(params.get('sub')) || 1;
 
 let hls = null;
-
-// 状态：当前播放列表（单视频模式只有1个，合集模式有N个）
-let playlist = [];       // [{ac, title, p}]
+let playlist = [];
 let currentIndex = 0;
+let currentPages = [];
 
 if (albumId) {
-    // 合集模式
     document.title = (title || 'AcFun 合集') + ' - 櫻花动漫';
     document.getElementById('pageTitle').textContent = title || 'AcFun 合集 ' + albumId;
     initCollection(albumId);
 } else if (videoId) {
-    // 单视频模式
     document.title = (title || 'AcFun') + ' - 櫻花动漫';
     document.getElementById('pageTitle').textContent = title || 'AcFun 视频 ' + videoId;
-    initSingleVideo(videoId, currentP);
+    initSingleVideo(videoId);
 } else {
     document.getElementById('status').textContent = '缺少参数（id 或 album）';
 }
 
 // ---------- 单视频模式 ----------
-async function initSingleVideo(videoId, p) {
+async function initSingleVideo(videoId) {
     const status = document.getElementById('status');
     status.textContent = '正在获取视频地址...';
 
     try {
-        const res = await fetch(`${API_BASE}/api/acfun/${videoId}?p=${p}`);
+        const res = await fetch(`${API_BASE}/api/acfun/${videoId}?p=${currentSubP}`);
         const data = await res.json();
 
         if (!data.ok || !data.urls || !data.urls.length) {
@@ -101,10 +105,11 @@ async function initSingleVideo(videoId, p) {
             return;
         }
 
-        playlist = [{ ac: videoId, p: p, title: data.videoTitle || ('第 ' + p + ' 集') }];
+        playlist = [{ ac: videoId, p: 1, title: data.videoTitle || title || '视频' }];
         currentIndex = 0;
-        renderPages();
-        setupPlayer(data.urls, data.videoTitle || title, p);
+        currentPages = data.pages || [];
+        renderSubP();
+        setupPlayer(data.urls, playlist[0].title, 1);
     } catch (err) {
         status.textContent = '获取失败：' + err.message;
     }
@@ -129,7 +134,10 @@ async function initCollection(albumId) {
             p: item.p,
             title: item.title
         }));
-        currentIndex = 0;
+
+        currentIndex = currentP - 1;
+        if (currentIndex < 0 || currentIndex >= playlist.length) currentIndex = 0;
+
         renderPages();
         loadCurrent();
     } catch (err) {
@@ -137,7 +145,7 @@ async function initCollection(albumId) {
     }
 }
 
-// 加载当前 index 对应的视频
+// 加载当前集
 async function loadCurrent() {
     if (currentIndex < 0 || currentIndex >= playlist.length) return;
 
@@ -152,7 +160,7 @@ async function loadCurrent() {
     video.load();
 
     try {
-        const res = await fetch(`${API_BASE}/api/acfun/${item.ac}?p=1`);
+        const res = await fetch(`${API_BASE}/api/acfun/${item.ac}?p=${currentSubP}`);
         const data = await res.json();
 
         if (!data.ok || !data.urls || !data.urls.length) {
@@ -160,18 +168,49 @@ async function loadCurrent() {
             return;
         }
 
+        currentPages = data.pages || [];
+        renderSubP();
         setupPlayer(data.urls, item.title, item.p);
 
-        // 更新 URL 参数（方便分享）
+        // 更新 URL
         const newUrl = new URL(location.href);
-        newUrl.searchParams.set('album', albumId || '');
         newUrl.searchParams.set('p', item.p);
+        newUrl.searchParams.set('sub', currentSubP);
         history.replaceState({}, '', newUrl);
     } catch (err) {
         status.textContent = '获取失败：' + err.message;
     }
 }
 
+// 渲染分P按钮
+function renderSubP() {
+    const section = document.getElementById('subPSection');
+    const list = document.getElementById('subPList');
+
+    // 只有多个 P 时才显示
+    if (currentPages.length <= 1) {
+        section.style.display = 'none';
+        return;
+    }
+
+    section.style.display = 'block';
+    list.innerHTML = '';
+
+    currentPages.forEach(pg => {
+        const btn = document.createElement('button');
+        btn.className = 'page-btn sub-p-btn' + (pg.p === currentSubP ? ' on' : '');
+        btn.textContent = 'P' + pg.p + (pg.title ? ' · ' + pg.title : '');
+        btn.title = pg.title || '';
+        btn.onclick = () => {
+            currentSubP = pg.p;
+            loadCurrent();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+        list.appendChild(btn);
+    });
+}
+
+// 渲染选集按钮
 function renderPages() {
     const pagesSection = document.getElementById('pagesSection');
     const pagesList = document.getElementById('pagesList');
@@ -191,6 +230,7 @@ function renderPages() {
         btn.title = item.title || '';
         btn.onclick = () => {
             currentIndex = idx;
+            currentSubP = 1;  // 切换集时重置分P
             renderPages();
             loadCurrent();
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -247,7 +287,9 @@ function setupPlayer(urls, videoTitle, p) {
         info.style.display = 'block';
         document.getElementById('videoTitle').textContent = videoTitle || title || 'AcFun';
         document.getElementById('videoMeta').textContent =
-            '来源：AcFun' + (playlist.length > 1 ? ' · 第 ' + p + ' 集' : '') +
+            '来源：AcFun' +
+            (playlist.length > 1 ? ' · 第 ' + p + ' 集' : '') +
+            (currentPages.length > 1 ? ' · P' + currentSubP : '') +
             ' · 清晰度：' + (item.quality || '默认');
 
         if (btn) {
@@ -264,10 +306,11 @@ function setupPlayer(urls, videoTitle, p) {
         qualityList.appendChild(btn);
     });
 
-    // 自动下一集
+    // 自动下一集（分P 播完也跳下一集）
     video.onended = () => {
         if (currentIndex < playlist.length - 1) {
             currentIndex++;
+            currentSubP = 1;
             renderPages();
             loadCurrent();
             window.scrollTo({ top: 0, behavior: 'smooth' });
