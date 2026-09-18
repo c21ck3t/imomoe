@@ -170,6 +170,7 @@ async function loadCurrent() {
 
         currentPages = data.pages || [];
         renderSubP();
+        renderPages();  // 更新选集高亮
         setupPlayer(data.urls, item.title, item.p);
 
         // 更新 URL
@@ -187,7 +188,6 @@ function renderSubP() {
     const section = document.getElementById('subPSection');
     const list = document.getElementById('subPList');
 
-    // 只有多个 P 时才显示
     if (currentPages.length <= 1) {
         section.style.display = 'none';
         return;
@@ -230,7 +230,7 @@ function renderPages() {
         btn.title = item.title || '';
         btn.onclick = () => {
             currentIndex = idx;
-            currentSubP = 1;  // 切换集时重置分P
+            currentSubP = 1;
             renderPages();
             loadCurrent();
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -306,8 +306,16 @@ function setupPlayer(urls, videoTitle, p) {
         qualityList.appendChild(btn);
     });
 
-    // 自动下一集（分P 播完也跳下一集）
+    // 自动连播：先播完当前集所有分P，再跳下一集的 P1
     video.onended = () => {
+        // 1. 如果当前集还有未播的分P，播下一分P
+        if (currentPages.length > 1 && currentSubP < currentPages.length) {
+            currentSubP++;
+            loadCurrent();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            return;
+        }
+        // 2. 当前集所有分P播完，跳到下一集的 P1
         if (currentIndex < playlist.length - 1) {
             currentIndex++;
             currentSubP = 1;
