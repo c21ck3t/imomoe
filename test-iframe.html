@@ -2,38 +2,21 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<title>解析服务测试</title>
+<title>反代 iframe 测试</title>
 <style>
-body { margin:0; font-family:sans-serif; background:#222; color:#fff; }
-.bar { padding:10px 20px; background:#333; font-size:13px; display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+body { margin:0; background:#222; color:#fff; font-family:sans-serif; }
+.bar { padding:10px 20px; background:#333; font-size:13px; }
 .bar b { color:#00a1d6; }
-.bar button { padding:6px 12px; background:#444; color:#fff; border:1px solid #555; border-radius:3px; cursor:pointer; font-size:12px; }
-.bar button:hover { background:#00a1d6; }
-.bar button.on { background:#00a1d6; }
-input { flex:1; min-width:300px; padding:6px 10px; background:#1a1a1a; border:1px solid #444; color:#fff; border-radius:3px; font-size:12px; }
-iframe { width:100vw; height:calc(100vh - 90px); border:0; display:block; background:#000; }
+iframe { width:100vw; height:calc(100vh - 40px); border:0; display:block; background:#000; }
 </style>
 </head>
 <body>
-<div class="bar">
-    <b>视频地址：</b>
-    <input type="text" id="url" value="https://www.acfun.cn/v/ac48710213">
-    <b>选择解析服务：</b>
-    <button onclick="load('https://jx.playerjy.com/?url=')">playerjy</button>
-    <button onclick="load('https://jx.xmflv.com/?url=')">xmflv</button>
-    <button onclick="load('https://jx.jsonplayer.com/player/?url=')">jsonplayer</button>
-    <button onclick="load('https://jx.m3u8.tv/jiexi/?url=')">m3u8.tv</button>
-    <button onclick="load('https://z1.m1907.cn/?jx=')">m1907</button>
-</div>
-<iframe id="frame" src="about:blank"></iframe>
+<div class="bar">反代测试：<b id="src"></b></div>
+<iframe id="frame"></iframe>
 <script>
-function load(prefix) {
-    const url = document.getElementById('url').value.trim();
-    if (!url) return alert('请输入视频地址');
-    document.getElementById('frame').src = prefix + encodeURIComponent(url);
-}
-// 默认加载第一个
-load('https://jx.playerjy.com/?url=');
+const url = 'https://api.imomoe.dpdns.org/proxy/acfun/v/ac48710213';
+document.getElementById('src').textContent = url;
+document.getElementById('frame').src = url;
 </script>
 </body>
 </html>
