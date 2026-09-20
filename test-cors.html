@@ -3,77 +3,144 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CORS 测试</title>
+<title>CORS 直连测试</title>
 <style>
 body {
     font:15px/1.7 -apple-system,"Microsoft YaHei",sans-serif;
     background:#1a1a1a; color:#eee;
     padding:20px; margin:0;
 }
-h1 { color:#00a1d6; font-size:18px; }
+h1 { color:#00a1d6; font-size:18px; margin-bottom:8px; }
+.intro { font-size:13px; color:#888; margin-bottom:16px; }
 .box {
     background:#252525; border-radius:8px;
-    padding:16px; margin-top:16px;
+    padding:16px; margin-top:14px;
     word-break:break-all;
 }
 .ok   { border-left:4px solid #22aa55; }
 .err  { border-left:4px solid #f66; }
 .pending { border-left:4px solid #ffcc33; }
-.title { font-weight:bold; margin-bottom:8px; font-size:16px; }
-.content { font-size:13px; color:#bbb; line-height:1.6; }
-pre { background:#0d0d0d; padding:10px; border-radius:4px; overflow:auto; font-size:12px; color:#8f8; }
+.title { font-weight:bold; margin-bottom:8px; font-size:15px; color:#fff; }
+.content { font-size:13px; color:#bbb; line-height:1.7; }
+pre { background:#0d0d0d; padding:10px; border-radius:4px; overflow:auto; font-size:11px; color:#8f8; max-height:300px; margin-top:8px; }
 button {
     width:100%; padding:14px; background:#00a1d6; color:#fff;
     border:none; border-radius:8px; font-size:16px;
-    font-weight:bold; cursor:pointer; margin-top:10px;
+    font-weight:bold; cursor:pointer; margin-top:14px;
+    font-family:inherit;
 }
 button:active { background:#0088b8; }
+button:disabled { background:#555; }
 </style>
 </head>
 <body>
 
 <h1>🔍 CORS 直连测试</h1>
-<div class="content">点击下面按钮，检测视频 CDN 是否允许你的网站直接跨域访问。</div>
+<div class="intro">检测视频 CDN 是否允许你的网站直接跨域访问 m3u8 和 ts 分片。</div>
 
-<div class="box pending" id="result1">
+<div class="box pending" id="r1">
     <div class="title">测试 1：m3u8 跨域</div>
     <div class="content" id="c1">等待测试...</div>
 </div>
 
-<button onclick="testM3u8()">开始测试</button>
+<button id="btn" onclick="run()">开始测试</button>
 
-<div class="box" id="result2" style="display:none">
-    <div class="title">测试 2：m3u8 内容</div>
+<div class="box" id="r2" style="display:none">
+    <div class="title">测试 2：m3u8 内容（前 1500 字符）</div>
     <div class="content" id="c2"></div>
 </div>
 
+<div class="box" id="r3" style="display:none">
+    <div class="title">测试 3：分片直连</div>
+    <div class="content" id="c3">等待...</div>
+</div>
+
 <script>
+// ⚠️ 这个 URL 会过期，重新抓一条最新的替换
 const M3U8_URL = 'https://bkqiuqiu.xn--vhq3x51dn9bivas49nfps.com/within/playaddr/getaddr.m3u8?vcode=TPVCODE22287b787ebe8b7a925292d65a11083a&definition=1080P&vcodec=libx265&authentication=7ab432042524357137e19ace5cbc0340';
 
-async function testM3u8() {
-    const box1 = document.getElementById('result1');
-    const c1 = document.getElementById('c1');
-    const box2 = document.getElementById('result2');
-    const c2 = document.getElementById('c2');
+async function run() {
+    const btn = document.getElementById('btn');
+    const r1 = document.getElementById('r1'), c1 = document.getElementById('c1');
+    const r2 = document.getElementById('r2'), c2 = document.getElementById('c2');
+    const r3 = document.getElementById('r3'), c3 = document.getElementById('c3');
 
-    box1.className = 'box pending';
-    c1.textContent = '请求中...';
-    box2.style.display = 'none';
+    btn.disabled = true;
+    btn.textContent = '测试中...';
+    r1.className = 'box pending';
+    c1.textContent = '请求 m3u8 中...';
+    r2.style.display = 'none';
+    r3.style.display = 'none';
 
+    // ============ 测试 1：m3u8 跨域 ============
+    let m3u8Text;
     try {
         const res = await fetch(M3U8_URL);
-        const text = await res.text();
+        m3u8Text = await res.text();
 
-        // 能拿到内容 = CORS 通过
-        box1.className = 'box ok';
-        c1.innerHTML = '✅ <b>CORS 通过！</b><br>HTTP ' + res.status + '，返回 ' + text.length + ' 字节';
-
-        box2.style.display = 'block';
-        c2.innerHTML = '<pre>' + text.slice(0, 800).replace(/</g, '&lt;') + '</pre>';
+        r1.className = 'box ok';
+        c1.innerHTML = '✅ <b>CORS 通过</b><br>HTTP ' + res.status + '，返回 ' + m3u8Text.length + ' 字节';
     } catch (e) {
-        box1.className = 'box err';
+        r1.className = 'box err';
         c1.innerHTML = '❌ <b>CORS 失败</b><br>' + e.message;
+        btn.disabled = false;
+        btn.textContent = '重新测试';
+        return;
     }
+
+    // ============ 测试 2：显示 m3u8 内容 ============
+    r2.style.display = 'block';
+    c2.innerHTML = '<pre>' + m3u8Text.slice(0, 1500).replace(/</g, '&lt;') + '</pre>';
+
+    // ============ 测试 3：分片直连 ============
+    r3.style.display = 'block';
+
+    // 提取第一个非注释行（分片地址）
+    const lines = m3u8Text.split('\n')
+        .map(l => l.trim())
+        .filter(l => l && !l.startsWith('#'));
+
+    if (lines.length === 0) {
+        c3.innerHTML = '❌ m3u8 里没有找到分片地址';
+        btn.disabled = false;
+        btn.textContent = '重新测试';
+        return;
+    }
+
+    const firstSeg = lines[0];
+
+    c3.innerHTML =
+        '第一个分片：<br>' +
+        '<code style="font-size:10px;color:#ffcc33;word-break:break-all">' + firstSeg + '</code><br><br>' +
+        '正在测试分片直连...';
+
+    try {
+        const segRes = await fetch(firstSeg);
+        const size = segRes.headers.get('Content-Length') || '未知';
+
+        if (segRes.ok) {
+            c3.innerHTML =
+                '第一个分片：<br>' +
+                '<code style="font-size:10px;color:#ffcc33;word-break:break-all">' + firstSeg + '</code><br><br>' +
+                '✅ <b>分片也能直连！</b><br>HTTP ' + segRes.status + '，大小 ' + size + ' 字节';
+            r3.className = 'box ok';
+        } else {
+            c3.innerHTML =
+                '第一个分片：<br>' +
+                '<code style="font-size:10px;color:#ffcc33;word-break:break-all">' + firstSeg + '</code><br><br>' +
+                '❌ <b>分片返回异常</b>：HTTP ' + segRes.status;
+            r3.className = 'box err';
+        }
+    } catch (e) {
+        c3.innerHTML =
+            '第一个分片：<br>' +
+            '<code style="font-size:10px;color:#ffcc33;word-break:break-all">' + firstSeg + '</code><br><br>' +
+            '❌ <b>分片直连失败</b>：' + e.message;
+        r3.className = 'box err';
+    }
+
+    btn.disabled = false;
+    btn.textContent = '重新测试';
 }
 </script>
 
