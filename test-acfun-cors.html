@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AcFun 直连测试</title>
+<style>
+body { font:15px/1.7 "Microsoft YaHei",sans-serif; background:#1a1a1a; color:#eee; padding:20px; margin:0; }
+h1 { color:#00a1d6; font-size:18px; }
+.box { background:#252525; border-radius:8px; padding:16px; margin-top:14px; word-break:break-all; }
+.ok { border-left:4px solid #22aa55; }
+.err { border-left:4px solid #f66; }
+.pending { border-left:4px solid #ffcc33; }
+.title { font-weight:bold; margin-bottom:8px; color:#fff; }
+.content { font-size:13px; color:#bbb; line-height:1.7; }
+pre { background:#0d0d0d; padding:10px; border-radius:4px; overflow:auto; font-size:11px; color:#8f8; max-height:300px; }
+button { width:100%; padding:14px; background:#00a1d6; color:#fff; border:none; border-radius:8px; font-size:16px; font-weight:bold; cursor:pointer; margin-top:14px; font-family:inherit; }
+button:active { background:#0088b8; }
+button:disabled { background:#555; }
+</style>
+</head>
+<body>
+
+<h1>🔍 AcFun 直连测试</h1>
+
+<div class="box pending" id="r1">
+    <div class="title">测试 1：Worker 拿 m3u8 地址</div>
+    <div class="content" id="c1">等待测试...</div>
+</div>
+
+<button id="btn" onclick="run()">开始测试</button>
+
+<div class="box" id="r2" style="display:none">
+    <div class="title">测试 2：m3u8 直连</div>
+    <div class="content" id="c2"></div>
+</div>
+
+<div class="box" id="r3" style="display:none">
+    <div class="title">测试 3：分片直连</div>
+    <div class="content" id="c3"></div>
+</div>
+
+<script>
+const WORKER = 'https://api.imomoe.dpdns.org';
+const VIDEO_ID = '48710213';  // 哭泣少女乐队 第1话
+
+async function run() {
+    const btn = document.getElementById('btn');
+    const r1 = document.getElementById('r1'), c1 = document.getElementById('c1');
+    const r2 = document.getElementById('r2'), c2 = document.getElementById('c2');
+    const r3 = document.getElementById('r3'), c3 = document.getElementById('c3');
+
+    btn.disabled = true;
+    btn.textContent = '测试中...';
+    r1.className = 'box pending';
+    r2.style.display = 'none';
+    r3.style.display = 'none';
+
+    // ============ 测试 1：拿 m3u8 地址 ============
+    let m3u8Url;
+    try {
+        const res = await fetch(WORKER + '/api/acfun/' + VIDEO_ID + '?p=1');
+        const data = await res.json();
+        if (!data.ok || !data.urls || !data.urls.length) {
+            r1.className = 'box err';
+            c1.textContent = '❌ Worker 返回异常：' + JSON.stringify(data);
+            btn.disabled = false;
+            btn.textContent = '重新测试';
+            return;
+        }
+        m3u8Url = data.urls[0].url;
+        r1.className = 'box ok';
+        c1.innerHTML = '✅ 拿到 m3u8 地址<br>清晰度：' + data.urls[0].quality + '<br><code style="font-size:10px;color:#ffcc33">' + m3u8Url.slice(0, 120) + '...</code>';
+    } catch (e) {
+        r1.className = 'box err';
+        c1.textContent = '❌ 请求 Worker 失败：' + e.message;
+        btn.disabled = false;
+        btn.textContent = '重新测试';
+        return;
+    }
+
+    // ============ 测试 2：m3u8 能否直连 ============
+    r2.style.display = 'block';
+    c2.textContent = '请求 m3u8 中...';
+
+    let m3u8Text;
+    try {
+        const res = await fetch(m3u8Url);
+        m3u8Text = await res.text();
+        r2.className = 'box ok';
+        c2.innerHTML = '✅ <b>m3u8 直连成功</b><br>HTTP ' + res.status + '，' + m3u8Text.length + ' 字节';
+    } catch (e) {
+        r2.className = 'box err';
+        c2.innerHTML = '❌ <b>m3u8 直连失败</b><br>' + e.message;
+        btn.disabled = false;
+        btn.textContent = '重新测试';
+        return;
+    }
+
+    // ============ 测试 3：分片能否直连 ============
+    r3.style.display = 'block';
+
+    const lines = m3u8Text.split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('#'));
+    if (lines.length === 0) {
+        c3.textContent = '❌ m3u8 里没有找到分片地址';
+        btn.disabled = false;
+        btn.textContent = '重新测试';
+        return;
+    }
+
+    // 处理相对路径
+    let firstSeg = lines[0];
+    if (!firstSeg.startsWith('http')) {
+        const base = m3u8Url.substring(0, m3u8Url.lastIndexOf('/') + 1);
+        firstSeg = base + firstSeg;
+    }
+
+    c3.innerHTML = '分片地址：<br><code style="font-size:10px;color:#ffcc33">' + firstSeg.slice(0, 150) + '</code><br><br>测试中...';
+
+    try {
+        const segRes = await fetch(firstSeg);
+        if (segRes.ok) {
+            r3.className = 'box ok';
+            c3.innerHTML += '<br>✅ <b>分片直连成功！</b>HTTP ' + segRes.status + '，' + (segRes.headers.get('Content-Length') || '?') + ' 字节';
+        } else {
+            r3.className = 'box err';
+            c3.innerHTML += '<br>❌ <b>分片返回 ' + segRes.status + '</b>';
+        }
+    } catch (e) {
+        r3.className = 'box err';
+        c3.innerHTML += '<br>❌ <b>分片直连失败</b>：' + e.message;
+    }
+
+    btn.disabled = false;
+    btn.textContent = '重新测试';
+}
+</script>
+
+</body>
+</html>
