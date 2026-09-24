@@ -16,29 +16,21 @@ a { color:inherit; text-decoration:none; }
 button { font-family:inherit; cursor:pointer; border:none; outline:none; background:none; color:inherit; }
 input, textarea { font-family:inherit; outline:none; border:none; }
 
+/* ============ 顶栏 ============ */
 .bili-header {
     background:#fff; height:56px; padding:0 24px;
     display:flex; align-items:center; gap:20px;
     box-shadow:0 1px 2px rgba(0,0,0,.04);
     position:sticky; top:0; z-index:100;
 }
-.bili-logo {
-    display:flex; align-items:center; gap:8px;
-    font-size:18px; font-weight:bold; color:#fb7299;
-}
+.bili-logo { display:flex; align-items:center; gap:8px; font-size:18px; font-weight:bold; color:#fb7299; }
 .bili-logo svg { width:28px; height:28px; }
 .bili-nav { display:flex; gap:4px; }
 .bili-nav a { padding:6px 12px; font-size:14px; border-radius:6px; }
 .bili-nav a:hover { background:#f1f2f3; }
 .bili-search { margin-left:auto; position:relative; width:320px; }
-.bili-search input {
-    width:100%; height:34px; padding:0 40px 0 14px;
-    background:#f1f2f3; border-radius:17px; font-size:13px;
-}
-.bili-search .search-icon {
-    position:absolute; right:14px; top:50%;
-    transform:translateY(-50%); color:#9499a0; pointer-events:none;
-}
+.bili-search input { width:100%; height:34px; padding:0 40px 0 14px; background:#f1f2f3; border-radius:17px; font-size:13px; }
+.bili-search .search-icon { position:absolute; right:14px; top:50%; transform:translateY(-50%); color:#9499a0; pointer-events:none; }
 .bili-user { display:flex; align-items:center; gap:10px; font-size:13px; color:#61666d; }
 .bili-user .avatar {
     width:32px; height:32px; border-radius:50%;
@@ -47,36 +39,29 @@ input, textarea { font-family:inherit; outline:none; border:none; }
     font-weight:bold; font-size:14px;
 }
 .bili-user .username { color:#00aeec; font-weight:500; }
-.bili-user .login-link {
-    padding:6px 16px; background:#fb7299; color:#fff;
-    border-radius:6px; font-size:13px; font-weight:500;
-}
+.bili-user .login-link { padding:6px 16px; background:#fb7299; color:#fff; border-radius:6px; font-size:13px; font-weight:500; }
 
+/* ============ 主体 ============ */
 .main-container {
     max-width:1500px; margin:16px auto; padding:0 24px;
     display:grid; grid-template-columns:minmax(0,1fr) 380px;
     gap:20px; align-items:flex-start;
 }
 .left-col { min-width:0; }
-.video-info-head {
-    background:#fff; border-radius:8px 8px 0 0;
-    padding:16px 20px 12px;
-}
-.video-title {
-    font-size:18px; font-weight:600; line-height:1.4;
-    margin-bottom:10px; word-break:break-word;
-}
-.video-meta-row {
-    display:flex; flex-wrap:wrap; gap:16px;
-    font-size:13px; color:#9499a0;
-}
+.video-info-head { background:#fff; border-radius:8px 8px 0 0; padding:16px 20px 12px; }
+.video-title { font-size:18px; font-weight:600; line-height:1.4; margin-bottom:10px; word-break:break-word; }
+.video-meta-row { display:flex; flex-wrap:wrap; gap:16px; font-size:13px; color:#9499a0; }
 .video-meta-row .meta-item { display:inline-flex; align-items:center; gap:4px; }
 .video-meta-row .meta-item svg { width:16px; height:16px; }
-
-.player-wrap {
-    background:#000; position:relative;
-    aspect-ratio:16/9; overflow:hidden;
+.iv-tag {
+    display:inline-block; padding:2px 8px;
+    background:#e5f4ff; color:#00aeec;
+    border-radius:4px; font-size:12px; font-weight:bold;
+    margin-right:8px; vertical-align:middle;
 }
+
+/* ============ 播放器 ============ */
+.player-wrap { background:#000; position:relative; aspect-ratio:16/9; overflow:hidden; }
 .player-wrap video { width:100%; height:100%; display:block; background:#000; }
 .player-status {
     position:absolute; inset:0;
@@ -91,22 +76,37 @@ input, textarea { font-family:inherit; outline:none; border:none; }
 }
 @keyframes spin { to { transform:rotate(360deg); } }
 
+/* ============ 弹幕层 ============ */
 .dm-layer { position:absolute; inset:0; pointer-events:none; overflow:hidden; z-index:3; }
 .dm-item {
     position:absolute; left:100%; white-space:nowrap;
-    font-size:20px; font-weight:bold; color:#fff;
+    font-weight:bold; color:#fff;
     text-shadow:1px 1px 2px #000, 0 0 4px #000;
     will-change:transform;
+}
+.dm-item.scroll {
     animation:dmMove 8s linear forwards;
 }
+.dm-item.top, .dm-item.bottom {
+    left:50%; transform:translateX(-50%);
+    animation:dmStatic 4s linear forwards;
+}
+.dm-item.bottom { bottom:20px; top:auto !important; }
 .dm-item.self {
-    color:#fff; border:1.5px solid #00aeec;
-    border-radius:4px; padding:0 8px;
+    border:1.5px solid #00aeec;
+    border-radius:4px;
+    padding:0 8px;
     box-shadow:0 0 6px rgba(0,174,236,.6);
 }
 @keyframes dmMove {
     from { transform:translateX(0); }
     to { transform:translateX(calc(-100vw - 100%)); }
+}
+@keyframes dmStatic {
+    0%   { opacity:0; }
+    10%  { opacity:1; }
+    90%  { opacity:1; }
+    100% { opacity:0; }
 }
 .dm-toggle {
     position:absolute; right:12px; top:12px;
@@ -116,39 +116,106 @@ input, textarea { font-family:inherit; outline:none; border:none; }
 }
 .dm-toggle.off { opacity:.5; }
 
-/* ============ 弹幕输入条（放到播放器下方） ============ */
-.dm-input-row {
+/* ============ 弹幕输入区（播放器下方，B站样式） ============ */
+.dm-input-area {
     background:#fff;
-    padding:10px 20px;
+    padding:12px 20px;
     display:flex;
+    flex-direction:column;
     gap:10px;
     border-top:1px solid #f1f2f3;
 }
-.dm-input-row input {
+.dm-input-row {
+    display:flex;
+    gap:10px;
+    align-items:center;
+}
+.dm-input-row input[type="text"] {
     flex:1;
     background:#f1f2f3;
     border-radius:20px;
     padding:9px 16px;
     font-size:13px;
     color:#18191c;
-    transition:background .2s;
 }
-.dm-input-row input::placeholder { color:#9499a0; }
-.dm-input-row input:focus { background:#e3e5e7; }
-.dm-input-row button {
+.dm-input-row input[type="text"]:focus { background:#e3e5e7; }
+.dm-input-row input[type="text"]::placeholder { color:#9499a0; }
+.dm-input-row button.send {
     background:#fb7299; color:#fff;
     padding:9px 22px; border-radius:20px;
     font-size:13px; font-weight:600;
-    transition:background .2s;
 }
-.dm-input-row button:hover { background:#fc8bab; }
-.dm-input-row button:disabled { background:#e3e5e7; color:#9499a0; cursor:not-allowed; }
+.dm-input-row button.send:hover { background:#fc8bab; }
+.dm-input-row button.send:disabled { background:#e3e5e7; color:#9499a0; cursor:not-allowed; }
 
-.video-toolbar {
-    background:#fff; padding:8px 20px;
-    display:flex; align-items:center; gap:8px;
-    border-top:1px solid #f1f2f3;
+/* 弹幕设置行 */
+.dm-settings {
+    display:flex;
+    gap:14px;
+    align-items:center;
+    flex-wrap:wrap;
+    font-size:12px;
+    color:#61666d;
 }
+.dm-settings .group {
+    display:flex; gap:6px; align-items:center;
+}
+.dm-settings .label { color:#9499a0; }
+
+/* 颜色选择器 */
+.color-picker-wrap {
+    position:relative;
+    display:flex;
+    align-items:center;
+    gap:6px;
+}
+.color-dots {
+    display:flex;
+    gap:4px;
+}
+.color-dot {
+    width:18px; height:18px;
+    border-radius:50%;
+    cursor:pointer;
+    border:2px solid transparent;
+    transition:transform .15s, border-color .15s;
+}
+.color-dot:hover { transform:scale(1.15); }
+.color-dot.on {
+    border-color:#00aeec;
+    transform:scale(1.15);
+}
+.color-custom {
+    position:relative;
+    width:22px; height:22px;
+    border-radius:50%;
+    cursor:pointer;
+    background:conic-gradient(red, yellow, lime, aqua, blue, magenta, red);
+    border:2px solid #e3e5e7;
+    overflow:hidden;
+}
+.color-custom input[type="color"] {
+    position:absolute;
+    inset:0;
+    opacity:0;
+    cursor:pointer;
+    width:100%; height:100%;
+}
+
+/* 位置/字号按钮组 */
+.btn-group { display:flex; gap:2px; background:#f1f2f3; border-radius:6px; padding:2px; }
+.btn-group button {
+    padding:4px 10px;
+    font-size:12px;
+    color:#61666d;
+    border-radius:4px;
+    transition:all .15s;
+}
+.btn-group button:hover { background:#e3e5e7; }
+.btn-group button.on { background:#fff; color:#00aeec; font-weight:600; box-shadow:0 1px 2px rgba(0,0,0,.06); }
+
+/* ============ 工具栏 ============ */
+.video-toolbar { background:#fff; padding:8px 20px; display:flex; align-items:center; gap:8px; border-top:1px solid #f1f2f3; }
 .toolbar-btn {
     display:inline-flex; align-items:center; gap:6px;
     padding:8px 14px; font-size:13px; color:#61666d;
@@ -159,41 +226,27 @@ input, textarea { font-family:inherit; outline:none; border:none; }
 .toolbar-btn.active { color:#fb7299; }
 .toolbar-btn.active svg { fill:#fb7299; }
 
-.video-desc {
-    background:#fff; padding:16px 20px;
-    font-size:13px; line-height:1.7;
-    border-top:1px solid #f1f2f3;
-}
+/* ============ 简介 & 标签 ============ */
+.video-desc { background:#fff; padding:16px 20px; font-size:13px; line-height:1.7; border-top:1px solid #f1f2f3; }
 .video-desc.collapsed { max-height:60px; overflow:hidden; }
-.video-desc .toggle-desc {
-    color:#00aeec; cursor:pointer; font-weight:600; margin-left:6px;
-}
-.video-tags {
-    background:#fff; padding:8px 20px 16px;
-    display:flex; flex-wrap:wrap; gap:8px;
-    border-top:1px solid #f1f2f3;
-}
+.video-desc .toggle-desc { color:#00aeec; cursor:pointer; font-weight:600; margin-left:6px; }
+.video-tags { background:#fff; padding:8px 20px 16px; display:flex; flex-wrap:wrap; gap:8px; border-top:1px solid #f1f2f3; }
 .video-tags .tag {
-    padding:4px 12px; background:#f1f2f3;
-    color:#61666d; border-radius:14px; font-size:12px;
+    padding:4px 12px; background:#f1f2f3; color:#61666d;
+    border-radius:14px; font-size:12px;
 }
 .video-bottom-rounded { background:#fff; height:8px; border-radius:0 0 8px 8px; }
 
-.comment-card {
-    background:#fff; border-radius:8px;
-    margin-top:16px; padding:20px 24px;
-}
+/* ============ 评论 ============ */
+.comment-card { background:#fff; border-radius:8px; margin-top:16px; padding:20px 24px; }
 .comment-head {
     font-size:16px; font-weight:600;
-    padding-bottom:16px;
-    border-bottom:1px solid #f1f2f3;
-    margin-bottom:16px;
+    padding-bottom:16px; border-bottom:1px solid #f1f2f3; margin-bottom:16px;
 }
 .comment-head .count { font-size:13px; font-weight:normal; color:#9499a0; margin-left:8px; }
 .comment-input-area { display:flex; gap:12px; margin-bottom:24px; }
 .comment-avatar {
-    flex-shrink:0; width:40px; height:40px;
-    border-radius:50%;
+    flex-shrink:0; width:40px; height:40px; border-radius:50%;
     background:linear-gradient(135deg,#fb7299,#fc8bab);
     display:flex; align-items:center; justify-content:center;
     color:#fff; font-weight:bold; font-size:16px;
@@ -207,21 +260,18 @@ input, textarea { font-family:inherit; outline:none; border:none; }
 .comment-input-box .submit-row { display:flex; justify-content:flex-end; margin-top:8px; }
 .comment-input-box .submit-btn {
     padding:6px 20px; border-radius:6px;
-    background:#fb7299; color:#fff;
-    font-size:13px; font-weight:600;
+    background:#fb7299; color:#fff; font-size:13px; font-weight:600;
 }
 .comment-input-box .submit-btn:disabled { background:#e3e5e7; color:#9499a0; cursor:not-allowed; }
 .comment-login-tip {
-    padding:20px; background:#f6f7f8;
-    border-radius:8px; text-align:center;
-    color:#9499a0; font-size:13px; margin-bottom:24px;
+    padding:20px; background:#f6f7f8; border-radius:8px;
+    text-align:center; color:#9499a0; font-size:13px; margin-bottom:24px;
 }
 .comment-login-tip a { color:#fb7299; font-weight:600; }
 .comment-item { display:flex; gap:12px; padding:16px 0; border-bottom:1px solid #f6f7f8; }
 .comment-item:last-child { border-bottom:none; }
 .comment-item .avatar {
-    flex-shrink:0; width:40px; height:40px;
-    border-radius:50%;
+    flex-shrink:0; width:40px; height:40px; border-radius:50%;
     background:linear-gradient(135deg,#00aeec,#0088b8);
     display:flex; align-items:center; justify-content:center;
     color:#fff; font-weight:bold; font-size:16px;
@@ -229,16 +279,12 @@ input, textarea { font-family:inherit; outline:none; border:none; }
 .comment-item .body { flex:1; min-width:0; }
 .comment-item .head { display:flex; align-items:baseline; gap:8px; margin-bottom:4px; }
 .comment-item .username { font-size:13px; color:#00aeec; font-weight:600; }
+.comment-item .username a { color:inherit; }
 .comment-item .time { font-size:12px; color:#9499a0; }
-.comment-item .content {
-    font-size:14px; line-height:1.7;
-    word-break:break-word; white-space:pre-wrap;
-}
-.comment-empty, .comment-loading {
-    text-align:center; color:#9499a0;
-    padding:40px 0; font-size:13px;
-}
+.comment-item .content { font-size:14px; line-height:1.7; word-break:break-word; white-space:pre-wrap; }
+.comment-empty, .comment-loading { text-align:center; color:#9499a0; padding:40px 0; font-size:13px; }
 
+/* ============ 右侧栏 ============ */
 .right-col { position:sticky; top:72px; }
 .up-card { background:#fff; border-radius:8px; padding:16px; margin-bottom:12px; }
 .up-info { display:flex; align-items:center; gap:12px; margin-bottom:14px; }
@@ -250,6 +296,8 @@ input, textarea { font-family:inherit; outline:none; border:none; }
 }
 .up-meta { flex:1; min-width:0; }
 .up-name { font-size:14px; font-weight:600; margin-bottom:2px; }
+.up-name a { color:inherit; }
+.up-name a:hover { color:#00aeec; }
 .up-desc { font-size:12px; color:#9499a0; }
 .up-follow-btn {
     width:100%; padding:8px;
@@ -259,16 +307,12 @@ input, textarea { font-family:inherit; outline:none; border:none; }
 .pod-card { background:#fff; border-radius:8px; overflow:hidden; }
 .pod-head {
     display:flex; align-items:center;
-    padding:12px 16px;
-    border-bottom:1px solid #f1f2f3;
+    padding:12px 16px; border-bottom:1px solid #f1f2f3;
     font-size:14px; font-weight:600;
 }
 .pod-head .amt { font-size:12px; font-weight:normal; color:#9499a0; margin-left:6px; }
 .pod-head .tabs { margin-left:auto; display:flex; gap:4px; }
-.pod-tab {
-    padding:4px 10px; font-size:12px;
-    border-radius:4px; cursor:pointer;
-}
+.pod-tab { padding:4px 10px; font-size:12px; border-radius:4px; cursor:pointer; }
 .pod-tab.on { background:#e5f4ff; color:#00aeec; font-weight:600; }
 .pod-list { max-height:560px; overflow-y:auto; padding:8px 0; }
 .pod-list::-webkit-scrollbar { width:6px; }
@@ -329,7 +373,10 @@ input, textarea { font-family:inherit; outline:none; border:none; }
 <div class="main-container">
     <div class="left-col">
         <div class="video-info-head">
-            <h1 class="video-title" id="videoTitle">加载中...</h1>
+            <h1 class="video-title" id="videoTitle">
+                <span class="iv-tag" id="ivTag"></span>
+                <span id="videoTitleText">加载中...</span>
+            </h1>
             <div class="video-meta-row" id="videoMeta"></div>
         </div>
 
@@ -344,10 +391,46 @@ input, textarea { font-family:inherit; outline:none; border:none; }
             <button class="dm-toggle" id="dmToggle">弹幕 开</button>
         </div>
 
-        <!-- 弹幕输入条（播放器下方） -->
-        <div class="dm-input-row">
-            <input type="text" id="dmInput" placeholder="发个弹幕见证当下..." maxlength="50">
-            <button id="dmSend">发送</button>
+        <!-- 弹幕输入区（播放器下方） -->
+        <div class="dm-input-area">
+            <div class="dm-input-row">
+                <input type="text" id="dmInput" placeholder="发个弹幕见证当下..." maxlength="50">
+                <button class="send" id="dmSend">发送</button>
+            </div>
+            <div class="dm-settings">
+                <div class="group">
+                    <span class="label">颜色</span>
+                    <div class="color-dots" id="colorDots">
+                        <div class="color-dot on" data-color="#ffffff" style="background:#fff;border:2px solid #e3e5e7;"></div>
+                        <div class="color-dot" data-color="#ff0000" style="background:#ff0000;"></div>
+                        <div class="color-dot" data-color="#ff8800" style="background:#ff8800;"></div>
+                        <div class="color-dot" data-color="#ffdd00" style="background:#ffdd00;"></div>
+                        <div class="color-dot" data-color="#00cc00" style="background:#00cc00;"></div>
+                        <div class="color-dot" data-color="#00aeec" style="background:#00aeec;"></div>
+                        <div class="color-dot" data-color="#9900ff" style="background:#9900ff;"></div>
+                        <div class="color-dot" data-color="#ff6699" style="background:#ff6699;"></div>
+                    </div>
+                    <div class="color-custom" title="自定义颜色">
+                        <input type="color" id="colorCustom" value="#ffffff">
+                    </div>
+                </div>
+                <div class="group">
+                    <span class="label">类型</span>
+                    <div class="btn-group" id="positionGroup">
+                        <button data-pos="scroll" class="on">滚动</button>
+                        <button data-pos="top">顶部</button>
+                        <button data-pos="bottom">底部</button>
+                    </div>
+                </div>
+                <div class="group">
+                    <span class="label">字号</span>
+                    <div class="btn-group" id="fontSizeGroup">
+                        <button data-size="small">小</button>
+                        <button data-size="medium" class="on">中</button>
+                        <button data-size="large">大</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="video-toolbar">
@@ -383,13 +466,13 @@ input, textarea { font-family:inherit; outline:none; border:none; }
     <div class="right-col">
         <div class="up-card">
             <div class="up-info">
-                <div class="up-avatar">樱</div>
+                <div class="up-avatar" id="upAvatar">樱</div>
                 <div class="up-meta">
-                    <div class="up-name">櫻花动漫</div>
-                    <div class="up-desc">搬运 / 字幕 / 番剧分享</div>
+                    <div class="up-name" id="upName">加载中...</div>
+                    <div class="up-desc" id="upDesc">搬运 / 字幕 / 番剧分享</div>
                 </div>
             </div>
-            <button class="up-follow-btn">+ 关注</button>
+            <button class="up-follow-btn" id="upFollowBtn">+ 关注</button>
         </div>
 
         <div class="pod-card">
@@ -415,12 +498,15 @@ function escapeHtml(s) {
     }[m]));
 }
 
+// ============================================================
+// 弹幕引擎（支持 color / position / font_size）
+// ============================================================
 class DanmuEngine {
     constructor(layerEl) {
         this.layer = layerEl;
         this.enabled = true;
-        this.tracks = 6;
-        this.trackFree = new Array(6).fill(0);
+        this.tracks = 8;
+        this.trackFree = new Array(this.tracks).fill(0);
     }
     pickTrack() {
         const now = Date.now();
@@ -437,15 +523,34 @@ class DanmuEngine {
         this.trackFree[min] = now + 8000;
         return min;
     }
-    shoot(text, isSelf = false) {
+    shoot(content, opts = {}) {
         if (!this.enabled) return;
-        const track = this.pickTrack();
+        const color = opts.color || '#ffffff';
+        const position = opts.position || 'scroll';
+        const fontSize = opts.fontSize || 'medium';
+        const isSelf = opts.isSelf || false;
+
         const el = document.createElement('div');
-        el.className = 'dm-item' + (isSelf ? ' self' : '');
-        el.textContent = text;
-        el.style.top = (track * 40 + 10) + 'px';
+        el.className = 'dm-item ' + position + (isSelf ? ' self' : '');
+        el.textContent = content;
+        el.style.color = color;
+
+        // 字号
+        const sizeMap = { small: '14px', medium: '20px', large: '28px' };
+        el.style.fontSize = sizeMap[fontSize] || '20px';
+
+        if (position === 'scroll') {
+            const track = this.pickTrack();
+            el.style.top = (track * 36 + 10) + 'px';
+        } else if (position === 'top') {
+            el.style.top = '60px';
+        } else if (position === 'bottom') {
+            el.style.bottom = '60px';
+        }
+
         this.layer.appendChild(el);
-        setTimeout(() => el.remove(), 8500);
+        const dur = position === 'scroll' ? 8000 : 4000;
+        setTimeout(() => el.remove(), dur + 500);
     }
     clear() {
         this.layer.innerHTML = '';
@@ -453,21 +558,28 @@ class DanmuEngine {
     }
 }
 
+// ============================================================
+// 状态
+// ============================================================
 const params = new URLSearchParams(location.search);
+const animeId = parseInt(params.get('id') || params.get('aid') || '0');
 const albumId = params.get('album');
-const singleId = params.get('id');
+const singleId = params.get('ac');
 const urlTitle = params.get('title') || '';
-let currentP = parseInt(params.get('p')) || 1;
 
 let hls = null;
-let playlist = [];
-let currentIndex = 0;
 let danmuEngine = null;
 let danmuList = [];
 let lastDanmuTime = 0;
-let currentVideoKey = '';
-let qualityOptions = [];
-let currentQualityIdx = 0;
+let currentAnime = null;
+let acId = null;
+let episodeList = [];
+let currentEpIdx = 0;
+
+// 弹幕发送设置
+let sendColor = '#ffffff';
+let sendPosition = 'scroll';
+let sendFontSize = 'medium';
 
 const video = document.getElementById('video');
 const dmLayer = document.getElementById('dmLayer');
@@ -484,8 +596,8 @@ function renderUser() {
     const user = getCurrentUser();
     const box = document.getElementById('biliUser');
     if (user) {
-        box.innerHTML = '<div class="avatar">' + escapeHtml(user.username[0].toUpperCase()) + '</div>' +
-                        '<span class="username">' + escapeHtml(user.username) + '</span>';
+        box.innerHTML = '<a class="avatar" href="./user.html?uid=' + user.uid + '" style="color:#fff">' + escapeHtml(user.username[0].toUpperCase()) + '</a>' +
+                        '<a class="username" href="./user.html?uid=' + user.uid + '">' + escapeHtml(user.username) + '</a>';
     } else {
         box.innerHTML = '<a class="login-link" href="./index.html">登录</a>';
     }
@@ -499,14 +611,52 @@ document.getElementById('topSearch').addEventListener('keydown', (e) => {
     }
 });
 
-if (!albumId && !singleId) {
-    showStatus('缺少参数：?album=xxx 或 ?id=xxx');
+// ============================================================
+// 弹幕设置交互
+// ============================================================
+document.getElementById('colorDots').addEventListener('click', (e) => {
+    const dot = e.target.closest('.color-dot');
+    if (!dot) return;
+    document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('on'));
+    dot.classList.add('on');
+    sendColor = dot.dataset.color;
+    document.getElementById('colorCustom').value = sendColor;
+});
+
+document.getElementById('colorCustom').addEventListener('input', (e) => {
+    sendColor = e.target.value;
+    document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('on'));
+});
+
+document.getElementById('positionGroup').addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    document.querySelectorAll('#positionGroup button').forEach(b => b.classList.remove('on'));
+    btn.classList.add('on');
+    sendPosition = btn.dataset.pos;
+});
+
+document.getElementById('fontSizeGroup').addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    document.querySelectorAll('#fontSizeGroup button').forEach(b => b.classList.remove('on'));
+    btn.classList.add('on');
+    sendFontSize = btn.dataset.size;
+});
+
+// ============================================================
+// 初始化
+// ============================================================
+if (!animeId && !albumId && !singleId) {
+    showStatus('缺少参数：?id=<animeId> 或 ?album=xxx 或 ?ac=xxx');
+} else if (animeId) {
+    initByAnimeId(animeId);
 } else if (albumId) {
-    document.title = (urlTitle || '合集') + ' - 櫻花动漫';
-    initCollection(albumId);
+    // 兼容旧链接（用合集 ID）
+    initByAnimeIdFromAlbum(albumId);
 } else {
-    document.title = (urlTitle || '视频') + ' - 櫻花动漫';
-    initSingle(singleId);
+    // 兼容旧链接（用 ac 号）
+    initByAcId(singleId);
 }
 
 function showStatus(text) {
@@ -517,36 +667,143 @@ function hideStatus() {
     document.getElementById('playerStatus').classList.add('hide');
 }
 
-async function initCollection(albumId) {
-    showStatus('加载合集列表...');
+// 通过 animeId 加载（主流程）
+async function initByAnimeId(id) {
+    showStatus('加载番剧信息...');
     try {
-        const res = await fetch(`${API_BASE}/api/acfun-collection/${albumId}`);
+        const res = await fetch(`${API_BASE}/api/anime/${id}`);
         const data = await res.json();
-        if (!data.ok || !data.list || !data.list.length) {
-            showStatus('合集加载失败：' + (data.error || '未知错误'));
+        if (!data.ok) {
+            showStatus('番剧不存在：' + (data.error || '未知错误'));
             return;
         }
-        playlist = data.list.map(item => ({
-            ac: item.ac, p: item.p, title: item.title || ('第' + item.p + '集')
-        }));
-        currentIndex = Math.max(0, Math.min(currentP - 1, playlist.length - 1));
-        renderPodList();
-        loadCurrent();
+        currentAnime = data.anime;
+        renderAnimeInfo(currentAnime);
+        await loadStats(currentAnime.id);
+        await loadDanmu(currentAnime.id);
+        loadComments(currentAnime.id);
+        await loadAndPlay(currentAnime);
     } catch (e) {
         showStatus('网络错误：' + e.message);
     }
 }
 
-async function initSingle(videoId) {
-    playlist = [{ ac: videoId, p: 1, title: urlTitle || '视频' }];
-    currentIndex = 0;
-    renderPodList();
-    loadCurrent();
+// 兼容：只给了 album ID，去找对应 anime
+async function initByAnimeIdFromAlbum(albumId) {
+    // 直接调用 AcFun 合集接口（沿用旧逻辑）
+    showStatus('加载合集...');
+    try {
+        const res = await fetch(`${API_BASE}/api/acfun-collection/${albumId}`);
+        const data = await res.json();
+        if (!data.ok) {
+            showStatus('合集不存在：' + (data.error || '未知错误'));
+            return;
+        }
+        episodeList = data.list.map(item => ({
+            ac: item.ac, p: item.p, title: item.title || ('第' + item.p + '集')
+        }));
+        currentEpIdx = 0;
+        document.getElementById('videoTitleText').textContent = urlTitle || ('合集 ' + albumId);
+        document.getElementById('ivTag').textContent = '';
+        renderPodList();
+        await loadCurrentEpisode();
+    } catch (e) {
+        showStatus('网络错误：' + e.message);
+    }
 }
 
-async function loadCurrent() {
-    const item = playlist[currentIndex];
-    if (!item) return;
+// 兼容：只给了 ac 号
+async function initByAcId(ac) {
+    showStatus('加载视频...');
+    episodeList = [{ ac, p: 1, title: urlTitle || '视频' }];
+    currentEpIdx = 0;
+    document.getElementById('videoTitleText').textContent = urlTitle || '视频';
+    renderPodList();
+    await loadCurrentEpisode();
+}
+
+function renderAnimeInfo(anime) {
+    document.getElementById('ivTag').textContent = anime.iv || ('iv' + anime.id);
+    document.getElementById('videoTitleText').textContent = anime.title;
+    document.title = anime.title + ' - 櫻花动漫';
+
+    document.getElementById('upName').innerHTML = '<a href="./user.html?uid=' + anime.ownerUid + '">' + escapeHtml(anime.ownerName || '匿名') + '</a>';
+    document.getElementById('upAvatar').textContent = (anime.ownerName || '匿')[0].toUpperCase();
+
+    document.getElementById('descText').textContent = anime.description || '暂无简介';
+
+    document.getElementById('videoTags').innerHTML =
+        (anime.tags || []).map(t => '<span class="tag">' + escapeHtml(t) + '</span>').join('');
+
+    // 选集列表（把链接里的 ac 提取出来）
+    episodeList = [];
+    const links = anime.links || {};
+    for (const key of ['a', 'b', 'mfuns']) {
+        if (!links[key]) continue;
+        if (key === 'a') {
+            const m = links[key].match(/acfun\.cn\/a\/aa(\d+)/);
+            if (m) {
+                // 是合集链接——留给 loadAndPlay 去处理
+                currentAnime._collectionId = m[1];
+            } else {
+                const m2 = links[key].match(/acfun\.cn\/v\/ac(\d+)/);
+                if (m2) episodeList.push({ ac: m2[1], p: 1, title: anime.title });
+            }
+        } else if (key === 'mfuns') {
+            const m = links[key].match(/mfuns\.net\/video\/(\d+)/);
+            if (m) episodeList.push({ mfuns: m[1], p: 1, title: anime.title });
+        }
+    }
+    renderPodList();
+}
+
+async function loadAndPlay(anime) {
+    // 优先用 AcFun 合集
+    if (anime._collectionId) {
+        showStatus('加载合集列表...');
+        try {
+            const res = await fetch(`${API_BASE}/api/acfun-collection/${anime._collectionId}`);
+            const data = await res.json();
+            if (data.ok && data.list && data.list.length) {
+                episodeList = data.list.map(item => ({
+                    ac: item.ac, p: item.p, title: item.title || ('第' + item.p + '集')
+                }));
+                currentEpIdx = 0;
+                renderPodList();
+                await loadCurrentEpisode();
+                return;
+            }
+        } catch (e) {}
+    }
+    // 否则直接用第一个 ac
+    if (episodeList.length > 0 && episodeList[0].ac) {
+        await loadCurrentEpisode();
+        return;
+    }
+    // 兜底：从 links 里提取单视频
+    const links = anime.links || {};
+    for (const k of ['a', 'b', 'mfuns']) {
+        if (!links[k]) continue;
+        const m = links[k].match(/acfun\.cn\/v\/ac(\d+)/);
+        if (m) {
+            episodeList = [{ ac: m[1], p: 1, title: anime.title }];
+            currentEpIdx = 0;
+            renderPodList();
+            await loadCurrentEpisode();
+            return;
+        }
+    }
+    showStatus('没有可播放的源');
+}
+
+async function loadCurrentEpisode() {
+    const ep = episodeList[currentEpIdx];
+    if (!ep) return;
+
+    if (!ep.ac) {
+        showStatus('此集暂无可播放的 AcFun 源');
+        return;
+    }
 
     showStatus('获取视频地址...');
     if (hls) { hls.destroy(); hls = null; }
@@ -554,89 +811,48 @@ async function loadCurrent() {
     video.load();
     danmuEngine.clear();
 
-    currentVideoKey = albumId ? `album_${albumId}_ep${item.p}` : `ac_${item.ac}`;
-    document.getElementById('videoTitle').textContent = item.title;
-
     try {
-        const res = await fetch(`${API_BASE}/api/acfun/${item.ac}?p=1`);
+        const res = await fetch(`${API_BASE}/api/acfun/${ep.ac}?p=1`);
         const data = await res.json();
         if (!data.ok || !data.urls || !data.urls.length) {
             showStatus('获取视频失败：' + (data.error || '未知错误'));
             return;
         }
 
-        qualityOptions = sortQualities(data.urls);
-        currentQualityIdx = 0;
-        const pages = data.pages || [];
+        // 更新副标题
+        if (currentAnime) {
+            document.getElementById('videoTitleText').textContent =
+                currentAnime.title + (episodeList.length > 1 ? ' · ' + ep.title : '');
+        }
 
-        document.getElementById('videoMeta').innerHTML =
-            '<span class="meta-item">' +
-                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>' +
-                (item.p * 12300 + 45600).toLocaleString() +
-            '</span>' +
-            '<span class="meta-item">' +
-                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>' +
-                (danmuList.length || Math.floor(Math.random() * 500 + 100)) +
-            '</span>' +
-            '<span class="meta-item">' + new Date().toLocaleDateString('zh-CN') + '</span>' +
-            (pages.length > 1 ? '<span class="meta-item">' + pages.length + ' 个分P · 无缝连播</span>' : '');
-
-        document.getElementById('descText').textContent =
-            '【' + item.title + '】本视频由櫻花动漫聚合整理，如涉及版权问题请联系删除。';
-
-        document.getElementById('videoTags').innerHTML =
-            ['番剧', '动画', 'AcFun', '在线观看', '全集'].map(t => '<span class="tag">' + t + '</span>').join('');
-
+        // 更新 URL
         const newUrl = new URL(location.href);
-        newUrl.searchParams.set('p', item.p);
+        newUrl.searchParams.set('ep', ep.p || (currentEpIdx + 1));
         history.replaceState({}, '', newUrl);
 
+        // 高亮选集
         document.querySelectorAll('.ep-item').forEach((el, i) => {
-            el.classList.toggle('on', i === currentIndex);
+            el.classList.toggle('on', i === currentEpIdx);
             const dot = el.querySelector('.playing-dot');
             if (dot) dot.remove();
-            if (i === currentIndex) el.insertAdjacentHTML('beforeend', '<span class="playing-dot"></span>');
+            if (i === currentEpIdx) el.insertAdjacentHTML('beforeend', '<span class="playing-dot"></span>');
         });
 
-        loadDanmu(currentVideoKey);
-        loadComments(currentVideoKey);
+        // 播视频
+        playSingle(data.urls[0]);
 
-        // 关键：多P走前端合并，单P走直连
-        if (pages.length > 1) {
-            await playMerged(item, pages);
-        } else {
-            playSingle(qualityOptions[0]);
-        }
+        // 播完后 +1
+        fetch(`${API_BASE}/api/view`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ animeId: currentAnime ? currentAnime.id : 0 })
+        }).catch(() => {});
 
     } catch (e) {
         showStatus('网络错误：' + e.message);
     }
 }
 
-function sortQualities(urls) {
-    function lv(q) {
-        const s = (q || '').toLowerCase();
-        if (s.includes('2160') || s.includes('4k')) return 200;
-        if (s.includes('1080')) return 100;
-        if (s.includes('720')) return 80;
-        if (s.includes('540')) return 60;
-        if (s.includes('480')) return 50;
-        if (s.includes('360')) return 40;
-        return 55;
-    }
-    const sorted = urls.map(u => ({ ...u, level: lv(u.quality) })).sort((a, b) => b.level - a.level);
-    const out = [];
-    const seen = new Set();
-    for (const it of sorted) {
-        const name = it.quality || '默认';
-        if (!seen.has(name)) { seen.add(name); out.push(it); }
-    }
-    return out;
-}
-
-// ============================================================
-// 单P：直连播放
-// ============================================================
 function playSingle(quality) {
     if (!quality || !quality.url) {
         showStatus('无可用清晰度');
@@ -667,182 +883,77 @@ function playSingle(quality) {
     }
 }
 
-// ============================================================
-// 多P：前端拉取所有分P的 m3u8，拼接成一个大 m3u8
-// 分片地址保持 AcFun 原样 → 浏览器直连 AcFun，不走 Worker
-// ============================================================
-async function playMerged(item, pages) {
-    showStatus('合并分P中...（' + pages.length + ' 个分P）');
+async function loadStats(animeId) {
+    try {
+        const res = await fetch(`${API_BASE}/api/anime/${animeId}/stats`);
+        const data = await res.json();
+        if (!data.ok) return;
 
-    const quality = qualityOptions[currentQualityIdx];
-    const qualityKeyword = extractQualityKeyword(quality.quality);
-
-    let merged = '#EXTM3U\n#EXT-X-VERSION:3\n#EXT-X-PLAYLIST-TYPE:VOD\n';
-    let hasContent = false;
-    let maxDur = 0;
-
-    for (const pg of pages) {
-        try {
-            // 拿这个分P的播放地址
-            const res = await fetch(`${API_BASE}/api/acfun/${item.ac}?p=${pg.p}`);
-            const data = await res.json();
-            if (!data.ok || !data.urls) continue;
-
-            // 从分P的 URL 里选对应清晰度
-            const targetUrls = sortQualities(data.urls);
-            const target = targetUrls.find(u => u.quality.includes(qualityKeyword)) || targetUrls[0];
-            if (!target) continue;
-
-            // 直接 fetch AcFun 的 m3u8 文本
-            const m3u8Res = await fetch(target.url);
-            if (!m3u8Res.ok) {
-                console.warn('P' + pg.p + ' m3u8 拉取失败：', m3u8Res.status);
-                continue;
-            }
-            const m3u8Text = await m3u8Res.text();
-
-            const baseUrl = target.url.substring(0, target.url.lastIndexOf('/') + 1);
-            const targetOrigin = new URL(target.url).origin;
-
-            let expectUrl = false;
-            for (const line of m3u8Text.split('\n')) {
-                const trimmed = line.trim();
-                if (!trimmed) continue;
-
-                if (trimmed.startsWith('#EXTINF')) {
-                    const m = trimmed.match(/#EXTINF:([\d.]+)/);
-                    if (m) maxDur = Math.max(maxDur, parseFloat(m[1]));
-                    merged += trimmed + '\n';
-                    expectUrl = true;
-                } else if (expectUrl && !trimmed.startsWith('#')) {
-                    let u = trimmed;
-                    if (!u.startsWith('http')) {
-                        u = u.startsWith('/') ? targetOrigin + u : baseUrl + u;
-                    }
-                    merged += u + '\n';
-                    hasContent = true;
-                    expectUrl = false;
-                }
-            }
-
-            merged += '#EXT-X-DISCONTINUITY\n';
-        } catch (e) {
-            console.warn('P' + pg.p + ' 合并失败：', e.message);
-        }
-    }
-
-    if (!hasContent) {
-        // 合并失败，回退到单P
-        console.warn('合并失败，回退到单P');
-        playSingle(qualityOptions[0]);
-        return;
-    }
-
-    merged += '#EXT-X-ENDLIST\n';
-    merged = merged.replace(
-        '#EXT-X-PLAYLIST-TYPE:VOD\n',
-        '#EXT-X-PLAYLIST-TYPE:VOD\n#EXT-X-TARGETDURATION:' + Math.ceil(maxDur || 10) + '\n'
-    );
-
-    const blob = new Blob([merged], { type: 'application/vnd.apple.mpegurl' });
-    const blobUrl = URL.createObjectURL(blob);
-
-    if (hls) { hls.destroy(); hls = null; }
-    hls = new Hls({ enableWorker: true });
-    hls.loadSource(blobUrl);
-    hls.attachMedia(video);
-    hls.on(Hls.Events.MANIFEST_PARSED, () => {
-        hideStatus();
-        video.play().catch(() => {});
-        lastDanmuTime = 0;
-    });
-    hls.on(Hls.Events.ERROR, (e, data) => {
-        console.error('HLS 错误：', data);
-        if (data.fatal) showStatus('播放错误：' + (data.details || '未知'));
-    });
+        document.getElementById('videoMeta').innerHTML =
+            '<span class="meta-item">' +
+                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>' +
+                data.views.toLocaleString() +
+            '</span>' +
+            '<span class="meta-item">' +
+                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>' +
+                data.danmu.toLocaleString() +
+            '</span>' +
+            '<span class="meta-item">' +
+                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>' +
+                data.comments.toLocaleString() +
+            '</span>' +
+            '<span class="meta-item">' + new Date().toLocaleDateString('zh-CN') + '</span>';
+    } catch (e) {}
 }
-
-function extractQualityKeyword(q) {
-    if (!q) return '1080';
-    const m = q.match(/\d+/);
-    return m ? m[0] : '1080';
-}
-
-let podTab = 'eps';
-document.querySelectorAll('.pod-tab').forEach(tab => {
-    tab.onclick = () => {
-        document.querySelectorAll('.pod-tab').forEach(t => t.classList.remove('on'));
-        tab.classList.add('on');
-        podTab = tab.dataset.tab;
-        renderPodList();
-    };
-});
 
 function renderPodList() {
     const list = document.getElementById('podList');
     const amt = document.getElementById('podAmt');
-
-    if (podTab === 'eps') {
-        amt.textContent = '（' + (currentIndex + 1) + '/' + playlist.length + '）';
-        if (playlist.length <= 1) {
-            list.innerHTML = '<div class="comment-loading" style="padding:20px 0;font-size:12px;">单个视频</div>';
-            return;
-        }
-        list.innerHTML = playlist.map((item, idx) =>
-            '<div class="ep-item' + (idx === currentIndex ? ' on' : '') + '" data-idx="' + idx + '">' +
-                '<span class="ep-num">' + (idx + 1) + '</span>' +
-                '<span class="ep-title">' + escapeHtml(item.title) + '</span>' +
-                (idx === currentIndex ? '<span class="playing-dot"></span>' : '') +
-            '</div>'
-        ).join('');
-        list.querySelectorAll('.ep-item').forEach(el => {
-            el.onclick = () => {
-                currentIndex = parseInt(el.dataset.idx);
-                renderPodList();
-                loadCurrent();
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            };
-        });
-    } else {
-        amt.textContent = '';
-        if (qualityOptions.length <= 1) {
-            list.innerHTML = '<div class="comment-loading" style="padding:20px 0;font-size:12px;">仅一个清晰度</div>';
-            return;
-        }
-        list.innerHTML = qualityOptions.map((q, i) =>
-            '<div class="q-item' + (i === currentQualityIdx ? ' on' : '') + '" data-idx="' + i + '">' +
-                '<span>' + escapeHtml(q.quality || '默认') + '</span>' +
-                (i === currentQualityIdx ? '<span class="q-check">✓</span>' : '') +
-            '</div>'
-        ).join('');
-        list.querySelectorAll('.q-item').forEach(el => {
-            el.onclick = () => {
-                const i = parseInt(el.dataset.idx);
-                currentQualityIdx = i;
-                list.querySelectorAll('.q-item').forEach(x => {
-                    x.classList.remove('on');
-                    const c = x.querySelector('.q-check'); if (c) c.remove();
-                });
-                el.classList.add('on');
-                el.insertAdjacentHTML('beforeend', '<span class="q-check">✓</span>');
-                // 重新加载（会重新合并）
-                loadCurrent();
-            };
-        });
+    amt.textContent = '（' + (currentEpIdx + 1) + '/' + episodeList.length + '）';
+    if (episodeList.length <= 1) {
+        list.innerHTML = '<div class="comment-loading" style="padding:20px 0;font-size:12px;">单个视频</div>';
+        return;
     }
+    list.innerHTML = episodeList.map((ep, idx) =>
+        '<div class="ep-item' + (idx === currentEpIdx ? ' on' : '') + '" data-idx="' + idx + '">' +
+            '<span class="ep-num">' + (idx + 1) + '</span>' +
+            '<span class="ep-title">' + escapeHtml(ep.title) + '</span>' +
+            (idx === currentEpIdx ? '<span class="playing-dot"></span>' : '') +
+        '</div>'
+    ).join('');
+    list.querySelectorAll('.ep-item').forEach(el => {
+        el.onclick = () => {
+            currentEpIdx = parseInt(el.dataset.idx);
+            renderPodList();
+            loadCurrentEpisode();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+    });
 }
 
-async function loadDanmu(videoKey) {
+// 简化的 tab 切换（保持原逻辑）
+document.querySelectorAll('.pod-tab').forEach(tab => {
+    tab.onclick = () => {
+        document.querySelectorAll('.pod-tab').forEach(t => t.classList.remove('on'));
+        tab.classList.add('on');
+    };
+});
+
+// 加载弹幕
+async function loadDanmu(animeId) {
     danmuList = [];
     lastDanmuTime = 0;
     try {
-        const res = await fetch(`${API_BASE}/api/danmu/${encodeURIComponent(videoKey)}`);
+        const res = await fetch(`${API_BASE}/api/danmu/${animeId}`);
         const data = await res.json();
         if (Array.isArray(data)) {
             danmuList = data.map(d => ({
                 time: parseFloat(d.time_in_video) || 0,
                 content: d.content,
-                username: d.username || '匿名'
+                username: d.username || '匿名',
+                color: d.color || '#ffffff',
+                position: d.position || 'scroll',
+                fontSize: d.font_size || 'medium'
             }));
         }
     } catch (e) {}
@@ -854,15 +965,21 @@ video.addEventListener('timeupdate', () => {
         lastDanmuTime = now;
         return;
     }
+    const user = getCurrentUser();
     danmuList.forEach(d => {
         if (d.time > lastDanmuTime && d.time <= now) {
-            const user = getCurrentUser();
-            danmuEngine.shoot(d.content, user && user.username === d.username);
+            danmuEngine.shoot(d.content, {
+                color: d.color,
+                position: d.position,
+                fontSize: d.fontSize,
+                isSelf: user && user.username === d.username
+            });
         }
     });
     lastDanmuTime = now;
 });
 
+// 发送弹幕
 document.getElementById('dmSend').onclick = sendDanmu;
 document.getElementById('dmInput').addEventListener('keydown', e => {
     if (e.key === 'Enter') sendDanmu();
@@ -872,8 +989,10 @@ async function sendDanmu() {
     const input = document.getElementById('dmInput');
     const content = input.value.trim();
     if (!content) return;
+
     const user = getCurrentUser();
     if (!user) { alert('请先登录'); location.href = './index.html'; return; }
+    if (!currentAnime) { alert('番剧信息未加载'); return; }
 
     const btn = document.getElementById('dmSend');
     btn.disabled = true;
@@ -881,14 +1000,37 @@ async function sendDanmu() {
     try {
         const res = await fetch(`${API_BASE}/api/danmu`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + user.token },
-            body: JSON.stringify({ videoKey: currentVideoKey, content, timeInVideo: video.currentTime })
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + user.token
+            },
+            body: JSON.stringify({
+                animeId: currentAnime.id,
+                content,
+                timeInVideo: video.currentTime,
+                color: sendColor,
+                position: sendPosition,
+                fontSize: sendFontSize
+            })
         });
         const data = await res.json();
         if (data.ok) {
             input.value = '';
-            danmuEngine.shoot(content, true);
-            danmuList.push({ time: video.currentTime, content, username: user.username });
+            // 立即显示
+            danmuEngine.shoot(content, {
+                color: sendColor,
+                position: sendPosition,
+                fontSize: sendFontSize,
+                isSelf: true
+            });
+            danmuList.push({
+                time: video.currentTime,
+                content,
+                username: user.username,
+                color: sendColor,
+                position: sendPosition,
+                fontSize: sendFontSize
+            });
         } else {
             alert(data.error || '发送失败');
         }
@@ -907,14 +1049,15 @@ document.getElementById('dmToggle').onclick = function () {
     if (!danmuEngine.enabled) danmuEngine.clear();
 };
 
-async function loadComments(videoKey) {
+// 评论
+async function loadComments(animeId) {
     const list = document.getElementById('commentList');
     const count = document.getElementById('commentCount');
     list.innerHTML = '<div class="comment-loading">加载中...</div>';
     renderCommentInput();
 
     try {
-        const res = await fetch(`${API_BASE}/api/comments/${encodeURIComponent(videoKey)}`);
+        const res = await fetch(`${API_BASE}/api/comments/${animeId}`);
         const data = await res.json();
         if (!Array.isArray(data) || data.length === 0) {
             list.innerHTML = '<div class="comment-empty">还没有评论，来抢沙发~</div>';
@@ -931,11 +1074,12 @@ async function loadComments(videoKey) {
 function renderCommentItem(c) {
     const timeStr = formatTime(c.created_at);
     const avatar = (c.username || '匿')[0].toUpperCase();
+    const uid = c.uid || 0;
     return '<div class="comment-item">' +
         '<div class="avatar">' + avatar + '</div>' +
         '<div class="body">' +
             '<div class="head">' +
-                '<span class="username">' + escapeHtml(c.username || '匿名') + '</span>' +
+                '<span class="username"><a href="./user.html?uid=' + uid + '">' + escapeHtml(c.username || '匿名') + '</a></span>' +
                 '<span class="time">' + timeStr + '</span>' +
             '</div>' +
             '<div class="content">' + escapeHtml(c.content) + '</div>' +
@@ -967,6 +1111,7 @@ async function sendComment() {
     if (!content) return;
     const user = getCurrentUser();
     if (!user) { alert('请先登录'); return; }
+    if (!currentAnime) return;
 
     const btn = document.getElementById('commentSend');
     btn.disabled = true;
@@ -975,12 +1120,12 @@ async function sendComment() {
         const res = await fetch(`${API_BASE}/api/comments`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + user.token },
-            body: JSON.stringify({ videoKey: currentVideoKey, content })
+            body: JSON.stringify({ animeId: currentAnime.id, content })
         });
         const data = await res.json();
         if (data.ok) {
             input.value = '';
-            loadComments(currentVideoKey);
+            loadComments(currentAnime.id);
         } else {
             alert(data.error || '发送失败');
         }
@@ -1005,15 +1150,17 @@ function formatTime(str) {
     return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
 }
 
+// 自动连播
 video.onended = () => {
-    if (currentIndex < playlist.length - 1) {
-        currentIndex++;
+    if (currentEpIdx < episodeList.length - 1) {
+        currentEpIdx++;
         renderPodList();
-        loadCurrent();
+        loadCurrentEpisode();
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 };
 
+// 工具栏
 document.getElementById('likeBtn').onclick = function () { this.classList.toggle('active'); };
 document.getElementById('favBtn').onclick = function () {
     this.classList.toggle('active');
