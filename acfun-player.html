@@ -419,13 +419,13 @@ input, textarea { font-family:inherit; outline:none; border:none; }
 const API_BASE = 'https://api.imomoe.dpdns.org';
 
 function escapeHtml(s) {
-    return String(s).replace(/[&<>"']/g, m => ({
+    return String(s || '').replace(/[&<>"']/g, m => ({
         '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
     }[m]));
 }
 
 // ============================================================
-// 弹幕引擎
+// 弹幕引擎（支持 color / position / font_size）
 // ============================================================
 class DanmuEngine {
     constructor(layerEl) {
@@ -488,14 +488,13 @@ class DanmuEngine {
 // ============================================================
 const params = new URLSearchParams(location.search);
 
-// ⭐ 关键：从 ?iv=iv1 解析番剧 id（不区分大小写）
+// ⭐ 从 ?iv=iv1 解析（不区分大小写）
 function parseIvParam() {
     const ivParam = params.get('iv');
     if (ivParam) {
-        const m = ivParam.match(/(\d+)/);  // 提取数字，不区分大小写
+        const m = ivParam.match(/(\d+)/);
         if (m) return parseInt(m[1]);
     }
-    // 兼容旧链接 ?id=1
     const idParam = params.get('id');
     if (idParam) {
         const n = parseInt(idParam);
@@ -517,7 +516,6 @@ let currentAnime = null;
 let episodeList = [];
 let currentEpIdx = 0;
 
-// 弹幕发送设置
 let sendColor = '#ffffff';
 let sendPosition = 'scroll';
 let sendFontSize = 'medium';
@@ -552,9 +550,7 @@ document.getElementById('topSearch').addEventListener('keydown', (e) => {
     }
 });
 
-// ============================================================
 // 弹幕设置交互
-// ============================================================
 document.getElementById('colorDots').addEventListener('click', (e) => {
     const dot = e.target.closest('.color-dot');
     if (!dot) return;
@@ -585,9 +581,7 @@ document.getElementById('fontSizeGroup').addEventListener('click', (e) => {
     sendFontSize = btn.dataset.size;
 });
 
-// ============================================================
 // 初始化
-// ============================================================
 if (!animeId && !albumId && !singleId) {
     showStatus('缺少参数：?iv=iv1 或 ?id=1');
 } else if (animeId) {
@@ -606,7 +600,6 @@ function hideStatus() {
     document.getElementById('playerStatus').classList.add('hide');
 }
 
-// 主流程：通过 iv 号加载
 async function initByAnimeId(id) {
     showStatus('加载番剧信息...');
     try {
@@ -618,10 +611,9 @@ async function initByAnimeId(id) {
         }
         currentAnime = data.anime;
 
-        // ⭐ 关键：把 URL 里的 iv 号统一小写成 iv{n}
         const newUrl = new URL(location.href);
         newUrl.searchParams.set('iv', 'iv' + currentAnime.id);
-        newUrl.searchParams.delete('id');  // 清掉旧的 id 参数
+        newUrl.searchParams.delete('id');
         history.replaceState({}, '', newUrl);
 
         renderAnimeInfo(currentAnime);
@@ -665,7 +657,6 @@ async function initByAcId(ac) {
 }
 
 function renderAnimeInfo(anime) {
-    // ⭐ 标题只显示标题，不再显示 iv
     document.getElementById('videoTitle').textContent = anime.title;
     document.title = anime.title + ' - 櫻花动漫';
 
@@ -676,17 +667,7 @@ function renderAnimeInfo(anime) {
     document.getElementById('videoTags').innerHTML =
         (anime.tags || []).map(t => '<span class="tag">' + escapeHtml(t) + '</span>').join('');
 
-    // 检查是否有 AcFun 链接
     const links = anime.links || {};
-    let hasAcfun = false;
-    for (const k of Object.keys(links)) {
-        if (k === 'a' || (typeof links[k] === 'string' && links[k].includes('acfun'))) {
-            hasAcfun = true;
-            break;
-        }
-    }
-
-    // 收集分集 ac 号
     episodeList = [];
     const collectionMatch = (links.a || '').match(/acfun\.cn\/a\/aa(\d+)/);
     if (collectionMatch) {
@@ -701,7 +682,6 @@ function renderAnimeInfo(anime) {
 }
 
 async function loadAndPlay(anime) {
-    // 优先用 AcFun 合集
     if (anime._collectionId) {
         showStatus('加载合集列表...');
         try {
@@ -722,7 +702,6 @@ async function loadAndPlay(anime) {
         await loadCurrentEpisode();
         return;
     }
-    // 兜底
     const links = anime.links || {};
     const m = (links.a || '').match(/acfun\.cn\/v\/ac(\d+)/);
     if (m) {
@@ -758,25 +737,21 @@ async function loadCurrentEpisode() {
 
         const pages = data.pages || [];
 
-        // ⭐ 关键：多P 走合并，单P 走直连
         if (pages.length > 1) {
             await playMerged(ep.ac, data.urls, pages);
         } else {
             playSingle(data.urls[0]);
         }
 
-        // 更新页面标题
         if (currentAnime) {
             document.getElementById('videoTitle').textContent =
                 currentAnime.title + (episodeList.length > 1 ? ' · ' + ep.title : '');
         }
 
-        // 更新 URL 的 ep 参数
         const newUrl = new URL(location.href);
         newUrl.searchParams.set('ep', ep.p || (currentEpIdx + 1));
         history.replaceState({}, '', newUrl);
 
-        // 高亮选集
         document.querySelectorAll('.ep-item').forEach((el, i) => {
             el.classList.toggle('on', i === currentEpIdx);
             const dot = el.querySelector('.playing-dot');
@@ -784,7 +759,6 @@ async function loadCurrentEpisode() {
             if (i === currentEpIdx) el.insertAdjacentHTML('beforeend', '<span class="playing-dot"></span>');
         });
 
-        // 播放量 +1
         if (currentAnime) {
             fetch(`${API_BASE}/api/view`, {
                 method: 'POST',
@@ -792,15 +766,11 @@ async function loadCurrentEpisode() {
                 body: JSON.stringify({ animeId: currentAnime.id })
             }).catch(() => {});
         }
-
     } catch (e) {
         showStatus('网络错误：' + e.message);
     }
 }
 
-// ============================================================
-// 单P：直连播放
-// ============================================================
 function playSingle(quality) {
     if (!quality || !quality.url) {
         showStatus('无可用清晰度');
@@ -831,14 +801,10 @@ function playSingle(quality) {
     }
 }
 
-// ============================================================
-// 多P：前端合并（分片走 AcFun 直连，不走 Worker）
-// ============================================================
 async function playMerged(ac, urls, pages) {
     showStatus('合并分P中...（' + pages.length + ' 个分P）');
 
     const qualityKw = ((urls[0].quality || '').match(/\d+/) || ['1080'])[0];
-
     let merged = '#EXTM3U\n#EXT-X-VERSION:3\n#EXT-X-PLAYLIST-TYPE:VOD\n';
     let hasContent = false;
     let maxDur = 0;
@@ -852,7 +818,6 @@ async function playMerged(ac, urls, pages) {
             const target = pData.urls.find(u => u.quality.includes(qualityKw)) || pData.urls[0];
             if (!target) continue;
 
-            // 直连 fetch m3u8 内容（浏览器直接访问 AcFun CDN）
             const m3u8Res = await fetch(target.url);
             if (!m3u8Res.ok) continue;
             const m3u8Text = await m3u8Res.text();
@@ -891,7 +856,6 @@ async function playMerged(ac, urls, pages) {
         return;
     }
 
-    // ⭐ 加 ENDLIST 让进度条能拖
     merged += '#EXT-X-ENDLIST\n';
     merged = merged.replace(
         '#EXT-X-PLAYLIST-TYPE:VOD\n',
