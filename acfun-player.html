@@ -425,7 +425,7 @@ function escapeHtml(s) {
 }
 
 // ============================================================
-// 弹幕引擎（支持 color / position / font_size）
+// 弹幕引擎
 // ============================================================
 class DanmuEngine {
     constructor(layerEl) {
@@ -549,7 +549,6 @@ document.getElementById('topSearch').addEventListener('keydown', (e) => {
     }
 });
 
-// 弹幕设置交互
 document.getElementById('colorDots').addEventListener('click', (e) => {
     const dot = e.target.closest('.color-dot');
     if (!dot) return;
@@ -680,7 +679,11 @@ function renderAnimeInfo(anime) {
     renderPodList();
 }
 
+// ============================================================
+// ⭐ 核心：加载并播放（带自动跳转）
+// ============================================================
 async function loadAndPlay(anime) {
+    // 1. 优先 AcFun 合集
     if (anime._collectionId) {
         showStatus('加载合集列表...');
         try {
@@ -697,11 +700,16 @@ async function loadAndPlay(anime) {
             }
         } catch (e) {}
     }
+
+    // 2. 有 ac 号，直接播
     if (episodeList.length > 0 && episodeList[0].ac) {
         await loadCurrentEpisode();
         return;
     }
+
     const links = anime.links || {};
+
+    // 3. 兜底：从 links.a 里提取单视频 ac 号
     const m = (links.a || '').match(/acfun\.cn\/v\/ac(\d+)/);
     if (m) {
         episodeList = [{ ac: m[1], p: 1, title: anime.title }];
@@ -710,7 +718,34 @@ async function loadAndPlay(anime) {
         await loadCurrentEpisode();
         return;
     }
-    showStatus('此番剧暂无 AcFun 播放源');
+
+    // 4. ⭐ 没有 AcFun 源，但有 B站链接 → 自动跳 B站
+    const biliUrl = (links.b || '').trim() ||
+                    Object.values(links).find(v => typeof v === 'string' && v.includes('bilibili'));
+    if (biliUrl) {
+        showStatus('此番剧在 B站播放，正在跳转...');
+        setTimeout(() => {
+            window.location.href = biliUrl;
+        }, 800);
+        return;
+    }
+
+    // 5. ⭐ 有 MFuns 链接 → 跳 MFuns 播放页
+    const mfunsUrl = (links.mfuns || '').trim() ||
+                     Object.values(links).find(v => typeof v === 'string' && v.includes('mfuns'));
+    if (mfunsUrl) {
+        const mf = mfunsUrl.match(/mfuns\.net\/video\/(\d+)/);
+        if (mf) {
+            showStatus('此番剧在 MFuns 播放，正在跳转...');
+            setTimeout(() => {
+                window.location.href = './player.html?id=' + mf[1];
+            }, 800);
+            return;
+        }
+    }
+
+    // 6. 都没有
+    showStatus('此番剧暂无播放源');
 }
 
 async function loadCurrentEpisode() {
@@ -1060,7 +1095,6 @@ async function loadComments(animeId) {
         count.textContent = data.length;
         list.innerHTML = data.map(c => renderCommentItem(c)).join('');
 
-        // 给删除按钮绑事件
         list.querySelectorAll('.comment-del').forEach(btn => {
             btn.onclick = async (e) => {
                 e.stopPropagation();
@@ -1153,9 +1187,6 @@ async function sendComment() {
     }
 }
 
-// ============================================================
-// 删除评论
-// ============================================================
 async function deleteComment(commentId) {
     const user = getCurrentUser();
     if (!user) { alert('请先登录'); return; }
@@ -1190,9 +1221,6 @@ async function deleteComment(commentId) {
     }
 }
 
-// ============================================================
-// 时间格式化：显示"相对时间 · 绝对时间"
-// ============================================================
 function formatTime(str) {
     if (!str) return '';
     const d = new Date(str.replace(' ', 'T') + 'Z');
