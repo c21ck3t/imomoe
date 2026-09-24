@@ -115,25 +115,34 @@ input, textarea { font-family:inherit; outline:none; border:none; }
     z-index:4;
 }
 .dm-toggle.off { opacity:.5; }
-.dm-input-bar {
-    position:absolute; left:0; right:0; bottom:0;
-    padding:10px 12px;
-    background:linear-gradient(to top, rgba(0,0,0,.7), transparent);
-    display:flex; gap:8px; z-index:4; transition:opacity .3s;
+
+/* ============ 弹幕输入条（放到播放器下方） ============ */
+.dm-input-row {
+    background:#fff;
+    padding:10px 20px;
+    display:flex;
+    gap:10px;
+    border-top:1px solid #f1f2f3;
 }
-.dm-input-bar input {
-    flex:1; background:rgba(255,255,255,.15);
-    border-radius:20px; color:#fff;
-    padding:8px 14px; font-size:13px;
-    backdrop-filter:blur(6px);
+.dm-input-row input {
+    flex:1;
+    background:#f1f2f3;
+    border-radius:20px;
+    padding:9px 16px;
+    font-size:13px;
+    color:#18191c;
+    transition:background .2s;
 }
-.dm-input-bar input::placeholder { color:rgba(255,255,255,.6); }
-.dm-input-bar button {
+.dm-input-row input::placeholder { color:#9499a0; }
+.dm-input-row input:focus { background:#e3e5e7; }
+.dm-input-row button {
     background:#fb7299; color:#fff;
-    padding:8px 18px; border-radius:20px;
+    padding:9px 22px; border-radius:20px;
     font-size:13px; font-weight:600;
+    transition:background .2s;
 }
-.dm-input-bar button:disabled { background:#666; cursor:not-allowed; }
+.dm-input-row button:hover { background:#fc8bab; }
+.dm-input-row button:disabled { background:#e3e5e7; color:#9499a0; cursor:not-allowed; }
 
 .video-toolbar {
     background:#fff; padding:8px 20px;
@@ -324,6 +333,7 @@ input, textarea { font-family:inherit; outline:none; border:none; }
             <div class="video-meta-row" id="videoMeta"></div>
         </div>
 
+        <!-- 播放器 -->
         <div class="player-wrap">
             <video id="video" controls playsinline preload="metadata"></video>
             <div class="dm-layer" id="dmLayer"></div>
@@ -332,10 +342,12 @@ input, textarea { font-family:inherit; outline:none; border:none; }
                 <span id="statusText">加载中...</span>
             </div>
             <button class="dm-toggle" id="dmToggle">弹幕 开</button>
-            <div class="dm-input-bar" id="dmInputBar" style="opacity:0;pointer-events:none;">
-                <input type="text" id="dmInput" placeholder="发个弹幕..." maxlength="50">
-                <button id="dmSend">发送</button>
-            </div>
+        </div>
+
+        <!-- 弹幕输入条（播放器下方） -->
+        <div class="dm-input-row">
+            <input type="text" id="dmInput" placeholder="发个弹幕见证当下..." maxlength="50">
+            <button id="dmSend">发送</button>
         </div>
 
         <div class="video-toolbar">
@@ -455,6 +467,7 @@ let danmuList = [];
 let lastDanmuTime = 0;
 let currentVideoKey = '';
 let qualityOptions = [];
+let currentQualityIdx = 0;
 
 const video = document.getElementById('video');
 const dmLayer = document.getElementById('dmLayer');
@@ -553,6 +566,8 @@ async function loadCurrent() {
         }
 
         qualityOptions = sortQualities(data.urls);
+        currentQualityIdx = 0;
+        const pages = data.pages || [];
 
         document.getElementById('videoMeta').innerHTML =
             '<span class="meta-item">' +
@@ -563,7 +578,8 @@ async function loadCurrent() {
                 '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>' +
                 (danmuList.length || Math.floor(Math.random() * 500 + 100)) +
             '</span>' +
-            '<span class="meta-item">' + new Date().toLocaleDateString('zh-CN') + '</span>';
+            '<span class="meta-item">' + new Date().toLocaleDateString('zh-CN') + '</span>' +
+            (pages.length > 1 ? '<span class="meta-item">' + pages.length + ' 个分P · 无缝连播</span>' : '');
 
         document.getElementById('descText').textContent =
             '【' + item.title + '】本视频由櫻花动漫聚合整理，如涉及版权问题请联系删除。';
@@ -584,7 +600,13 @@ async function loadCurrent() {
 
         loadDanmu(currentVideoKey);
         loadComments(currentVideoKey);
-        playVideo(qualityOptions[0], item);
+
+        // 关键：多P走前端合并，单P走直连
+        if (pages.length > 1) {
+            await playMerged(item, pages);
+        } else {
+            playSingle(qualityOptions[0]);
+        }
 
     } catch (e) {
         showStatus('网络错误：' + e.message);
@@ -613,14 +635,13 @@ function sortQualities(urls) {
 }
 
 // ============================================================
-// 直连模式：浏览器直接加载 AcFun CDN，不走 Worker 代理
+// 单P：直连播放
 // ============================================================
-function playVideo(quality, item) {
+function playSingle(quality) {
     if (!quality || !quality.url) {
         showStatus('无可用清晰度');
         return;
     }
-
     const directUrl = quality.url;
     const isM3u8 = quality.url.includes('.m3u8');
 
@@ -644,6 +665,107 @@ function playVideo(quality, item) {
         video.play().catch(() => {});
         hideStatus();
     }
+}
+
+// ============================================================
+// 多P：前端拉取所有分P的 m3u8，拼接成一个大 m3u8
+// 分片地址保持 AcFun 原样 → 浏览器直连 AcFun，不走 Worker
+// ============================================================
+async function playMerged(item, pages) {
+    showStatus('合并分P中...（' + pages.length + ' 个分P）');
+
+    const quality = qualityOptions[currentQualityIdx];
+    const qualityKeyword = extractQualityKeyword(quality.quality);
+
+    let merged = '#EXTM3U\n#EXT-X-VERSION:3\n#EXT-X-PLAYLIST-TYPE:VOD\n';
+    let hasContent = false;
+    let maxDur = 0;
+
+    for (const pg of pages) {
+        try {
+            // 拿这个分P的播放地址
+            const res = await fetch(`${API_BASE}/api/acfun/${item.ac}?p=${pg.p}`);
+            const data = await res.json();
+            if (!data.ok || !data.urls) continue;
+
+            // 从分P的 URL 里选对应清晰度
+            const targetUrls = sortQualities(data.urls);
+            const target = targetUrls.find(u => u.quality.includes(qualityKeyword)) || targetUrls[0];
+            if (!target) continue;
+
+            // 直接 fetch AcFun 的 m3u8 文本
+            const m3u8Res = await fetch(target.url);
+            if (!m3u8Res.ok) {
+                console.warn('P' + pg.p + ' m3u8 拉取失败：', m3u8Res.status);
+                continue;
+            }
+            const m3u8Text = await m3u8Res.text();
+
+            const baseUrl = target.url.substring(0, target.url.lastIndexOf('/') + 1);
+            const targetOrigin = new URL(target.url).origin;
+
+            let expectUrl = false;
+            for (const line of m3u8Text.split('\n')) {
+                const trimmed = line.trim();
+                if (!trimmed) continue;
+
+                if (trimmed.startsWith('#EXTINF')) {
+                    const m = trimmed.match(/#EXTINF:([\d.]+)/);
+                    if (m) maxDur = Math.max(maxDur, parseFloat(m[1]));
+                    merged += trimmed + '\n';
+                    expectUrl = true;
+                } else if (expectUrl && !trimmed.startsWith('#')) {
+                    let u = trimmed;
+                    if (!u.startsWith('http')) {
+                        u = u.startsWith('/') ? targetOrigin + u : baseUrl + u;
+                    }
+                    merged += u + '\n';
+                    hasContent = true;
+                    expectUrl = false;
+                }
+            }
+
+            merged += '#EXT-X-DISCONTINUITY\n';
+        } catch (e) {
+            console.warn('P' + pg.p + ' 合并失败：', e.message);
+        }
+    }
+
+    if (!hasContent) {
+        // 合并失败，回退到单P
+        console.warn('合并失败，回退到单P');
+        playSingle(qualityOptions[0]);
+        return;
+    }
+
+    merged += '#EXT-X-ENDLIST\n';
+    merged = merged.replace(
+        '#EXT-X-PLAYLIST-TYPE:VOD\n',
+        '#EXT-X-PLAYLIST-TYPE:VOD\n#EXT-X-TARGETDURATION:' + Math.ceil(maxDur || 10) + '\n'
+    );
+
+    const blob = new Blob([merged], { type: 'application/vnd.apple.mpegurl' });
+    const blobUrl = URL.createObjectURL(blob);
+
+    if (hls) { hls.destroy(); hls = null; }
+    hls = new Hls({ enableWorker: true });
+    hls.loadSource(blobUrl);
+    hls.attachMedia(video);
+    hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        hideStatus();
+        video.play().catch(() => {});
+        lastDanmuTime = 0;
+    });
+    hls.on(Hls.Events.ERROR, (e, data) => {
+        console.error('HLS 错误：', data);
+        if (data.fatal) showStatus('播放错误：' + (data.details || '未知'));
+    });
+}
+
+function extractQualityKeyword(q) {
+    if (!q) return '1080';
+    const m = q.match(/\d+/);
+    return m ? m[0] : '1080';
 }
 
 let podTab = 'eps';
@@ -688,21 +810,23 @@ function renderPodList() {
             return;
         }
         list.innerHTML = qualityOptions.map((q, i) =>
-            '<div class="q-item' + (i === 0 ? ' on' : '') + '" data-idx="' + i + '">' +
+            '<div class="q-item' + (i === currentQualityIdx ? ' on' : '') + '" data-idx="' + i + '">' +
                 '<span>' + escapeHtml(q.quality || '默认') + '</span>' +
-                (i === 0 ? '<span class="q-check">✓</span>' : '') +
+                (i === currentQualityIdx ? '<span class="q-check">✓</span>' : '') +
             '</div>'
         ).join('');
         list.querySelectorAll('.q-item').forEach(el => {
             el.onclick = () => {
                 const i = parseInt(el.dataset.idx);
+                currentQualityIdx = i;
                 list.querySelectorAll('.q-item').forEach(x => {
                     x.classList.remove('on');
                     const c = x.querySelector('.q-check'); if (c) c.remove();
                 });
                 el.classList.add('on');
                 el.insertAdjacentHTML('beforeend', '<span class="q-check">✓</span>');
-                playVideo(qualityOptions[i], playlist[currentIndex]);
+                // 重新加载（会重新合并）
+                loadCurrent();
             };
         });
     }
@@ -738,20 +862,6 @@ video.addEventListener('timeupdate', () => {
     });
     lastDanmuTime = now;
 });
-
-const dmInputBar = document.getElementById('dmInputBar');
-video.addEventListener('mouseenter', () => {
-    dmInputBar.style.opacity = '1';
-    dmInputBar.style.pointerEvents = 'auto';
-});
-video.addEventListener('mouseleave', () => {
-    dmInputBar.style.opacity = '0';
-    dmInputBar.style.pointerEvents = 'none';
-});
-if ('ontouchstart' in window) {
-    dmInputBar.style.opacity = '1';
-    dmInputBar.style.pointerEvents = 'auto';
-}
 
 document.getElementById('dmSend').onclick = sendDanmu;
 document.getElementById('dmInput').addEventListener('keydown', e => {
