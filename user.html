@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>个人主页 - 櫻花动漫</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body {
+    font:14px/1.6 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+    color:#18191c; background:#f1f2f3;
+    -webkit-font-smoothing:antialiased;
+}
+a { color:inherit; text-decoration:none; }
+button { font-family:inherit; cursor:pointer; border:none; outline:none; background:none; color:inherit; }
+input, textarea, select { font-family:inherit; outline:none; border:none; }
+
+.bili-header {
+    background:#fff; height:56px; padding:0 24px;
+    display:flex; align-items:center; gap:20px;
+    box-shadow:0 1px 2px rgba(0,0,0,.04);
+    position:sticky; top:0; z-index:100;
+}
+.bili-logo { display:flex; align-items:center; gap:8px; font-size:18px; font-weight:bold; color:#fb7299; }
+.bili-logo svg { width:28px; height:28px; }
+.bili-nav { display:flex; gap:4px; }
+.bili-nav a { padding:6px 12px; font-size:14px; border-radius:6px; }
+.bili-nav a:hover { background:#f1f2f3; }
+.bili-search { margin-left:auto; position:relative; width:320px; }
+.bili-search input { width:100%; height:34px; padding:0 40px 0 14px; background:#f1f2f3; border-radius:17px; font-size:13px; }
+.bili-search .search-icon { position:absolute; right:14px; top:50%; transform:translateY(-50%); color:#9499a0; pointer-events:none; }
+.bili-user { display:flex; align-items:center; gap:10px; font-size:13px; color:#61666d; }
+.bili-user .avatar {
+    width:32px; height:32px; border-radius:50%;
+    background:linear-gradient(135deg,#fb7299,#fc8bab);
+    color:#fff; display:flex; align-items:center; justify-content:center;
+    font-weight:bold; font-size:14px;
+}
+.bili-user .username { color:#00aeec; font-weight:500; }
+.bili-user .login-link { padding:6px 16px; background:#fb7299; color:#fff; border-radius:6px; font-size:13px; font-weight:500; }
+
+.page-wrap { max-width:1100px; margin:20px auto; padding:0 24px; }
+
+/* 顶部横幅 */
+.profile-banner {
+    height:160px; border-radius:8px 8px 0 0;
+    background:linear-gradient(135deg,#fb7299,#fc8bab);
+    position:relative;
+}
+.profile-banner .banner-text {
+    position:absolute; right:24px; bottom:16px;
+    color:rgba(255,255,255,.6); font-size:12px;
+}
+
+/* 资料卡 */
+.profile-card {
+    background:#fff; border-radius:0 0 8px 8px;
+    padding:20px 24px 24px;
+    display:flex; gap:20px; align-items:flex-start;
+    margin-bottom:16px;
+}
+.profile-avatar {
+    width:96px; height:96px; border-radius:50%;
+    background:linear-gradient(135deg,#fb7299,#fc8bab);
+    display:flex; align-items:center; justify-content:center;
+    color:#fff; font-weight:bold; font-size:36px;
+    flex-shrink:0; margin-top:-48px;
+    border:4px solid #fff;
+    box-shadow:0 2px 8px rgba(0,0,0,.1);
+    overflow:hidden;
+}
+.profile-avatar img { width:100%; height:100%; object-fit:cover; }
+.profile-info { flex:1; min-width:0; padding-top:8px; }
+.profile-name { font-size:22px; font-weight:700; margin-bottom:4px; }
+.profile-signature { font-size:13px; color:#61666d; margin-bottom:12px; min-height:20px; }
+.profile-meta { display:flex; gap:20px; font-size:12px; color:#9499a0; flex-wrap:wrap; }
+.profile-meta span { display:inline-flex; align-items:center; gap:4px; }
+.profile-actions { flex-shrink:0; padding-top:8px; }
+.btn-edit {
+    padding:8px 20px; border-radius:6px;
+    background:#fb7299; color:#fff; font-size:13px; font-weight:600;
+    transition:all .15s;
+}
+.btn-edit:hover { background:#fc8bab; }
+
+/* 数据条 */
+.stats-bar {
+    background:#fff; border-radius:8px; padding:16px 24px;
+    display:flex; gap:40px; margin-bottom:16px;
+    flex-wrap:wrap;
+}
+.stat-item { text-align:center; }
+.stat-num { font-size:22px; font-weight:700; color:#18191c; }
+.stat-label { font-size:12px; color:#9499a0; margin-top:2px; }
+
+/* 投稿列表 */
+.section-card { background:#fff; border-radius:8px; overflow:hidden; }
+.section-head {
+    padding:14px 24px; border-bottom:1px solid #f1f2f3;
+    font-size:16px; font-weight:600;
+    display:flex; align-items:center; justify-content:space-between;
+}
+.section-head .count { font-size:13px; font-weight:normal; color:#9499a0; }
+
+.anime-grid {
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+    gap:16px; padding:20px 24px;
+}
+.anime-card {
+    border-radius:8px; overflow:hidden;
+    background:#f9f9fa;
+    transition:all .15s;
+    cursor:pointer;
+}
+.anime-card:hover { transform:translateY(-3px); box-shadow:0 4px 12px rgba(0,0,0,.1); }
+.anime-card .cover {
+    aspect-ratio:3/4; background:#f1f2f3;
+    overflow:hidden; position:relative;
+}
+.anime-card .cover img { width:100%; height:100%; object-fit:cover; display:block; }
+.anime-card .cover .badge-wrap {
+    position:absolute; top:6px; left:6px;
+    display:flex; gap:4px; flex-wrap:wrap;
+}
+.anime-card .badge {
+    padding:2px 8px; border-radius:4px;
+    font-size:11px; font-weight:600;
+    backdrop-filter:blur(4px);
+}
+.badge.acfun { background:rgba(0,174,236,.85); color:#fff; }
+.badge.bili { background:rgba(251,114,153,.85); color:#fff; }
+.badge.mfuns { background:rgba(34,170,85,.85); color:#fff; }
+.anime-card .info { padding:10px 12px; }
+.anime-card .title {
+    font-size:13px; font-weight:600;
+    overflow:hidden; text-overflow:ellipsis;
+    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;
+    line-height:1.4; margin-bottom:6px;
+}
+.anime-card .sub { font-size:11px; color:#9499a0; display:flex; gap:8px; }
+
+.empty-box {
+    padding:60px 20px; text-align:center;
+    color:#9499a0; font-size:14px;
+}
+.empty-box .emoji { font-size:40px; display:block; margin-bottom:12px; }
+
+/* 编辑弹窗 */
+.modal-mask {
+    position:fixed; inset:0;
+    background:rgba(0,0,0,.5);
+    display:flex; align-items:center; justify-content:center;
+    z-index:9999; padding:20px;
+}
+.modal-box {
+    background:#fff; border-radius:10px;
+    width:100%; max-width:480px;
+    max-height:calc(100vh - 40px);
+    display:flex; flex-direction:column;
+    box-shadow:0 12px 40px rgba(0,0,0,.2);
+}
+.modal-header {
+    padding:18px 24px; border-bottom:1px solid #f1f2f3;
+    display:flex; justify-content:space-between; align-items:center;
+}
+.modal-header h2 { font-size:17px; font-weight:600; }
+.modal-close { font-size:24px; color:#9499a0; line-height:1; }
+.modal-close:hover { color:#f00; }
+.modal-body { padding:20px 24px; overflow-y:auto; flex:1; }
+.modal-footer {
+    padding:14px 24px; border-top:1px solid #f1f2f3;
+    display:flex; justify-content:flex-end; gap:10px;
+}
+.form-row { margin-bottom:16px; }
+.form-row label { display:block; font-size:13px; color:#61666d; margin-bottom:6px; font-weight:500; }
+.form-row input, .form-row select, .form-row textarea {
+    width:100%; padding:8px 12px;
+    background:#f9f9fa; border:1px solid #e3e5e7;
+    border-radius:6px; font-size:13px; color:#18191c;
+}
+.form-row input:focus, .form-row select:focus, .form-row textarea:focus {
+    border-color:#00aeec; background:#fff;
+}
+.form-row textarea { min-height:60px; resize:vertical; }
+.form-row .hint { font-size:12px; color:#9499a0; margin-top:4px; }
+.form-msg { padding:10px 14px; border-radius:6px; font-size:13px; margin-bottom:16px; display:none; }
+.form-msg.err { background:#ffe6e6; color:#f00; display:block; }
+.form-msg.ok { background:#e6f7e6; color:#22aa55; display:block; }
+
+@media (max-width:768px) {
+    .profile-card { flex-direction:column; align-items:center; text-align:center; }
+    .profile-avatar { margin-top:-56px; }
+    .profile-meta { justify-content:center; }
+    .stats-bar { gap:24px; justify-content:center; }
+    .bili-search { width:160px; }
+    .bili-nav { display:none; }
+    .anime-grid { grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); }
+}
+</style>
+</head>
+<body>
+
+<div class="bili-header">
+    <a class="bili-logo" href="./index.html">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l7 4.5-7 4.5z"/></svg>
+        櫻花动漫
+    </a>
+    <nav class="bili-nav">
+        <a href="./index.html">首页</a>
+        <a href="./index.html#bangumi">番剧</a>
+    </nav>
+    <div class="bili-search">
+        <input type="text" placeholder="搜索番剧..." id="topSearch">
+        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="7"/>
+            <line x1="16.5" y1="16.5" x2="21" y2="21"/>
+        </svg>
+    </div>
+    <div class="bili-user" id="biliUser"></div>
+</div>
+
+<div class="page-wrap" id="pageWrap">
+    <div class="empty-box">
+        <span class="emoji">⏳</span>
+        加载中...
+    </div>
+</div>
+
+<script>
+const API_BASE = 'https://api.imomoe.dpdns.org';
+
+const $ = s => document.querySelector(s);
+
+function escapeHtml(str) {
+    return String(str || '').replace(/[&<>"']/g, m => ({
+        '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+    }[m]));
+}
+
+function getCurrentUser() {
+    try {
+        const raw = localStorage.getItem('imomoe_user');
+        return raw ? JSON.parse(raw) : null;
+    } catch { return null; }
+}
+
+// URL 参数
+const params = new URLSearchParams(location.search);
+const targetUid = parseInt(params.get('uid'));
+
+if (!targetUid) {
+    $('#pageWrap').innerHTML = '<div class="empty-box"><span class="emoji">❓</span>缺少用户参数，请使用 ?uid=1 访问</div>';
+}
+
+// 顶栏用户区
+function renderTopUser() {
+    const user = getCurrentUser();
+    const box = $('#biliUser');
+    if (user) {
+        box.innerHTML = '<a class="avatar" href="./user.html?uid=' + user.uid + '" style="color:#fff">' + escapeHtml(user.username[0].toUpperCase()) + '</a>' +
+                        '<a class="username" href="./user.html?uid=' + user.uid + '">' + escapeHtml(user.username) + '</a>';
+    } else {
+        box.innerHTML = '<a class="login-link" href="./index.html">登录</a>';
+    }
+}
+renderTopUser();
+
+$('#topSearch').addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+        const kw = e.target.value.trim();
+        if (kw) location.href = './index.html#search=' + encodeURIComponent(kw);
+    }
+});
+
+// ============================================================
+// 加载用户数据
+// ============================================================
+async function loadProfile() {
+    if (!targetUid) return;
+
+    try {
+        const [userRes, animeRes] = await Promise.all([
+            fetch(`${API_BASE}/api/user/${targetUid}`),
+            fetch(`${API_BASE}/api/user/${targetUid}/animes`)
+        ]);
+
+        const userData = await userRes.json();
+        if (!userData.ok) {
+            $('#pageWrap').innerHTML = '<div class="empty-box"><span class="emoji">😢</span>' + escapeHtml(userData.error || '用户不存在') + '</div>';
+            return;
+        }
+
+        const animeData = await animeRes.json();
+        const animes = animeData.ok ? (animeData.list || []) : [];
+
+        renderPage(userData.user, animes);
+    } catch (e) {
+        $('#pageWrap').innerHTML = '<div class="empty-box"><span class="emoji">😢</span>网络错误：' + escapeHtml(e.message) + '</div>';
+    }
+}
+
+// ============================================================
+// 渲染页面
+// ============================================================
+function renderPage(user, animes) {
+    const me = getCurrentUser();
+    const isSelf = me && me.uid === user.id;
+
+    document.title = user.username + ' 的个人主页 - 櫻花动漫';
+
+    const avatarHtml = user.avatarUrl
+        ? '<img src="' + escapeHtml(user.avatarUrl) + '" onerror="this.style.display=\'none\';this.parentNode.textContent=\'' + escapeHtml(user.username[0].toUpperCase()) + '\'">'
+        : escapeHtml(user.username[0].toUpperCase());
+
+    const signature = user.signature || '这个人很懒，什么都没写~';
+
+    const genderMap = { male:'♂ 男', female:'♀ 女', other:'⚥ 其他' };
+    const genderHtml = genderMap[user.gender] ? '<span>' + genderMap[user.gender] + '</span>' : '';
+    const birthdayHtml = user.birthday ? '<span>🎂 ' + escapeHtml(user.birthday) + '</span>' : '';
+    const joinDate = user.createdAt ? '<span>📅 ' + user.createdAt.slice(0, 10) + ' 加入</span>' : '';
+
+    let html = '';
+
+    // 横幅
+    html += '<div class="profile-banner"><div class="banner-text">UID: ' + user.id + '</div></div>';
+
+    // 资料卡
+    html += '<div class="profile-card">';
+    html += '  <div class="profile-avatar">' + avatarHtml + '</div>';
+    html += '  <div class="profile-info">';
+    html += '    <div class="profile-name">' + escapeHtml(user.username) + '</div>';
+    html += '    <div class="profile-signature">' + escapeHtml(signature) + '</div>';
+    html += '    <div class="profile-meta">' + genderHtml + birthdayHtml + joinDate + '</div>';
+    html += '  </div>';
+    if (isSelf) {
+        html += '  <div class="profile-actions"><button class="btn-edit" id="editBtn">编辑资料</button></div>';
+    }
+    html += '</div>';
+
+    // 数据条
+    html += '<div class="stats-bar">';
+    html += '  <div class="stat-item"><div class="stat-num">' + (user.followingCount || 0) + '</div><div class="stat-label">关注</div></div>';
+    html += '  <div class="stat-item"><div class="stat-num">' + (user.followerCount || 0) + '</div><div class="stat-label">粉丝</div></div>';
+    html += '  <div class="stat-item"><div class="stat-num">' + (user.likesCount || 0) + '</div><div class="stat-label">获赞</div></div>';
+    html += '  <div class="stat-item"><div class="stat-num">' + (user.stats?.views || 0).toLocaleString() + '</div><div class="stat-label">播放</div></div>';
+    html += '  <div class="stat-item"><div class="stat-num">' + (user.stats?.animes || 0) + '</div><div class="stat-label">投稿</div></div>';
+    html += '</div>';
+
+    // 投稿列表
+    html += '<div class="section-card">';
+    html += '  <div class="section-head">TA 的投稿 <span class="count">（' + animes.length + ' 部）</span></div>';
+
+    if (animes.length === 0) {
+        html += '  <div class="empty-box"><span class="emoji">📺</span>还没有投稿</div>';
+    } else {
+        html += '  <div class="anime-grid">';
+        animes.forEach(a => {
+            const links = a.links || {};
+            const badges = [];
+            if (links.a) badges.push('<span class="badge acfun">A站</span>');
+            if (links.b) badges.push('<span class="badge bili">B站</span>');
+            if (links.mfuns) badges.push('<span class="badge mfuns">MFuns</span>');
+
+            html += '    <a class="anime-card" href="./acfun-player.html?iv=iv' + a.id + '">';
+            html += '      <div class="cover">';
+            html += '        <img src="' + escapeHtml(a.coverV || a.coverH || '') + '" onerror="this.src=\'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="160" height="213"><rect width="160" height="213" fill="#e2e2e2"/></svg>') + '\'">';
+            html += '        <div class="badge-wrap">' + badges.join('') + '</div>';
+            html += '      </div>';
+            html += '      <div class="info">';
+            html += '        <div class="title">' + escapeHtml(a.title) + '</div>';
+            html += '        <div class="sub">';
+            html += '          <span>' + (a.year || '') + '</span>';
+            html += '          <span>' + (a.totalEp ? '全' + a.totalEp + '话' : '') + '</span>';
+            html += '        </div>';
+            html += '      </div>';
+            html += '    </a>';
+        });
+        html += '  </div>';
+    }
+
+    html += '</div>';
+
+    $('#pageWrap').innerHTML = html;
+
+    if (isSelf) {
+        $('#editBtn').onclick = () => openEditModal(user);
+    }
+}
+
+// ============================================================
+// 编辑资料弹窗
+// ============================================================
+function openEditModal(user) {
+    const me = getCurrentUser();
+    if (!me) return;
+
+    const modal = document.createElement('div');
+    modal.className = 'modal-mask';
+    modal.id = 'editModal';
+    modal.innerHTML =
+        '<div class="modal-box">' +
+            '<div class="modal-header">' +
+                '<h2>编辑资料</h2>' +
+                '<button class="modal-close" id="modalClose">×</button>' +
+            '</div>' +
+            '<div class="modal-body">' +
+                '<div class="form-msg" id="editMsg"></div>' +
+                '<div class="form-row">' +
+                    '<label>头像链接（外链 URL）</label>' +
+                    '<input type="text" id="e-avatar" placeholder="https://...jpg" value="' + escapeHtml(user.avatarUrl || '') + '">' +
+                    '<div class="hint">填图片外链，留空则显示用户名首字母</div>' +
+                '</div>' +
+                '<div class="form-row">' +
+                    '<label>个性签名</label>' +
+                    '<textarea id="e-signature" maxlength="100" placeholder="介绍一下自己...">' + escapeHtml(user.signature || '') + '</textarea>' +
+                '</div>' +
+                '<div class="form-row">' +
+                    '<label>性别</label>' +
+                    '<select id="e-gender">' +
+                        '<option value=""' + (!user.gender ? ' selected' : '') + '>不公开</option>' +
+                        '<option value="male"' + (user.gender === 'male' ? ' selected' : '') + '>男</option>' +
+                        '<option value="female"' + (user.gender === 'female' ? ' selected' : '') + '>女</option>' +
+                        '<option value="other"' + (user.gender === 'other' ? ' selected' : '') + '>其他</option>' +
+                    '</select>' +
+                '</div>' +
+                '<div class="form-row">' +
+                    '<label>生日</label>' +
+                    '<input type="text" id="e-birthday" placeholder="例如：2000-01-01" value="' + escapeHtml(user.birthday || '') + '">' +
+                '</div>' +
+            '</div>' +
+            '<div class="modal-footer">' +
+                '<button class="btn-edit" id="saveBtn" style="background:#f1f2f3;color:#61666d;">取消</button>' +
+                '<button class="btn-edit" id="saveBtn2">保存</button>' +
+            '</div>' +
+        '</div>';
+
+    document.body.appendChild(modal);
+
+    const close = () => modal.remove();
+    $('#modalClose').onclick = close;
+    $('#saveBtn').onclick = close;
+    modal.addEventListener('click', e => { if (e.target === modal) close(); });
+
+    $('#saveBtn2').onclick = async () => {
+        const msg = $('#editMsg');
+        const saveBtn = $('#saveBtn2');
+        saveBtn.disabled = true;
+        saveBtn.textContent = '保存中...';
+
+        try {
+            const res = await fetch(`${API_BASE}/api/user/${me.uid}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + me.token
+                },
+                body: JSON.stringify({
+                    avatarUrl: $('#e-avatar').value.trim(),
+                    signature: $('#e-signature').value.trim(),
+                    gender: $('#e-gender').value,
+                    birthday: $('#e-birthday').value.trim()
+                })
+            });
+            const data = await res.json();
+            if (data.ok) {
+                msg.textContent = '保存成功！';
+                msg.className = 'form-msg ok';
+                setTimeout(() => { close(); loadProfile(); }, 600);
+            } else {
+                msg.textContent = data.error || '保存失败';
+                msg.className = 'form-msg err';
+                saveBtn.disabled = false;
+                saveBtn.textContent = '保存';
+            }
+        } catch (e) {
+            msg.textContent = '网络错误：' + e.message;
+            msg.className = 'form-msg err';
+            saveBtn.disabled = false;
+            saveBtn.textContent = '保存';
+        }
+    };
+}
+
+// 启动
+loadProfile();
+</script>
+
+</body>
+</html>
