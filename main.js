@@ -84,7 +84,7 @@ function showLoginModal() {
         const btn = document.getElementById('modalSubmit');
         if (!username || !password) {
             msg.textContent = '用户名和密码必填';
-            msg.className = 'modal-msg err';
+            msg.className = 'modal-err modal-msg err';
             return;
         }
         btn.disabled = true;
@@ -122,7 +122,7 @@ function showLoginModal() {
 }
 
 // ============================================================
-// 卡片动作判断（AcFun 内部 > MFuns 内部 > B站外链）
+// 卡片动作判断
 // ============================================================
 function getCardAction(anime, page) {
     const links = anime.links || {};
@@ -131,20 +131,17 @@ function getCardAction(anime, page) {
         ? Object.fromEntries(pageLinks.map(k => [k, links[k]]))
         : links;
 
-    // AcFun 优先
     const acfunUrl = effectiveLinks.a || Object.values(effectiveLinks).find(v => typeof v === 'string' && v.includes('acfun'));
     if (acfunUrl) {
         return { type: 'internal', url: './acfun-player.html?iv=iv' + anime.id, source: 'acfun' };
     }
 
-    // MFuns
     const mfunsUrl = effectiveLinks.mfuns || Object.values(effectiveLinks).find(v => typeof v === 'string' && v.includes('mfuns'));
     if (mfunsUrl) {
         const m = mfunsUrl.match(/mfuns\.net\/video\/(\d+)/);
         if (m) return { type: 'internal', url: './player.html?id=' + m[1], source: 'mfuns' };
     }
 
-    // B站外链
     const biliUrl = effectiveLinks.b || Object.values(effectiveLinks).find(v => typeof v === 'string' && v.includes('bilibili'));
     if (biliUrl) {
         return { type: 'external', url: biliUrl, source: 'bili' };
@@ -211,8 +208,28 @@ function rankHTML(anime, i, page) {
 }
 
 // ============================================================
-// 卡片点击
+// 番剧 index 卡片
 // ============================================================
+function idxCardHTML(anime) {
+    const action = getCardAction(anime, 'bangumi');
+    const source = action ? action.source : 'none';
+    const epText = anime.totalEp ? ('全' + anime.totalEp + '话') : '';
+    const ymText = (anime.year || '') + '年' + (anime.month || '');
+
+    return '<div class="idx-card" data-id="' + anime.id + '"' +
+        ' data-action-type="' + (action ? action.type : 'none') + '"' +
+        ' data-action-url="' + escapeHtml(action ? action.url : '') + '">' +
+        '<div class="idx-cover">' +
+            '<img src="' + escapeHtml(anime.coverV) + '" alt="' + escapeHtml(anime.title) + '" loading="lazy">' +
+            '<div class="x" style="position:absolute;right:3px;bottom:3px;background:rgba(0,0,0,.6);color:#fff;padding:0 4px;font-size:11px;line-height:16px;border-radius:2px;">' +
+                sourceBadgeHTML(source) +
+            '</div>' +
+        '</div>' +
+        '<div class="idx-title">' + escapeHtml(anime.title) + '</div>' +
+        '<div class="idx-meta"><span>' + epText + '</span><span>' + ymText + '</span></div>' +
+    '</div>';
+}
+
 function bindCardEvents(scope) {
     scope.querySelectorAll('.v, .rlist li').forEach(el => {
         el.addEventListener('click', e => {
@@ -224,6 +241,18 @@ function bindCardEvents(scope) {
             } else {
                 location.href = url;
             }
+        });
+    });
+}
+
+function bindIdxCardEvents(scope) {
+    scope.querySelectorAll('.idx-card').forEach(el => {
+        el.addEventListener('click', () => {
+            const type = el.getAttribute('data-action-type');
+            const url = el.getAttribute('data-action-url');
+            if (!url || type === 'none') { alert('暂无可播放的源'); return; }
+            if (type === 'external') window.open(url, '_blank', 'noopener');
+            else location.href = url;
         });
     });
 }
@@ -348,8 +377,50 @@ function renderPartTwoelement() {
     return html;
 }
 
+// ============================================================
+// 番剧 index（完整标签索引）
+// ============================================================
+const idxState = { tag: '全部', quality: '全部', year: '全部', month: '全部' };
+
+function filterIdxData() {
+    return animeData.filter(a => {
+        const tags = a.tags || [];
+        if (idxState.tag !== '全部' && !tags.includes(idxState.tag)) return false;
+        if (idxState.quality !== '全部' && !tags.includes(idxState.quality)) return false;
+        if (idxState.year !== '全部' && a.year !== idxState.year) return false;
+        if (idxState.month !== '全部' && a.month !== idxState.month) return false;
+        return true;
+    });
+}
+
+function renderIdxListOnly() {
+    const listBox = $('#idxListBox');
+    if (!listBox) return;
+    const data = filterIdxData();
+    const countEl = $('#idxCount');
+    if (countEl) countEl.textContent = data.length;
+    if (data.length === 0) {
+        listBox.innerHTML = '<div class="idx-empty">没有找到符合条件的番剧 (´；ω；`)</div>';
+    } else {
+        listBox.innerHTML = data.map(idxCardHTML).join('');
+        bindIdxCardEvents(listBox);
+    }
+}
+
 function renderBangumiIndex() {
     const all = animeData.filter(a => a.scope === 'bangumi' || a.scope === 'both');
+
+    const typeOpts = ['全部','禁','校园','恋爱','日常','科幻','悬疑','经典','音乐','搞笑','百合','战斗','奇幻','后宫','历史','战争','机战','运动','热血','漫画改','游戏改','美食','泡面','治愈','欧美','女性向'];
+    const qualityOpts = ['全部','4K','60帧'];
+    const yearOpts  = ['全部','2026','2024','2021','2011','2009','2008','2006','1998'];
+    const monthOpts = ['全部','1月','4月','7月','10月'];
+
+    function optsHTML(arr, key) {
+        return arr.map(v =>
+            '<a href="javascript:void(0);" data-key="' + key + '" data-val="' + v + '" class="' + (v === '全部' ? 'on' : '') + '">' + v + '</a>'
+        ).join('');
+    }
+
     let html = '<div class="container-top-wrapper"><div class="main-inner">';
     html += '<div class="fcname"><ul class="n_num">' +
         '<li><a href="#bangumi">全部</a></li>' +
@@ -357,18 +428,75 @@ function renderBangumiIndex() {
         '<li><a href="#part-twoelement">完结动画</a></li>' +
         '<li class="on"><a href="#bangumi-index">番剧index</a></li>' +
     '</ul></div></div></div>';
-    html += '<div class="idx-container"><div class="idx-main">';
-    html += '<div class="idx-list">' + all.map(a => {
-        const action = getCardAction(a, 'bangumi');
-        return '<div class="idx-card" data-id="' + a.id + '"' +
-            ' data-action-type="' + (action ? action.type : 'none') + '"' +
-            ' data-action-url="' + escapeHtml(action ? action.url : '') + '">' +
-            '<div class="idx-cover"><img src="' + escapeHtml(a.coverV) + '" alt="" loading="lazy"></div>' +
-            '<div class="idx-title">' + escapeHtml(a.title) + '</div>' +
-            '<div class="idx-meta"><span>' + (a.totalEp ? '全' + a.totalEp + '话' : '') + '</span><span>' + (a.year || '') + '年' + (a.month || '') + '</span></div>' +
-        '</div>';
-    }).join('') + '</div></div></div>';
+
+    html += '<div class="idx-container">';
+    html += '<div class="idx-side">';
+    html += '<div class="idx-side-header">分类索引</div>';
+    html += '<div class="idx-side-group">' +
+        '<p class="idx-catg">动漫作品</p>' +
+        '<ul class="idx-sub">' +
+            '<li class="on"><a href="javascript:void(0);">全部</a></li>' +
+            '<li><a href="javascript:void(0);">其他</a></li>' +
+            '<li><a href="javascript:void(0);">TV版</a></li>' +
+            '<li><a href="javascript:void(0);">OVA·OAD版</a></li>' +
+            '<li><a href="javascript:void(0);">剧场版</a></li>' +
+        '</ul>' +
+    '</div>';
+    html += '</div>';
+
+    html += '<div class="idx-main">';
+    html += '<div class="idx-selector">' +
+        '<div class="idx-row"><span class="idx-label">标签：</span><div class="idx-opts" data-key="tag">' + optsHTML(typeOpts, 'tag') + '</div></div>' +
+        '<div class="idx-row"><span class="idx-label">画质：</span><div class="idx-opts" data-key="quality">' + optsHTML(qualityOpts, 'quality') + '</div></div>' +
+        '<div class="idx-row"><span class="idx-label">年份：</span><div class="idx-opts" data-key="year">' + optsHTML(yearOpts, 'year') + '</div></div>' +
+        '<div class="idx-row"><span class="idx-label">月份：</span><div class="idx-opts" data-key="month">' + optsHTML(monthOpts, 'month') + '</div></div>' +
+    '</div>';
+
+    html += '<div class="idx-sort">' +
+        '<div class="sort-tabs">' +
+            '<a href="javascript:void(0);" class="on">人气排序</a>' +
+            '<a href="javascript:void(0);">更新排序</a>' +
+            '<a href="javascript:void(0);">最新发布</a>' +
+            '<a href="javascript:void(0);">播出日期</a>' +
+        '</div>' +
+        '<span>共 <em id="idxCount" class="idx-count">' + all.length + '</em> 部</span>' +
+    '</div>';
+
+    html += '<div class="idx-list" id="idxListBox">' + filterIdxData().map(idxCardHTML).join('') + '</div>';
+    html += '</div>';
+    html += '</div>';
     return html;
+}
+
+function bindIdxFilterEvents(main) {
+    main.querySelectorAll('.idx-opts').forEach(function (group) {
+        group.addEventListener('click', function (e) {
+            const link = e.target.closest('a'); if (!link) return;
+            e.preventDefault();
+            const key = group.getAttribute('data-key');
+            const val = link.getAttribute('data-val');
+            group.querySelectorAll('a').forEach(a => a.classList.remove('on'));
+            link.classList.add('on');
+            idxState[key] = val;
+            renderIdxListOnly();
+        });
+    });
+    main.querySelectorAll('.idx-sort .sort-tabs').forEach(function (group) {
+        group.addEventListener('click', function (e) {
+            const link = e.target.closest('a'); if (!link) return;
+            e.preventDefault();
+            group.querySelectorAll('a').forEach(a => a.classList.remove('on'));
+            link.classList.add('on');
+        });
+    });
+    main.querySelectorAll('.idx-sub').forEach(function (group) {
+        group.addEventListener('click', function (e) {
+            const link = e.target.closest('a'); if (!link) return;
+            e.preventDefault();
+            group.querySelectorAll('li').forEach(li => li.classList.remove('on'));
+            link.parentElement.classList.add('on');
+        });
+    });
 }
 
 function searchAnime(kw) {
@@ -451,7 +579,13 @@ function render() {
             case 'home': html = renderHome(); break;
             case 'bangumi-two': html = renderBangumiTwo(); break;
             case 'part-twoelement': html = renderPartTwoelement(); break;
-            case 'bangumi-index': html = renderBangumiIndex(); break;
+            case 'bangumi-index':
+                idxState.tag = '全部';
+                idxState.quality = '全部';
+                idxState.year = '全部';
+                idxState.month = '全部';
+                html = renderBangumiIndex();
+                break;
             case 'duty': html = renderDuty(); break;
             case 'bangumi':
             default: html = renderBangumi(); break;
@@ -462,15 +596,8 @@ function render() {
     bindCardEvents(main);
 
     if (rawHash === 'bangumi-index') {
-        main.querySelectorAll('.idx-card').forEach(el => {
-            el.addEventListener('click', () => {
-                const type = el.getAttribute('data-action-type');
-                const url = el.getAttribute('data-action-url');
-                if (!url || type === 'none') { alert('暂无可播放的源'); return; }
-                if (type === 'external') window.open(url, '_blank', 'noopener');
-                else location.href = url;
-            });
-        });
+        bindIdxCardEvents(main);
+        bindIdxFilterEvents(main);
     }
 
     $$('.m-i').forEach(li => li.classList.remove('on'));
