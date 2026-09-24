@@ -1,8 +1,12 @@
 const API_BASE = 'https://api.imomoe.dpdns.org';
+const TURNSTILE_SITE_KEY = '0x4AAAAAAFCmsfXtjAYGzUTa';
 
 // 全局数据
 let animeData = [];
 let statsMap = {};
+
+// Turnstile 状态
+let turnstileWidgetId = null;
 
 const $ = (s) => document.querySelector(s);
 const $$ = (s) => Array.from(document.querySelectorAll(s));
@@ -31,8 +35,9 @@ function refreshUserArea() {
     if (!area) return;
     const user = getCurrentUser();
     if (user) {
+        const name = user.nickname || user.username;
         area.innerHTML =
-            '<a href="./user.html?uid=' + user.uid + '" class="username-tag" style="text-decoration:none;color:#00a1d6;font-size:13px;padding:0 6px;">' + escapeHtml(user.username) + '</a>' +
+            '<a href="./user.html?uid=' + user.uid + '" class="username-tag" style="text-decoration:none;color:#00a1d6;font-size:13px;padding:0 6px;">' + escapeHtml(name) + '</a>' +
             '<button class="logout-btn" id="logoutBtn" style="padding:4px 10px;background:#eee;color:#666;border:1px solid #ddd;border-radius:3px;cursor:pointer;font-size:12px;">退出</button>';
         document.getElementById('logoutBtn').onclick = () => {
             clearUser();
@@ -45,6 +50,53 @@ function refreshUserArea() {
     }
 }
 
+// ============================================================
+// Turnstile 工具
+// ============================================================
+function ensureTurnstile(cb) {
+    if (window.turnstile) { cb(); return; }
+    let tries = 0;
+    const timer = setInterval(() => {
+        if (window.turnstile) {
+            clearInterval(timer);
+            cb();
+        } else if (++tries > 100) {
+            clearInterval(timer);
+        }
+    }, 100);
+}
+
+function renderTurnstileWidget() {
+    const container = document.getElementById('turnstileContainer');
+    if (!container) return;
+    ensureTurnstile(() => {
+        if (turnstileWidgetId === null) {
+            turnstileWidgetId = window.turnstile.render(container, {
+                sitekey: TURNSTILE_SITE_KEY,
+                theme: 'light'
+            });
+        } else {
+            window.turnstile.reset(turnstileWidgetId);
+        }
+    });
+}
+
+function getTurnstileToken() {
+    if (window.turnstile && turnstileWidgetId !== null) {
+        return window.turnstile.getResponse(turnstileWidgetId) || '';
+    }
+    return '';
+}
+
+function resetTurnstile() {
+    if (window.turnstile && turnstileWidgetId !== null) {
+        window.turnstile.reset(turnstileWidgetId);
+    }
+}
+
+// ============================================================
+// 登录 / 注册模态框
+// ============================================================
 function showLoginModal() {
     if (document.getElementById('imomoeModal')) return;
     const modal = document.createElement('div');
@@ -60,6 +112,7 @@ function showLoginModal() {
             '<div class="modal-msg" id="modalMsg"></div>' +
             '<div class="modal-field"><label>用户名</label><input type="text" id="modalUser" placeholder="2-20 位" autocomplete="off"></div>' +
             '<div class="modal-field"><label>密码</label><input type="password" id="modalPass" placeholder="至少 6 位" autocomplete="off"></div>' +
+            '<div class="modal-field" id="turnstileField" style="display:none;"><div id="turnstileContainer"></div></div>' +
             '<button class="modal-submit" id="modalSubmit">登录</button>' +
         '</div>';
     document.body.appendChild(modal);
@@ -72,6 +125,14 @@ function showLoginModal() {
             mode = tab.dataset.tab;
             document.getElementById('modalSubmit').textContent = mode === 'login' ? '登录' : '注册';
             document.getElementById('modalMsg').className = 'modal-msg';
+
+            const tsField = document.getElementById('turnstileField');
+            if (mode === 'register') {
+                tsField.style.display = 'block';
+                renderTurnstileWidget();
+            } else {
+                tsField.style.display = 'none';
+            }
         };
     });
     document.getElementById('modalClose').onclick = () => modal.remove();
@@ -84,20 +145,35 @@ function showLoginModal() {
         const btn = document.getElementById('modalSubmit');
         if (!username || !password) {
             msg.textContent = '用户名和密码必填';
-            msg.className = 'modal-err modal-msg err';
+            msg.className = 'modal-msg err';
             return;
         }
+
+        // 注册模式：先检查 Turnstile
+        let tsToken = '';
+        if (mode === 'register') {
+            tsToken = getTurnstileToken();
+            if (!tsToken) {
+                msg.textContent = '请先完成人机验证';
+                msg.className = 'modal-msg err';
+                return;
+            }
+        }
+
         btn.disabled = true;
         btn.textContent = '处理中...';
         try {
+            const payload = { username, password };
+            if (mode === 'register') payload.turnstileToken = tsToken;
+
             const res = await fetch(API_BASE + '/api/' + mode, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
+                body: JSON.stringify(payload)
             });
             const data = await res.json();
             if (data.ok) {
-                saveUser({ uid: data.uid, username: data.username, token: data.token });
+                saveUser({ uid: data.uid, username: data.username, nickname: data.nickname || '', token: data.token });
                 msg.textContent = mode === 'login' ? '登录成功！' : '注册成功！UID: ' + data.uid;
                 msg.className = 'modal-msg ok';
                 setTimeout(() => { modal.remove(); refreshUserArea(); }, 800);
@@ -106,12 +182,15 @@ function showLoginModal() {
                 msg.className = 'modal-msg err';
                 btn.disabled = false;
                 btn.textContent = mode === 'login' ? '登录' : '注册';
+                // 注册失败要重置 Turnstile（token 一次性）
+                if (mode === 'register') resetTurnstile();
             }
         } catch (e) {
             msg.textContent = '网络错误：' + e.message;
             msg.className = 'modal-msg err';
             btn.disabled = false;
             btn.textContent = mode === 'login' ? '登录' : '注册';
+            if (mode === 'register') resetTurnstile();
         }
     };
     modal.querySelectorAll('input').forEach(inp => {
@@ -604,7 +683,7 @@ function render() {
     if (rawHash === 'home') {
         const homeLi = $('.m-i.home'); if (homeLi) homeLi.classList.add('on');
     } else if (rawHash === 'bangumi' || rawHash === 'bangumi-two' || rawHash === 'part-twoelement' || rawHash === 'bangumi-index') {
-        const bangumiLi = $('.m-i[data-nav="bangumi"]'); if (bangumiLi) bangumiLi.classList.add('on');
+        const bangumiLi = $('.m-i[data-key="bangumi"], .m-i[data-nav="bangumi"]'); if (bangumiLi) bangumiLi.classList.add('on');
     }
 
     window.scrollTo(0, 0);
