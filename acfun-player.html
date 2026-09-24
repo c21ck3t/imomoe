@@ -3,331 +3,928 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AcFun 播放 - 櫻花动漫</title>
+<title>播放 - 櫻花动漫</title>
 <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js"></script>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
-body { font:14px/1.6 "Microsoft YaHei",Arial,sans-serif; background:#0d0d0d; color:#ddd; }
-.header { background:#1a1a1a; padding:12px 20px; display:flex; align-items:center; gap:16px; border-bottom:1px solid #333; }
-.header a { color:#00a1d6; text-decoration:none; font-weight:bold; }
-.header h1 { font-size:16px; color:#fff; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.wrap { max-width:1200px; margin:0 auto; padding:16px; }
-.video-box { background:#000; border-radius:6px; overflow:hidden; position:relative; aspect-ratio:16/9; }
-video { width:100%; height:100%; display:block; background:#000; }
-.info { margin-top:14px; padding:14px 18px; background:#1a1a1a; border-radius:6px; }
-.info h2 { font-size:15px; color:#fff; margin-bottom:8px; }
-.info .meta { font-size:12px; color:#888; margin-bottom:10px; }
-.status { padding:40px 0; text-align:center; color:#666; }
-.quality-list { display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; }
-.quality-btn { padding:5px 12px; background:#2a2a2a; color:#ccc; border:1px solid #444; border-radius:3px; cursor:pointer; font-size:12px; }
-.quality-btn:hover { background:#333; color:#fff; }
-.quality-btn.on { background:#00a1d6; color:#fff; border-color:#00a1d6; }
-.pages-section { margin-top:16px; padding:14px 18px; background:#1a1a1a; border-radius:6px; }
-.pages-section h3 { font-size:14px; color:#fff; margin-bottom:10px; }
-.pages-list { display:flex; flex-wrap:wrap; gap:8px; }
-.page-btn {
-    padding:6px 14px; background:#2a2a2a; color:#ccc;
-    border:1px solid #444; border-radius:3px; cursor:pointer;
-    font-size:12px; font-family:inherit;
-    max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+html, body {
+    font:14px/1.6 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+    color:#18191c; background:#f1f2f3;
+    -webkit-font-smoothing:antialiased;
 }
-.page-btn:hover { background:#333; color:#fff; }
-.page-btn.on { background:#00a1d6; color:#fff; border-color:#00a1d6; }
-.sub-p-btn { background:#1a1a1a; }
-.sub-p-btn.on { background:#22aa55; border-color:#22aa55; }
+a { color:inherit; text-decoration:none; }
+button { font-family:inherit; cursor:pointer; border:none; outline:none; background:none; color:inherit; }
+input, textarea { font-family:inherit; outline:none; border:none; }
+
+.bili-header {
+    background:#fff; height:56px; padding:0 24px;
+    display:flex; align-items:center; gap:20px;
+    box-shadow:0 1px 2px rgba(0,0,0,.04);
+    position:sticky; top:0; z-index:100;
+}
+.bili-logo {
+    display:flex; align-items:center; gap:8px;
+    font-size:18px; font-weight:bold; color:#fb7299;
+}
+.bili-logo svg { width:28px; height:28px; }
+.bili-nav { display:flex; gap:4px; }
+.bili-nav a { padding:6px 12px; font-size:14px; border-radius:6px; }
+.bili-nav a:hover { background:#f1f2f3; }
+.bili-search { margin-left:auto; position:relative; width:320px; }
+.bili-search input {
+    width:100%; height:34px; padding:0 40px 0 14px;
+    background:#f1f2f3; border-radius:17px; font-size:13px;
+}
+.bili-search .search-icon {
+    position:absolute; right:14px; top:50%;
+    transform:translateY(-50%); color:#9499a0; pointer-events:none;
+}
+.bili-user { display:flex; align-items:center; gap:10px; font-size:13px; color:#61666d; }
+.bili-user .avatar {
+    width:32px; height:32px; border-radius:50%;
+    background:linear-gradient(135deg,#fb7299,#fc8bab);
+    color:#fff; display:flex; align-items:center; justify-content:center;
+    font-weight:bold; font-size:14px;
+}
+.bili-user .username { color:#00aeec; font-weight:500; }
+.bili-user .login-link {
+    padding:6px 16px; background:#fb7299; color:#fff;
+    border-radius:6px; font-size:13px; font-weight:500;
+}
+
+.main-container {
+    max-width:1500px; margin:16px auto; padding:0 24px;
+    display:grid; grid-template-columns:minmax(0,1fr) 380px;
+    gap:20px; align-items:flex-start;
+}
+.left-col { min-width:0; }
+.video-info-head {
+    background:#fff; border-radius:8px 8px 0 0;
+    padding:16px 20px 12px;
+}
+.video-title {
+    font-size:18px; font-weight:600; line-height:1.4;
+    margin-bottom:10px; word-break:break-word;
+}
+.video-meta-row {
+    display:flex; flex-wrap:wrap; gap:16px;
+    font-size:13px; color:#9499a0;
+}
+.video-meta-row .meta-item { display:inline-flex; align-items:center; gap:4px; }
+.video-meta-row .meta-item svg { width:16px; height:16px; }
+
+.player-wrap {
+    background:#000; position:relative;
+    aspect-ratio:16/9; overflow:hidden;
+}
+.player-wrap video { width:100%; height:100%; display:block; background:#000; }
+.player-status {
+    position:absolute; inset:0;
+    display:flex; align-items:center; justify-content:center;
+    color:#a0a0a0; font-size:14px; background:#000; z-index:5;
+}
+.player-status.hide { display:none; }
+.player-status .spin {
+    width:28px; height:28px;
+    border:3px solid #2a2a2a; border-top-color:#fb7299;
+    border-radius:50%; animation:spin 1s linear infinite; margin-right:10px;
+}
+@keyframes spin { to { transform:rotate(360deg); } }
+
+.dm-layer { position:absolute; inset:0; pointer-events:none; overflow:hidden; z-index:3; }
+.dm-item {
+    position:absolute; left:100%; white-space:nowrap;
+    font-size:20px; font-weight:bold; color:#fff;
+    text-shadow:1px 1px 2px #000, 0 0 4px #000;
+    will-change:transform;
+    animation:dmMove 8s linear forwards;
+}
+.dm-item.self {
+    color:#fff; border:1.5px solid #00aeec;
+    border-radius:4px; padding:0 8px;
+    box-shadow:0 0 6px rgba(0,174,236,.6);
+}
+@keyframes dmMove {
+    from { transform:translateX(0); }
+    to { transform:translateX(calc(-100vw - 100%)); }
+}
+.dm-toggle {
+    position:absolute; right:12px; top:12px;
+    background:rgba(0,0,0,.5); color:#fff;
+    padding:5px 12px; border-radius:16px; font-size:12px;
+    z-index:4;
+}
+.dm-toggle.off { opacity:.5; }
+.dm-input-bar {
+    position:absolute; left:0; right:0; bottom:0;
+    padding:10px 12px;
+    background:linear-gradient(to top, rgba(0,0,0,.7), transparent);
+    display:flex; gap:8px; z-index:4; transition:opacity .3s;
+}
+.dm-input-bar input {
+    flex:1; background:rgba(255,255,255,.15);
+    border-radius:20px; color:#fff;
+    padding:8px 14px; font-size:13px;
+    backdrop-filter:blur(6px);
+}
+.dm-input-bar input::placeholder { color:rgba(255,255,255,.6); }
+.dm-input-bar button {
+    background:#fb7299; color:#fff;
+    padding:8px 18px; border-radius:20px;
+    font-size:13px; font-weight:600;
+}
+.dm-input-bar button:disabled { background:#666; cursor:not-allowed; }
+
+.video-toolbar {
+    background:#fff; padding:8px 20px;
+    display:flex; align-items:center; gap:8px;
+    border-top:1px solid #f1f2f3;
+}
+.toolbar-btn {
+    display:inline-flex; align-items:center; gap:6px;
+    padding:8px 14px; font-size:13px; color:#61666d;
+    border-radius:6px;
+}
+.toolbar-btn:hover { background:#f1f2f3; }
+.toolbar-btn svg { width:22px; height:22px; }
+.toolbar-btn.active { color:#fb7299; }
+.toolbar-btn.active svg { fill:#fb7299; }
+
+.video-desc {
+    background:#fff; padding:16px 20px;
+    font-size:13px; line-height:1.7;
+    border-top:1px solid #f1f2f3;
+}
+.video-desc.collapsed { max-height:60px; overflow:hidden; }
+.video-desc .toggle-desc {
+    color:#00aeec; cursor:pointer; font-weight:600; margin-left:6px;
+}
+.video-tags {
+    background:#fff; padding:8px 20px 16px;
+    display:flex; flex-wrap:wrap; gap:8px;
+    border-top:1px solid #f1f2f3;
+}
+.video-tags .tag {
+    padding:4px 12px; background:#f1f2f3;
+    color:#61666d; border-radius:14px; font-size:12px;
+}
+.video-bottom-rounded { background:#fff; height:8px; border-radius:0 0 8px 8px; }
+
+.comment-card {
+    background:#fff; border-radius:8px;
+    margin-top:16px; padding:20px 24px;
+}
+.comment-head {
+    font-size:16px; font-weight:600;
+    padding-bottom:16px;
+    border-bottom:1px solid #f1f2f3;
+    margin-bottom:16px;
+}
+.comment-head .count { font-size:13px; font-weight:normal; color:#9499a0; margin-left:8px; }
+.comment-input-area { display:flex; gap:12px; margin-bottom:24px; }
+.comment-avatar {
+    flex-shrink:0; width:40px; height:40px;
+    border-radius:50%;
+    background:linear-gradient(135deg,#fb7299,#fc8bab);
+    display:flex; align-items:center; justify-content:center;
+    color:#fff; font-weight:bold; font-size:16px;
+}
+.comment-input-box { flex:1; }
+.comment-input-box textarea {
+    width:100%; padding:10px 14px;
+    background:#f1f2f3; border-radius:8px;
+    font-size:13px; resize:none; min-height:60px;
+}
+.comment-input-box .submit-row { display:flex; justify-content:flex-end; margin-top:8px; }
+.comment-input-box .submit-btn {
+    padding:6px 20px; border-radius:6px;
+    background:#fb7299; color:#fff;
+    font-size:13px; font-weight:600;
+}
+.comment-input-box .submit-btn:disabled { background:#e3e5e7; color:#9499a0; cursor:not-allowed; }
+.comment-login-tip {
+    padding:20px; background:#f6f7f8;
+    border-radius:8px; text-align:center;
+    color:#9499a0; font-size:13px; margin-bottom:24px;
+}
+.comment-login-tip a { color:#fb7299; font-weight:600; }
+.comment-item { display:flex; gap:12px; padding:16px 0; border-bottom:1px solid #f6f7f8; }
+.comment-item:last-child { border-bottom:none; }
+.comment-item .avatar {
+    flex-shrink:0; width:40px; height:40px;
+    border-radius:50%;
+    background:linear-gradient(135deg,#00aeec,#0088b8);
+    display:flex; align-items:center; justify-content:center;
+    color:#fff; font-weight:bold; font-size:16px;
+}
+.comment-item .body { flex:1; min-width:0; }
+.comment-item .head { display:flex; align-items:baseline; gap:8px; margin-bottom:4px; }
+.comment-item .username { font-size:13px; color:#00aeec; font-weight:600; }
+.comment-item .time { font-size:12px; color:#9499a0; }
+.comment-item .content {
+    font-size:14px; line-height:1.7;
+    word-break:break-word; white-space:pre-wrap;
+}
+.comment-empty, .comment-loading {
+    text-align:center; color:#9499a0;
+    padding:40px 0; font-size:13px;
+}
+
+.right-col { position:sticky; top:72px; }
+.up-card { background:#fff; border-radius:8px; padding:16px; margin-bottom:12px; }
+.up-info { display:flex; align-items:center; gap:12px; margin-bottom:14px; }
+.up-avatar {
+    width:48px; height:48px; border-radius:50%;
+    background:linear-gradient(135deg,#00aeec,#0088b8);
+    display:flex; align-items:center; justify-content:center;
+    color:#fff; font-size:18px; font-weight:bold; flex-shrink:0;
+}
+.up-meta { flex:1; min-width:0; }
+.up-name { font-size:14px; font-weight:600; margin-bottom:2px; }
+.up-desc { font-size:12px; color:#9499a0; }
+.up-follow-btn {
+    width:100%; padding:8px;
+    background:#fb7299; color:#fff;
+    border-radius:6px; font-size:13px; font-weight:600;
+}
+.pod-card { background:#fff; border-radius:8px; overflow:hidden; }
+.pod-head {
+    display:flex; align-items:center;
+    padding:12px 16px;
+    border-bottom:1px solid #f1f2f3;
+    font-size:14px; font-weight:600;
+}
+.pod-head .amt { font-size:12px; font-weight:normal; color:#9499a0; margin-left:6px; }
+.pod-head .tabs { margin-left:auto; display:flex; gap:4px; }
+.pod-tab {
+    padding:4px 10px; font-size:12px;
+    border-radius:4px; cursor:pointer;
+}
+.pod-tab.on { background:#e5f4ff; color:#00aeec; font-weight:600; }
+.pod-list { max-height:560px; overflow-y:auto; padding:8px 0; }
+.pod-list::-webkit-scrollbar { width:6px; }
+.pod-list::-webkit-scrollbar-thumb { background:#e3e5e7; border-radius:3px; }
+.ep-item {
+    display:flex; align-items:center; gap:12px;
+    padding:9px 16px; cursor:pointer; font-size:13px;
+}
+.ep-item:hover { background:#f6f7f8; }
+.ep-item.on { background:#fff0f5; color:#fb7299; font-weight:600; }
+.ep-item .ep-num {
+    flex-shrink:0; min-width:28px; height:22px;
+    padding:0 6px; background:#f1f2f3;
+    border-radius:4px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:12px; color:#61666d;
+}
+.ep-item.on .ep-num { background:#fb7299; color:#fff; }
+.ep-item .ep-title { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.ep-item .playing-dot { width:6px; height:6px; background:#fb7299; border-radius:50%; }
+.q-item {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:10px 16px; cursor:pointer; font-size:13px;
+}
+.q-item:hover { background:#f6f7f8; }
+.q-item.on { background:#e5f4ff; color:#00aeec; font-weight:600; }
+.q-item .q-check { color:#00aeec; }
+
+@media (max-width:1100px) {
+    .main-container { grid-template-columns:1fr; padding:0 12px; }
+    .right-col { position:static; }
+    .bili-search { width:200px; }
+    .bili-nav { display:none; }
+}
 </style>
 </head>
 <body>
 
-<div class="header">
-    <a href="./index.html">← 返回首页</a>
-    <h1 id="pageTitle">加载中...</h1>
+<div class="bili-header">
+    <a class="bili-logo" href="./index.html">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l7 4.5-7 4.5z"/></svg>
+        櫻花动漫
+    </a>
+    <nav class="bili-nav">
+        <a href="./index.html">首页</a>
+        <a href="./index.html#bangumi">番剧</a>
+    </nav>
+    <div class="bili-search">
+        <input type="text" placeholder="搜索番剧..." id="topSearch">
+        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="7"/>
+            <line x1="16.5" y1="16.5" x2="21" y2="21"/>
+        </svg>
+    </div>
+    <div class="bili-user" id="biliUser"></div>
 </div>
 
-<div class="wrap">
-    <div class="video-box">
-        <video id="video" controls playsinline preload="metadata"></video>
+<div class="main-container">
+    <div class="left-col">
+        <div class="video-info-head">
+            <h1 class="video-title" id="videoTitle">加载中...</h1>
+            <div class="video-meta-row" id="videoMeta"></div>
+        </div>
+
+        <div class="player-wrap">
+            <video id="video" controls playsinline preload="metadata"></video>
+            <div class="dm-layer" id="dmLayer"></div>
+            <div class="player-status" id="playerStatus">
+                <div class="spin"></div>
+                <span id="statusText">加载中...</span>
+            </div>
+            <button class="dm-toggle" id="dmToggle">弹幕 开</button>
+            <div class="dm-input-bar" id="dmInputBar" style="opacity:0;pointer-events:none;">
+                <input type="text" id="dmInput" placeholder="发个弹幕..." maxlength="50">
+                <button id="dmSend">发送</button>
+            </div>
+        </div>
+
+        <div class="video-toolbar">
+            <button class="toolbar-btn" id="likeBtn">
+                <svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.77 30.86V11.75H7.55c-2.04 0-3.69 1.64-3.69 3.68v11.75c0 2.03 1.65 3.68 3.69 3.68h2.22z M11.99 30.86V11.71c3-1.08 4.7-3.82 5.11-8.37.16-1.78 1.86-2.52 3.48-1.74 1.6.77 2.66 2.73 2.66 5.34 0 1.56-.2 3.17-.59 4.81h7.08c2.04 0 3.7 1.65 3.7 3.7 0 .3-.04.6-.11.88l-2.33 9.47c-.73 2.97-3.4 5.06-6.46 5.06H11.99z"/></svg>
+                <span>点赞</span>
+            </button>
+            <button class="toolbar-btn" id="favBtn">
+                <svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M19.8 9.26a2.45 2.45 0 0 1-2.45-1.87l-1.88-3.9c-.58-1.3-2.37-1.3-3.03 0l-1.8 3.9a2.45 2.45 0 0 1-2.45 1.87l-3.9.65c-1.32.16-1.88 1.79-.9 2.76l3.19 3.25a2.45 2.45 0 0 1 .9 2.84l-1.4 4.55c-.25 1.38 1.23 2.35 2.45 1.7l3.6-1.95a2.45 2.45 0 0 1 3.19 0l3.6 1.95c1.23.65 2.62-.32 2.45-1.7l-.82-4.55a2.45 2.45 0 0 1 .9-2.84l3.19-3.25c.98-.97.42-2.6-.9-2.76l-3.9-.65z"/></svg>
+                <span>收藏</span>
+            </button>
+            <button class="toolbar-btn" id="shareBtn">
+                <svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M12.6 10.33V5.44c0-.8.67-1.44 1.49-1.44.35 0 .69.12.95.34l10.34 8.39c.73.59.82 1.64.22 2.35-.07.08-.14.15-.22.21l-10.34 8.39c-.63.51-1.57.43-2.1-.18-.22-.26-.34-.59-.34-.93v-4.5c-5.01 0-7.24 1.86-10.04 5.47-.1.12-.57.25-.57-.31 0-7 1.9-12.88 10.6-12.88z"/></svg>
+                <span>分享</span>
+            </button>
+        </div>
+
+        <div class="video-desc collapsed" id="videoDesc">
+            <span id="descText">加载中...</span>
+            <span class="toggle-desc" id="toggleDesc">展开更多</span>
+        </div>
+
+        <div class="video-tags" id="videoTags"></div>
+        <div class="video-bottom-rounded"></div>
+
+        <div class="comment-card">
+            <div class="comment-head">评论 <span class="count" id="commentCount">0</span></div>
+            <div id="commentInputWrap"></div>
+            <div id="commentList"><div class="comment-loading">加载中...</div></div>
+        </div>
     </div>
-    <div class="status" id="status">正在获取视频地址...</div>
-    <div class="info" id="info" style="display:none;">
-        <h2 id="videoTitle"></h2>
-        <div class="meta" id="videoMeta"></div>
-        <div class="quality-list" id="qualityList"></div>
-    </div>
-    <div class="pages-section" id="subPSection" style="display:none;">
-        <h3>🎞️ 分P</h3>
-        <div class="pages-list" id="subPList"></div>
-    </div>
-    <div class="pages-section" id="pagesSection" style="display:none;">
-        <h3>📚 选集</h3>
-        <div class="pages-list" id="pagesList"></div>
+
+    <div class="right-col">
+        <div class="up-card">
+            <div class="up-info">
+                <div class="up-avatar">樱</div>
+                <div class="up-meta">
+                    <div class="up-name">櫻花动漫</div>
+                    <div class="up-desc">搬运 / 字幕 / 番剧分享</div>
+                </div>
+            </div>
+            <button class="up-follow-btn">+ 关注</button>
+        </div>
+
+        <div class="pod-card">
+            <div class="pod-head">
+                <span>选集</span>
+                <span class="amt" id="podAmt"></span>
+                <div class="tabs">
+                    <div class="pod-tab on" data-tab="eps">选集</div>
+                    <div class="pod-tab" data-tab="quality">清晰度</div>
+                </div>
+            </div>
+            <div class="pod-list" id="podList"></div>
+        </div>
     </div>
 </div>
 
 <script>
 const API_BASE = 'https://api.imomoe.dpdns.org';
 
+function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, m => ({
+        '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+    }[m]));
+}
+
+class DanmuEngine {
+    constructor(layerEl) {
+        this.layer = layerEl;
+        this.enabled = true;
+        this.tracks = 6;
+        this.trackFree = new Array(6).fill(0);
+    }
+    pickTrack() {
+        const now = Date.now();
+        for (let i = 0; i < this.tracks; i++) {
+            if (this.trackFree[i] < now) {
+                this.trackFree[i] = now + 8000;
+                return i;
+            }
+        }
+        let min = 0;
+        for (let i = 1; i < this.tracks; i++) {
+            if (this.trackFree[i] < this.trackFree[min]) min = i;
+        }
+        this.trackFree[min] = now + 8000;
+        return min;
+    }
+    shoot(text, isSelf = false) {
+        if (!this.enabled) return;
+        const track = this.pickTrack();
+        const el = document.createElement('div');
+        el.className = 'dm-item' + (isSelf ? ' self' : '');
+        el.textContent = text;
+        el.style.top = (track * 40 + 10) + 'px';
+        this.layer.appendChild(el);
+        setTimeout(() => el.remove(), 8500);
+    }
+    clear() {
+        this.layer.innerHTML = '';
+        this.trackFree = new Array(this.tracks).fill(0);
+    }
+}
+
 const params = new URLSearchParams(location.search);
-const videoId = params.get('id');
 const albumId = params.get('album');
-const title = params.get('title') || '';
+const singleId = params.get('id');
+const urlTitle = params.get('title') || '';
 let currentP = parseInt(params.get('p')) || 1;
-let currentSubP = parseInt(params.get('sub')) || 1;
 
 let hls = null;
 let playlist = [];
 let currentIndex = 0;
-let currentPages = [];
+let danmuEngine = null;
+let danmuList = [];
+let lastDanmuTime = 0;
+let currentVideoKey = '';
+let qualityOptions = [];
 
-if (albumId) {
-    document.title = (title || 'AcFun 合集') + ' - 櫻花动漫';
-    document.getElementById('pageTitle').textContent = title || 'AcFun 合集 ' + albumId;
-    initCollection(albumId);
-} else if (videoId) {
-    document.title = (title || 'AcFun') + ' - 櫻花动漫';
-    document.getElementById('pageTitle').textContent = title || 'AcFun 视频 ' + videoId;
-    initSingleVideo(videoId);
-} else {
-    document.getElementById('status').textContent = '缺少参数（id 或 album）';
+const video = document.getElementById('video');
+const dmLayer = document.getElementById('dmLayer');
+danmuEngine = new DanmuEngine(dmLayer);
+
+function getCurrentUser() {
+    try {
+        const raw = localStorage.getItem('imomoe_user');
+        return raw ? JSON.parse(raw) : null;
+    } catch { return null; }
 }
 
-// ---------- 单视频模式 ----------
-async function initSingleVideo(videoId) {
-    const status = document.getElementById('status');
-    status.textContent = '正在获取视频地址...';
-
-    try {
-        const res = await fetch(`${API_BASE}/api/acfun/${videoId}?p=${currentSubP}`);
-        const data = await res.json();
-
-        if (!data.ok || !data.urls || !data.urls.length) {
-            status.textContent = '未找到视频：' + (data.error || '未知错误');
-            return;
-        }
-
-        playlist = [{ ac: videoId, p: 1, title: data.videoTitle || title || '视频' }];
-        currentIndex = 0;
-        currentPages = data.pages || [];
-        renderSubP();
-        setupPlayer(data.urls, playlist[0].title, 1);
-    } catch (err) {
-        status.textContent = '获取失败：' + err.message;
+function renderUser() {
+    const user = getCurrentUser();
+    const box = document.getElementById('biliUser');
+    if (user) {
+        box.innerHTML = '<div class="avatar">' + escapeHtml(user.username[0].toUpperCase()) + '</div>' +
+                        '<span class="username">' + escapeHtml(user.username) + '</span>';
+    } else {
+        box.innerHTML = '<a class="login-link" href="./index.html">登录</a>';
     }
 }
+renderUser();
 
-// ---------- 合集模式 ----------
+document.getElementById('topSearch').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+        const kw = e.target.value.trim();
+        if (kw) location.href = './index.html#search=' + encodeURIComponent(kw);
+    }
+});
+
+if (!albumId && !singleId) {
+    showStatus('缺少参数：?album=xxx 或 ?id=xxx');
+} else if (albumId) {
+    document.title = (urlTitle || '合集') + ' - 櫻花动漫';
+    initCollection(albumId);
+} else {
+    document.title = (urlTitle || '视频') + ' - 櫻花动漫';
+    initSingle(singleId);
+}
+
+function showStatus(text) {
+    document.getElementById('playerStatus').classList.remove('hide');
+    document.getElementById('statusText').textContent = text;
+}
+function hideStatus() {
+    document.getElementById('playerStatus').classList.add('hide');
+}
+
 async function initCollection(albumId) {
-    const status = document.getElementById('status');
-    status.textContent = '正在加载合集列表...';
-
+    showStatus('加载合集列表...');
     try {
         const res = await fetch(`${API_BASE}/api/acfun-collection/${albumId}`);
         const data = await res.json();
-
         if (!data.ok || !data.list || !data.list.length) {
-            status.textContent = '未找到合集：' + (data.error || '未知错误');
+            showStatus('合集加载失败：' + (data.error || '未知错误'));
             return;
         }
-
         playlist = data.list.map(item => ({
-            ac: item.ac,
-            p: item.p,
-            title: item.title
+            ac: item.ac, p: item.p, title: item.title || ('第' + item.p + '集')
         }));
-
-        currentIndex = currentP - 1;
-        if (currentIndex < 0 || currentIndex >= playlist.length) currentIndex = 0;
-
-        renderPages();
+        currentIndex = Math.max(0, Math.min(currentP - 1, playlist.length - 1));
+        renderPodList();
         loadCurrent();
-    } catch (err) {
-        status.textContent = '获取失败：' + err.message;
+    } catch (e) {
+        showStatus('网络错误：' + e.message);
     }
 }
 
-// 加载当前集
+async function initSingle(videoId) {
+    playlist = [{ ac: videoId, p: 1, title: urlTitle || '视频' }];
+    currentIndex = 0;
+    renderPodList();
+    loadCurrent();
+}
+
 async function loadCurrent() {
-    if (currentIndex < 0 || currentIndex >= playlist.length) return;
-
     const item = playlist[currentIndex];
-    const status = document.getElementById('status');
-    status.textContent = '正在获取视频地址...';
-    status.style.display = 'block';
+    if (!item) return;
 
-    const video = document.getElementById('video');
+    showStatus('获取视频地址...');
     if (hls) { hls.destroy(); hls = null; }
     video.removeAttribute('src');
     video.load();
+    danmuEngine.clear();
+
+    currentVideoKey = albumId ? `album_${albumId}_ep${item.p}` : `ac_${item.ac}`;
+    document.getElementById('videoTitle').textContent = item.title;
 
     try {
-        const res = await fetch(`${API_BASE}/api/acfun/${item.ac}?p=${currentSubP}`);
+        const res = await fetch(`${API_BASE}/api/acfun/${item.ac}?p=1`);
         const data = await res.json();
-
         if (!data.ok || !data.urls || !data.urls.length) {
-            status.textContent = '未找到视频：' + (data.error || '未知错误');
+            showStatus('获取视频失败：' + (data.error || '未知错误'));
             return;
         }
 
-        currentPages = data.pages || [];
-        renderSubP();
-        renderPages();
-        setupPlayer(data.urls, item.title, item.p);
+        qualityOptions = sortQualities(data.urls);
+
+        document.getElementById('videoMeta').innerHTML =
+            '<span class="meta-item">' +
+                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>' +
+                (item.p * 12300 + 45600).toLocaleString() +
+            '</span>' +
+            '<span class="meta-item">' +
+                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>' +
+                (danmuList.length || Math.floor(Math.random() * 500 + 100)) +
+            '</span>' +
+            '<span class="meta-item">' + new Date().toLocaleDateString('zh-CN') + '</span>';
+
+        document.getElementById('descText').textContent =
+            '【' + item.title + '】本视频由櫻花动漫聚合整理，如涉及版权问题请联系删除。';
+
+        document.getElementById('videoTags').innerHTML =
+            ['番剧', '动画', 'AcFun', '在线观看', '全集'].map(t => '<span class="tag">' + t + '</span>').join('');
 
         const newUrl = new URL(location.href);
         newUrl.searchParams.set('p', item.p);
-        newUrl.searchParams.set('sub', currentSubP);
         history.replaceState({}, '', newUrl);
-    } catch (err) {
-        status.textContent = '获取失败：' + err.message;
+
+        document.querySelectorAll('.ep-item').forEach((el, i) => {
+            el.classList.toggle('on', i === currentIndex);
+            const dot = el.querySelector('.playing-dot');
+            if (dot) dot.remove();
+            if (i === currentIndex) el.insertAdjacentHTML('beforeend', '<span class="playing-dot"></span>');
+        });
+
+        loadDanmu(currentVideoKey);
+        loadComments(currentVideoKey);
+        playVideo(qualityOptions[0], item);
+
+    } catch (e) {
+        showStatus('网络错误：' + e.message);
     }
 }
 
-// 渲染分P
-function renderSubP() {
-    const section = document.getElementById('subPSection');
-    const list = document.getElementById('subPList');
-
-    if (currentPages.length <= 1) {
-        section.style.display = 'none';
-        return;
-    }
-
-    section.style.display = 'block';
-    list.innerHTML = '';
-
-    currentPages.forEach(pg => {
-        const btn = document.createElement('button');
-        btn.className = 'page-btn sub-p-btn' + (pg.p === currentSubP ? ' on' : '');
-        btn.textContent = 'P' + pg.p + (pg.title ? ' · ' + pg.title : '');
-        btn.title = pg.title || '';
-        btn.onclick = () => {
-            currentSubP = pg.p;
-            loadCurrent();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        };
-        list.appendChild(btn);
-    });
-}
-
-// 渲染选集
-function renderPages() {
-    const pagesSection = document.getElementById('pagesSection');
-    const pagesList = document.getElementById('pagesList');
-
-    if (playlist.length <= 1) {
-        pagesSection.style.display = 'none';
-        return;
-    }
-
-    pagesSection.style.display = 'block';
-    pagesList.innerHTML = '';
-
-    playlist.forEach((item, idx) => {
-        const btn = document.createElement('button');
-        btn.className = 'page-btn' + (idx === currentIndex ? ' on' : '');
-        btn.textContent = item.title || ('第 ' + item.p + ' 集');
-        btn.title = item.title || '';
-        btn.onclick = () => {
-            currentIndex = idx;
-            currentSubP = 1;
-            renderPages();
-            loadCurrent();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        };
-        pagesList.appendChild(btn);
-    });
-}
-
-function setupPlayer(urls, videoTitle, p) {
-    const video = document.getElementById('video');
-    const status = document.getElementById('status');
-    const info = document.getElementById('info');
-    const qualityList = document.getElementById('qualityList');
-
-    qualityList.innerHTML = '';
-
-    function getLevel(q) {
+function sortQualities(urls) {
+    function lv(q) {
         const s = (q || '').toLowerCase();
+        if (s.includes('2160') || s.includes('4k')) return 200;
         if (s.includes('1080')) return 100;
         if (s.includes('720')) return 80;
-        if (s.includes('480')) return 60;
+        if (s.includes('540')) return 60;
+        if (s.includes('480')) return 50;
         if (s.includes('360')) return 40;
-        return 50;
+        return 55;
     }
-
-    const sorted = urls.map(u => ({ ...u, level: getLevel(u.quality) })).sort((a, b) => b.level - a.level);
-    const unique = [];
+    const sorted = urls.map(u => ({ ...u, level: lv(u.quality) })).sort((a, b) => b.level - a.level);
+    const out = [];
     const seen = new Set();
-    for (const item of sorted) {
-        const name = item.quality || '默认';
-        if (!seen.has(name)) { seen.add(name); unique.push(item); }
+    for (const it of sorted) {
+        const name = it.quality || '默认';
+        if (!seen.has(name)) { seen.add(name); out.push(it); }
+    }
+    return out;
+}
+
+// ============================================================
+// 直连模式：浏览器直接加载 AcFun CDN，不走 Worker 代理
+// ============================================================
+function playVideo(quality, item) {
+    if (!quality || !quality.url) {
+        showStatus('无可用清晰度');
+        return;
     }
 
-    function playAt(item, btn) {
-        // ============================================================
-        // 直连模式：浏览器直接加载 AcFun CDN，不走 Worker 代理
-        // ============================================================
-        const directUrl = item.url;
-        const isM3u8 = item.url.includes('.m3u8');
+    const directUrl = quality.url;
+    const isM3u8 = quality.url.includes('.m3u8');
 
-        if (hls) { hls.destroy(); hls = null; }
+    if (hls) { hls.destroy(); hls = null; }
 
-        if (isM3u8 && window.Hls && Hls.isSupported()) {
-            hls = new Hls({ enableWorker: true });
-            hls.loadSource(directUrl);
-            hls.attachMedia(video);
-            hls.on(Hls.Events.MANIFEST_PARSED, () => video.play().catch(() => {}));
-            hls.on(Hls.Events.ERROR, (e, data) => {
-                console.error('HLS 错误：', data);
-            });
-        } else {
-            video.src = directUrl;
+    if (isM3u8 && window.Hls && Hls.isSupported()) {
+        hls = new Hls({ enableWorker: true });
+        hls.loadSource(directUrl);
+        hls.attachMedia(video);
+        hls.on(Hls.Events.MANIFEST_PARSED, () => {
+            hideStatus();
             video.play().catch(() => {});
-        }
-
-        status.style.display = 'none';
-        info.style.display = 'block';
-        document.getElementById('videoTitle').textContent = videoTitle || title || 'AcFun';
-        document.getElementById('videoMeta').textContent =
-            '来源：AcFun' +
-            (playlist.length > 1 ? ' · 第 ' + p + ' 集' : '') +
-            (currentPages.length > 1 ? ' · P' + currentSubP : '') +
-            ' · 清晰度：' + (item.quality || '默认') +
-            ' · 直连';
-
-        if (btn) {
-            qualityList.querySelectorAll('.quality-btn').forEach(b => b.classList.remove('on'));
-            btn.classList.add('on');
-        }
+            lastDanmuTime = 0;
+        });
+        hls.on(Hls.Events.ERROR, (e, data) => {
+            console.error('HLS 错误：', data);
+            if (data.fatal) showStatus('播放错误：' + (data.details || '未知'));
+        });
+    } else {
+        video.src = directUrl;
+        video.play().catch(() => {});
+        hideStatus();
     }
+}
 
-    unique.forEach((item, i) => {
-        const btn = document.createElement('button');
-        btn.className = 'quality-btn' + (i === 0 ? ' on' : '');
-        btn.textContent = item.quality || '默认';
-        btn.onclick = () => playAt(item, btn);
-        qualityList.appendChild(btn);
-    });
+let podTab = 'eps';
+document.querySelectorAll('.pod-tab').forEach(tab => {
+    tab.onclick = () => {
+        document.querySelectorAll('.pod-tab').forEach(t => t.classList.remove('on'));
+        tab.classList.add('on');
+        podTab = tab.dataset.tab;
+        renderPodList();
+    };
+});
 
-    // 自动连播
-    video.onended = () => {
-        if (currentPages.length > 1 && currentSubP < currentPages.length) {
-            currentSubP++;
-            loadCurrent();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+function renderPodList() {
+    const list = document.getElementById('podList');
+    const amt = document.getElementById('podAmt');
+
+    if (podTab === 'eps') {
+        amt.textContent = '（' + (currentIndex + 1) + '/' + playlist.length + '）';
+        if (playlist.length <= 1) {
+            list.innerHTML = '<div class="comment-loading" style="padding:20px 0;font-size:12px;">单个视频</div>';
             return;
         }
-        if (currentIndex < playlist.length - 1) {
-            currentIndex++;
-            currentSubP = 1;
-            renderPages();
-            loadCurrent();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+        list.innerHTML = playlist.map((item, idx) =>
+            '<div class="ep-item' + (idx === currentIndex ? ' on' : '') + '" data-idx="' + idx + '">' +
+                '<span class="ep-num">' + (idx + 1) + '</span>' +
+                '<span class="ep-title">' + escapeHtml(item.title) + '</span>' +
+                (idx === currentIndex ? '<span class="playing-dot"></span>' : '') +
+            '</div>'
+        ).join('');
+        list.querySelectorAll('.ep-item').forEach(el => {
+            el.onclick = () => {
+                currentIndex = parseInt(el.dataset.idx);
+                renderPodList();
+                loadCurrent();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            };
+        });
+    } else {
+        amt.textContent = '';
+        if (qualityOptions.length <= 1) {
+            list.innerHTML = '<div class="comment-loading" style="padding:20px 0;font-size:12px;">仅一个清晰度</div>';
+            return;
         }
-    };
-
-    playAt(unique[0]);
+        list.innerHTML = qualityOptions.map((q, i) =>
+            '<div class="q-item' + (i === 0 ? ' on' : '') + '" data-idx="' + i + '">' +
+                '<span>' + escapeHtml(q.quality || '默认') + '</span>' +
+                (i === 0 ? '<span class="q-check">✓</span>' : '') +
+            '</div>'
+        ).join('');
+        list.querySelectorAll('.q-item').forEach(el => {
+            el.onclick = () => {
+                const i = parseInt(el.dataset.idx);
+                list.querySelectorAll('.q-item').forEach(x => {
+                    x.classList.remove('on');
+                    const c = x.querySelector('.q-check'); if (c) c.remove();
+                });
+                el.classList.add('on');
+                el.insertAdjacentHTML('beforeend', '<span class="q-check">✓</span>');
+                playVideo(qualityOptions[i], playlist[currentIndex]);
+            };
+        });
+    }
 }
+
+async function loadDanmu(videoKey) {
+    danmuList = [];
+    lastDanmuTime = 0;
+    try {
+        const res = await fetch(`${API_BASE}/api/danmu/${encodeURIComponent(videoKey)}`);
+        const data = await res.json();
+        if (Array.isArray(data)) {
+            danmuList = data.map(d => ({
+                time: parseFloat(d.time_in_video) || 0,
+                content: d.content,
+                username: d.username || '匿名'
+            }));
+        }
+    } catch (e) {}
+}
+
+video.addEventListener('timeupdate', () => {
+    const now = video.currentTime;
+    if (now < lastDanmuTime || now - lastDanmuTime > 2) {
+        lastDanmuTime = now;
+        return;
+    }
+    danmuList.forEach(d => {
+        if (d.time > lastDanmuTime && d.time <= now) {
+            const user = getCurrentUser();
+            danmuEngine.shoot(d.content, user && user.username === d.username);
+        }
+    });
+    lastDanmuTime = now;
+});
+
+const dmInputBar = document.getElementById('dmInputBar');
+video.addEventListener('mouseenter', () => {
+    dmInputBar.style.opacity = '1';
+    dmInputBar.style.pointerEvents = 'auto';
+});
+video.addEventListener('mouseleave', () => {
+    dmInputBar.style.opacity = '0';
+    dmInputBar.style.pointerEvents = 'none';
+});
+if ('ontouchstart' in window) {
+    dmInputBar.style.opacity = '1';
+    dmInputBar.style.pointerEvents = 'auto';
+}
+
+document.getElementById('dmSend').onclick = sendDanmu;
+document.getElementById('dmInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') sendDanmu();
+});
+
+async function sendDanmu() {
+    const input = document.getElementById('dmInput');
+    const content = input.value.trim();
+    if (!content) return;
+    const user = getCurrentUser();
+    if (!user) { alert('请先登录'); location.href = './index.html'; return; }
+
+    const btn = document.getElementById('dmSend');
+    btn.disabled = true;
+    btn.textContent = '发送中';
+    try {
+        const res = await fetch(`${API_BASE}/api/danmu`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + user.token },
+            body: JSON.stringify({ videoKey: currentVideoKey, content, timeInVideo: video.currentTime })
+        });
+        const data = await res.json();
+        if (data.ok) {
+            input.value = '';
+            danmuEngine.shoot(content, true);
+            danmuList.push({ time: video.currentTime, content, username: user.username });
+        } else {
+            alert(data.error || '发送失败');
+        }
+    } catch (e) {
+        alert('网络错误：' + e.message);
+    } finally {
+        btn.disabled = false;
+        btn.textContent = '发送';
+    }
+}
+
+document.getElementById('dmToggle').onclick = function () {
+    danmuEngine.enabled = !danmuEngine.enabled;
+    this.textContent = danmuEngine.enabled ? '弹幕 开' : '弹幕 关';
+    this.classList.toggle('off', !danmuEngine.enabled);
+    if (!danmuEngine.enabled) danmuEngine.clear();
+};
+
+async function loadComments(videoKey) {
+    const list = document.getElementById('commentList');
+    const count = document.getElementById('commentCount');
+    list.innerHTML = '<div class="comment-loading">加载中...</div>';
+    renderCommentInput();
+
+    try {
+        const res = await fetch(`${API_BASE}/api/comments/${encodeURIComponent(videoKey)}`);
+        const data = await res.json();
+        if (!Array.isArray(data) || data.length === 0) {
+            list.innerHTML = '<div class="comment-empty">还没有评论，来抢沙发~</div>';
+            count.textContent = '0';
+            return;
+        }
+        count.textContent = data.length;
+        list.innerHTML = data.map(c => renderCommentItem(c)).join('');
+    } catch (e) {
+        list.innerHTML = '<div class="comment-empty">加载失败</div>';
+    }
+}
+
+function renderCommentItem(c) {
+    const timeStr = formatTime(c.created_at);
+    const avatar = (c.username || '匿')[0].toUpperCase();
+    return '<div class="comment-item">' +
+        '<div class="avatar">' + avatar + '</div>' +
+        '<div class="body">' +
+            '<div class="head">' +
+                '<span class="username">' + escapeHtml(c.username || '匿名') + '</span>' +
+                '<span class="time">' + timeStr + '</span>' +
+            '</div>' +
+            '<div class="content">' + escapeHtml(c.content) + '</div>' +
+        '</div>' +
+    '</div>';
+}
+
+function renderCommentInput() {
+    const wrap = document.getElementById('commentInputWrap');
+    const user = getCurrentUser();
+    if (!user) {
+        wrap.innerHTML = '<div class="comment-login-tip">请先 <a href="./index.html">登录</a> 后发表评论</div>';
+        return;
+    }
+    wrap.innerHTML =
+        '<div class="comment-input-area">' +
+            '<div class="comment-avatar">' + escapeHtml(user.username[0].toUpperCase()) + '</div>' +
+            '<div class="comment-input-box">' +
+                '<textarea id="commentInput" placeholder="发一条友善的评论"></textarea>' +
+                '<div class="submit-row"><button class="submit-btn" id="commentSend">发布</button></div>' +
+            '</div>' +
+        '</div>';
+    document.getElementById('commentSend').onclick = sendComment;
+}
+
+async function sendComment() {
+    const input = document.getElementById('commentInput');
+    const content = input.value.trim();
+    if (!content) return;
+    const user = getCurrentUser();
+    if (!user) { alert('请先登录'); return; }
+
+    const btn = document.getElementById('commentSend');
+    btn.disabled = true;
+    btn.textContent = '发布中';
+    try {
+        const res = await fetch(`${API_BASE}/api/comments`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + user.token },
+            body: JSON.stringify({ videoKey: currentVideoKey, content })
+        });
+        const data = await res.json();
+        if (data.ok) {
+            input.value = '';
+            loadComments(currentVideoKey);
+        } else {
+            alert(data.error || '发送失败');
+        }
+    } catch (e) {
+        alert('网络错误：' + e.message);
+    } finally {
+        btn.disabled = false;
+        btn.textContent = '发布';
+    }
+}
+
+function formatTime(str) {
+    if (!str) return '';
+    const d = new Date(str.replace(' ', 'T') + 'Z');
+    if (isNaN(d.getTime())) return str;
+    const now = new Date();
+    const diff = (now - d) / 1000;
+    if (diff < 60) return '刚刚';
+    if (diff < 3600) return Math.floor(diff / 60) + ' 分钟前';
+    if (diff < 86400) return Math.floor(diff / 3600) + ' 小时前';
+    if (diff < 86400 * 7) return Math.floor(diff / 86400) + ' 天前';
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+
+video.onended = () => {
+    if (currentIndex < playlist.length - 1) {
+        currentIndex++;
+        renderPodList();
+        loadCurrent();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+};
+
+document.getElementById('likeBtn').onclick = function () { this.classList.toggle('active'); };
+document.getElementById('favBtn').onclick = function () {
+    this.classList.toggle('active');
+    this.querySelector('span').textContent = this.classList.contains('active') ? '已收藏' : '收藏';
+};
+document.getElementById('shareBtn').onclick = function () {
+    const url = location.href;
+    if (navigator.share) {
+        navigator.share({ title: document.title, url }).catch(() => {});
+    } else {
+        navigator.clipboard?.writeText(url);
+        alert('链接已复制');
+    }
+};
+
+document.getElementById('toggleDesc').onclick = function () {
+    const desc = document.getElementById('videoDesc');
+    const expanded = !desc.classList.contains('collapsed');
+    desc.classList.toggle('collapsed');
+    this.textContent = expanded ? '展开更多' : '收起';
+};
 </script>
 
 </body>
