@@ -488,7 +488,6 @@ class DanmuEngine {
 // ============================================================
 const params = new URLSearchParams(location.search);
 
-// ⭐ 从 ?iv=iv1 解析（不区分大小写）
 function parseIvParam() {
     const ivParam = params.get('iv');
     if (ivParam) {
@@ -1041,6 +1040,9 @@ document.getElementById('dmToggle').onclick = function () {
     if (!danmuEngine.enabled) danmuEngine.clear();
 };
 
+// ============================================================
+// 评论
+// ============================================================
 async function loadComments(animeId) {
     const list = document.getElementById('commentList');
     const count = document.getElementById('commentCount');
@@ -1057,6 +1059,16 @@ async function loadComments(animeId) {
         }
         count.textContent = data.length;
         list.innerHTML = data.map(c => renderCommentItem(c)).join('');
+
+        // 给删除按钮绑事件
+        list.querySelectorAll('.comment-del').forEach(btn => {
+            btn.onclick = async (e) => {
+                e.stopPropagation();
+                const cid = btn.getAttribute('data-cid');
+                if (!confirm('确定删除这条评论？')) return;
+                await deleteComment(cid);
+            };
+        });
     } catch (e) {
         list.innerHTML = '<div class="comment-empty">加载失败</div>';
     }
@@ -1066,12 +1078,25 @@ function renderCommentItem(c) {
     const timeStr = formatTime(c.created_at);
     const avatar = (c.username || '匿')[0].toUpperCase();
     const uid = c.uid || 0;
-    return '<div class="comment-item">' +
+
+    const user = getCurrentUser();
+    const ADMIN_UIDS = [1];
+    const isOwner = user && user.uid === uid;
+    const isAdmin = user && ADMIN_UIDS.includes(user.uid);
+    const canDelete = isOwner || isAdmin;
+
+    const delBtn = canDelete
+        ? '<button class="comment-del" data-cid="' + c.id + '" title="删除评论" ' +
+          'style="margin-left:auto;padding:2px 8px;font-size:12px;color:#9499a0;background:none;border:1px solid #e3e5e7;border-radius:4px;cursor:pointer;">删除</button>'
+        : '';
+
+    return '<div class="comment-item" data-cid="' + c.id + '">' +
         '<div class="avatar">' + avatar + '</div>' +
         '<div class="body">' +
-            '<div class="head">' +
+            '<div class="head" style="display:flex;align-items:center;gap:8px;">' +
                 '<span class="username"><a href="./user.html?uid=' + uid + '">' + escapeHtml(c.username || '匿名') + '</a></span>' +
                 '<span class="time">' + timeStr + '</span>' +
+                delBtn +
             '</div>' +
             '<div class="content">' + escapeHtml(c.content) + '</div>' +
         '</div>' +
@@ -1128,17 +1153,67 @@ async function sendComment() {
     }
 }
 
+// ============================================================
+// 删除评论
+// ============================================================
+async function deleteComment(commentId) {
+    const user = getCurrentUser();
+    if (!user) { alert('请先登录'); return; }
+
+    try {
+        const res = await fetch(`${API_BASE}/api/comment/${commentId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': 'Bearer ' + user.token
+            }
+        });
+        const data = await res.json();
+        if (data.ok) {
+            const item = document.querySelector('.comment-item[data-cid="' + commentId + '"]');
+            if (item) item.remove();
+
+            const countEl = document.getElementById('commentCount');
+            if (countEl) {
+                const n = Math.max(0, (parseInt(countEl.textContent) || 1) - 1);
+                countEl.textContent = n;
+            }
+
+            const list = document.getElementById('commentList');
+            if (list && list.querySelectorAll('.comment-item').length === 0) {
+                list.innerHTML = '<div class="comment-empty">还没有评论，来抢沙发~</div>';
+            }
+        } else {
+            alert(data.error || '删除失败');
+        }
+    } catch (e) {
+        alert('网络错误：' + e.message);
+    }
+}
+
+// ============================================================
+// 时间格式化：显示"相对时间 · 绝对时间"
+// ============================================================
 function formatTime(str) {
     if (!str) return '';
     const d = new Date(str.replace(' ', 'T') + 'Z');
     if (isNaN(d.getTime())) return str;
+
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    const hh = String(d.getHours()).padStart(2, '0');
+    const mi = String(d.getMinutes()).padStart(2, '0');
+    const absTime = y + '-' + m + '-' + day + ' ' + hh + ':' + mi;
+
     const now = new Date();
     const diff = (now - d) / 1000;
-    if (diff < 60) return '刚刚';
-    if (diff < 3600) return Math.floor(diff / 60) + ' 分钟前';
-    if (diff < 86400) return Math.floor(diff / 3600) + ' 小时前';
-    if (diff < 86400 * 7) return Math.floor(diff / 86400) + ' 天前';
-    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    let rel = '';
+    if (diff < 60) rel = '刚刚';
+    else if (diff < 3600) rel = Math.floor(diff / 60) + ' 分钟前';
+    else if (diff < 86400) rel = Math.floor(diff / 3600) + ' 小时前';
+    else if (diff < 86400 * 7) rel = Math.floor(diff / 86400) + ' 天前';
+
+    return rel ? (rel + ' · ' + absTime) : absTime;
 }
 
 video.onended = () => {
