@@ -16,7 +16,6 @@ a { color:inherit; text-decoration:none; }
 button { font-family:inherit; cursor:pointer; border:none; outline:none; background:none; color:inherit; }
 input, textarea { font-family:inherit; outline:none; border:none; }
 
-/* ============ 顶栏 ============ */
 .bili-header {
     background:#fff; height:56px; padding:0 24px;
     display:flex; align-items:center; gap:20px;
@@ -41,7 +40,6 @@ input, textarea { font-family:inherit; outline:none; border:none; }
 .bili-user .username { color:#00aeec; font-weight:500; }
 .bili-user .login-link { padding:6px 16px; background:#fb7299; color:#fff; border-radius:6px; font-size:13px; font-weight:500; }
 
-/* ============ 主体 ============ */
 .main-container {
     max-width:1500px; margin:16px auto; padding:0 24px;
     display:grid; grid-template-columns:minmax(0,1fr) 380px;
@@ -53,14 +51,7 @@ input, textarea { font-family:inherit; outline:none; border:none; }
 .video-meta-row { display:flex; flex-wrap:wrap; gap:16px; font-size:13px; color:#9499a0; }
 .video-meta-row .meta-item { display:inline-flex; align-items:center; gap:4px; }
 .video-meta-row .meta-item svg { width:16px; height:16px; }
-.iv-tag {
-    display:inline-block; padding:2px 8px;
-    background:#e5f4ff; color:#00aeec;
-    border-radius:4px; font-size:12px; font-weight:bold;
-    margin-right:8px; vertical-align:middle;
-}
 
-/* ============ 播放器 ============ */
 .player-wrap { background:#000; position:relative; aspect-ratio:16/9; overflow:hidden; }
 .player-wrap video { width:100%; height:100%; display:block; background:#000; }
 .player-status {
@@ -76,7 +67,6 @@ input, textarea { font-family:inherit; outline:none; border:none; }
 }
 @keyframes spin { to { transform:rotate(360deg); } }
 
-/* ============ 弹幕层 ============ */
 .dm-layer { position:absolute; inset:0; pointer-events:none; overflow:hidden; z-index:3; }
 .dm-item {
     position:absolute; left:100%; white-space:nowrap;
@@ -84,9 +74,7 @@ input, textarea { font-family:inherit; outline:none; border:none; }
     text-shadow:1px 1px 2px #000, 0 0 4px #000;
     will-change:transform;
 }
-.dm-item.scroll {
-    animation:dmMove 8s linear forwards;
-}
+.dm-item.scroll { animation:dmMove 8s linear forwards; }
 .dm-item.top, .dm-item.bottom {
     left:50%; transform:translateX(-50%);
     animation:dmStatic 4s linear forwards;
@@ -94,8 +82,7 @@ input, textarea { font-family:inherit; outline:none; border:none; }
 .dm-item.bottom { bottom:20px; top:auto !important; }
 .dm-item.self {
     border:1.5px solid #00aeec;
-    border-radius:4px;
-    padding:0 8px;
+    border-radius:4px; padding:0 8px;
     box-shadow:0 0 6px rgba(0,174,236,.6);
 }
 @keyframes dmMove {
@@ -116,27 +103,15 @@ input, textarea { font-family:inherit; outline:none; border:none; }
 }
 .dm-toggle.off { opacity:.5; }
 
-/* ============ 弹幕输入区（播放器下方，B站样式） ============ */
 .dm-input-area {
-    background:#fff;
-    padding:12px 20px;
-    display:flex;
-    flex-direction:column;
-    gap:10px;
+    background:#fff; padding:12px 20px;
+    display:flex; flex-direction:column; gap:10px;
     border-top:1px solid #f1f2f3;
 }
-.dm-input-row {
-    display:flex;
-    gap:10px;
-    align-items:center;
-}
+.dm-input-row { display:flex; gap:10px; align-items:center; }
 .dm-input-row input[type="text"] {
-    flex:1;
-    background:#f1f2f3;
-    border-radius:20px;
-    padding:9px 16px;
-    font-size:13px;
-    color:#18191c;
+    flex:1; background:#f1f2f3; border-radius:20px;
+    padding:9px 16px; font-size:13px; color:#18191c;
 }
 .dm-input-row input[type="text"]:focus { background:#e3e5e7; }
 .dm-input-row input[type="text"]::placeholder { color:#9499a0; }
@@ -148,73 +123,39 @@ input, textarea { font-family:inherit; outline:none; border:none; }
 .dm-input-row button.send:hover { background:#fc8bab; }
 .dm-input-row button.send:disabled { background:#e3e5e7; color:#9499a0; cursor:not-allowed; }
 
-/* 弹幕设置行 */
-.dm-settings {
-    display:flex;
-    gap:14px;
-    align-items:center;
-    flex-wrap:wrap;
-    font-size:12px;
-    color:#61666d;
-}
-.dm-settings .group {
-    display:flex; gap:6px; align-items:center;
-}
+.dm-settings { display:flex; gap:14px; align-items:center; flex-wrap:wrap; font-size:12px; color:#61666d; }
+.dm-settings .group { display:flex; gap:6px; align-items:center; }
 .dm-settings .label { color:#9499a0; }
-
-/* 颜色选择器 */
-.color-picker-wrap {
-    position:relative;
-    display:flex;
-    align-items:center;
-    gap:6px;
-}
-.color-dots {
-    display:flex;
-    gap:4px;
-}
+.color-dots { display:flex; gap:4px; }
 .color-dot {
-    width:18px; height:18px;
-    border-radius:50%;
-    cursor:pointer;
-    border:2px solid transparent;
+    width:18px; height:18px; border-radius:50%;
+    cursor:pointer; border:2px solid transparent;
     transition:transform .15s, border-color .15s;
 }
 .color-dot:hover { transform:scale(1.15); }
-.color-dot.on {
-    border-color:#00aeec;
-    transform:scale(1.15);
-}
+.color-dot.on { border-color:#00aeec; transform:scale(1.15); }
 .color-custom {
-    position:relative;
-    width:22px; height:22px;
-    border-radius:50%;
-    cursor:pointer;
+    position:relative; width:22px; height:22px;
+    border-radius:50%; cursor:pointer;
     background:conic-gradient(red, yellow, lime, aqua, blue, magenta, red);
-    border:2px solid #e3e5e7;
-    overflow:hidden;
+    border:2px solid #e3e5e7; overflow:hidden;
 }
 .color-custom input[type="color"] {
-    position:absolute;
-    inset:0;
-    opacity:0;
-    cursor:pointer;
-    width:100%; height:100%;
+    position:absolute; inset:0; opacity:0;
+    cursor:pointer; width:100%; height:100%;
 }
-
-/* 位置/字号按钮组 */
 .btn-group { display:flex; gap:2px; background:#f1f2f3; border-radius:6px; padding:2px; }
 .btn-group button {
-    padding:4px 10px;
-    font-size:12px;
-    color:#61666d;
-    border-radius:4px;
+    padding:4px 10px; font-size:12px;
+    color:#61666d; border-radius:4px;
     transition:all .15s;
 }
 .btn-group button:hover { background:#e3e5e7; }
-.btn-group button.on { background:#fff; color:#00aeec; font-weight:600; box-shadow:0 1px 2px rgba(0,0,0,.06); }
+.btn-group button.on {
+    background:#fff; color:#00aeec; font-weight:600;
+    box-shadow:0 1px 2px rgba(0,0,0,.06);
+}
 
-/* ============ 工具栏 ============ */
 .video-toolbar { background:#fff; padding:8px 20px; display:flex; align-items:center; gap:8px; border-top:1px solid #f1f2f3; }
 .toolbar-btn {
     display:inline-flex; align-items:center; gap:6px;
@@ -226,18 +167,16 @@ input, textarea { font-family:inherit; outline:none; border:none; }
 .toolbar-btn.active { color:#fb7299; }
 .toolbar-btn.active svg { fill:#fb7299; }
 
-/* ============ 简介 & 标签 ============ */
 .video-desc { background:#fff; padding:16px 20px; font-size:13px; line-height:1.7; border-top:1px solid #f1f2f3; }
 .video-desc.collapsed { max-height:60px; overflow:hidden; }
 .video-desc .toggle-desc { color:#00aeec; cursor:pointer; font-weight:600; margin-left:6px; }
 .video-tags { background:#fff; padding:8px 20px 16px; display:flex; flex-wrap:wrap; gap:8px; border-top:1px solid #f1f2f3; }
 .video-tags .tag {
-    padding:4px 12px; background:#f1f2f3; color:#61666d;
-    border-radius:14px; font-size:12px;
+    padding:4px 12px; background:#f1f2f3;
+    color:#61666d; border-radius:14px; font-size:12px;
 }
 .video-bottom-rounded { background:#fff; height:8px; border-radius:0 0 8px 8px; }
 
-/* ============ 评论 ============ */
 .comment-card { background:#fff; border-radius:8px; margin-top:16px; padding:20px 24px; }
 .comment-head {
     font-size:16px; font-weight:600;
@@ -284,7 +223,6 @@ input, textarea { font-family:inherit; outline:none; border:none; }
 .comment-item .content { font-size:14px; line-height:1.7; word-break:break-word; white-space:pre-wrap; }
 .comment-empty, .comment-loading { text-align:center; color:#9499a0; padding:40px 0; font-size:13px; }
 
-/* ============ 右侧栏 ============ */
 .right-col { position:sticky; top:72px; }
 .up-card { background:#fff; border-radius:8px; padding:16px; margin-bottom:12px; }
 .up-info { display:flex; align-items:center; gap:12px; margin-bottom:14px; }
@@ -333,13 +271,6 @@ input, textarea { font-family:inherit; outline:none; border:none; }
 .ep-item.on .ep-num { background:#fb7299; color:#fff; }
 .ep-item .ep-title { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .ep-item .playing-dot { width:6px; height:6px; background:#fb7299; border-radius:50%; }
-.q-item {
-    display:flex; align-items:center; justify-content:space-between;
-    padding:10px 16px; cursor:pointer; font-size:13px;
-}
-.q-item:hover { background:#f6f7f8; }
-.q-item.on { background:#e5f4ff; color:#00aeec; font-weight:600; }
-.q-item .q-check { color:#00aeec; }
 
 @media (max-width:1100px) {
     .main-container { grid-template-columns:1fr; padding:0 12px; }
@@ -373,14 +304,10 @@ input, textarea { font-family:inherit; outline:none; border:none; }
 <div class="main-container">
     <div class="left-col">
         <div class="video-info-head">
-            <h1 class="video-title" id="videoTitle">
-                <span class="iv-tag" id="ivTag"></span>
-                <span id="videoTitleText">加载中...</span>
-            </h1>
+            <h1 class="video-title" id="videoTitle">加载中...</h1>
             <div class="video-meta-row" id="videoMeta"></div>
         </div>
 
-        <!-- 播放器 -->
         <div class="player-wrap">
             <video id="video" controls playsinline preload="metadata"></video>
             <div class="dm-layer" id="dmLayer"></div>
@@ -391,7 +318,6 @@ input, textarea { font-family:inherit; outline:none; border:none; }
             <button class="dm-toggle" id="dmToggle">弹幕 开</button>
         </div>
 
-        <!-- 弹幕输入区（播放器下方） -->
         <div class="dm-input-area">
             <div class="dm-input-row">
                 <input type="text" id="dmInput" placeholder="发个弹幕见证当下..." maxlength="50">
@@ -499,7 +425,7 @@ function escapeHtml(s) {
 }
 
 // ============================================================
-// 弹幕引擎（支持 color / position / font_size）
+// 弹幕引擎
 // ============================================================
 class DanmuEngine {
     constructor(layerEl) {
@@ -535,7 +461,6 @@ class DanmuEngine {
         el.textContent = content;
         el.style.color = color;
 
-        // 字号
         const sizeMap = { small: '14px', medium: '20px', large: '28px' };
         el.style.fontSize = sizeMap[fontSize] || '20px';
 
@@ -562,7 +487,24 @@ class DanmuEngine {
 // 状态
 // ============================================================
 const params = new URLSearchParams(location.search);
-const animeId = parseInt(params.get('id') || params.get('aid') || '0');
+
+// ⭐ 关键：从 ?iv=iv1 解析番剧 id（不区分大小写）
+function parseIvParam() {
+    const ivParam = params.get('iv');
+    if (ivParam) {
+        const m = ivParam.match(/(\d+)/);  // 提取数字，不区分大小写
+        if (m) return parseInt(m[1]);
+    }
+    // 兼容旧链接 ?id=1
+    const idParam = params.get('id');
+    if (idParam) {
+        const n = parseInt(idParam);
+        if (!isNaN(n)) return n;
+    }
+    return null;
+}
+
+const animeId = parseIvParam();
 const albumId = params.get('album');
 const singleId = params.get('ac');
 const urlTitle = params.get('title') || '';
@@ -572,7 +514,6 @@ let danmuEngine = null;
 let danmuList = [];
 let lastDanmuTime = 0;
 let currentAnime = null;
-let acId = null;
 let episodeList = [];
 let currentEpIdx = 0;
 
@@ -648,14 +589,12 @@ document.getElementById('fontSizeGroup').addEventListener('click', (e) => {
 // 初始化
 // ============================================================
 if (!animeId && !albumId && !singleId) {
-    showStatus('缺少参数：?id=<animeId> 或 ?album=xxx 或 ?ac=xxx');
+    showStatus('缺少参数：?iv=iv1 或 ?id=1');
 } else if (animeId) {
     initByAnimeId(animeId);
 } else if (albumId) {
-    // 兼容旧链接（用合集 ID）
-    initByAnimeIdFromAlbum(albumId);
+    initByAlbumId(albumId);
 } else {
-    // 兼容旧链接（用 ac 号）
     initByAcId(singleId);
 }
 
@@ -667,7 +606,7 @@ function hideStatus() {
     document.getElementById('playerStatus').classList.add('hide');
 }
 
-// 通过 animeId 加载（主流程）
+// 主流程：通过 iv 号加载
 async function initByAnimeId(id) {
     showStatus('加载番剧信息...');
     try {
@@ -678,6 +617,13 @@ async function initByAnimeId(id) {
             return;
         }
         currentAnime = data.anime;
+
+        // ⭐ 关键：把 URL 里的 iv 号统一小写成 iv{n}
+        const newUrl = new URL(location.href);
+        newUrl.searchParams.set('iv', 'iv' + currentAnime.id);
+        newUrl.searchParams.delete('id');  // 清掉旧的 id 参数
+        history.replaceState({}, '', newUrl);
+
         renderAnimeInfo(currentAnime);
         await loadStats(currentAnime.id);
         await loadDanmu(currentAnime.id);
@@ -688,9 +634,7 @@ async function initByAnimeId(id) {
     }
 }
 
-// 兼容：只给了 album ID，去找对应 anime
-async function initByAnimeIdFromAlbum(albumId) {
-    // 直接调用 AcFun 合集接口（沿用旧逻辑）
+async function initByAlbumId(albumId) {
     showStatus('加载合集...');
     try {
         const res = await fetch(`${API_BASE}/api/acfun-collection/${albumId}`);
@@ -703,8 +647,7 @@ async function initByAnimeIdFromAlbum(albumId) {
             ac: item.ac, p: item.p, title: item.title || ('第' + item.p + '集')
         }));
         currentEpIdx = 0;
-        document.getElementById('videoTitleText').textContent = urlTitle || ('合集 ' + albumId);
-        document.getElementById('ivTag').textContent = '';
+        document.getElementById('videoTitle').textContent = urlTitle || ('合集 ' + albumId);
         renderPodList();
         await loadCurrentEpisode();
     } catch (e) {
@@ -712,46 +655,46 @@ async function initByAnimeIdFromAlbum(albumId) {
     }
 }
 
-// 兼容：只给了 ac 号
 async function initByAcId(ac) {
     showStatus('加载视频...');
     episodeList = [{ ac, p: 1, title: urlTitle || '视频' }];
     currentEpIdx = 0;
-    document.getElementById('videoTitleText').textContent = urlTitle || '视频';
+    document.getElementById('videoTitle').textContent = urlTitle || '视频';
     renderPodList();
     await loadCurrentEpisode();
 }
 
 function renderAnimeInfo(anime) {
-    document.getElementById('ivTag').textContent = anime.iv || ('iv' + anime.id);
-    document.getElementById('videoTitleText').textContent = anime.title;
+    // ⭐ 标题只显示标题，不再显示 iv
+    document.getElementById('videoTitle').textContent = anime.title;
     document.title = anime.title + ' - 櫻花动漫';
 
-    document.getElementById('upName').innerHTML = '<a href="./user.html?uid=' + anime.ownerUid + '">' + escapeHtml(anime.ownerName || '匿名') + '</a>';
+    document.getElementById('upName').innerHTML =
+        '<a href="./user.html?uid=' + anime.ownerUid + '">' + escapeHtml(anime.ownerName || '匿名') + '</a>';
     document.getElementById('upAvatar').textContent = (anime.ownerName || '匿')[0].toUpperCase();
-
     document.getElementById('descText').textContent = anime.description || '暂无简介';
-
     document.getElementById('videoTags').innerHTML =
         (anime.tags || []).map(t => '<span class="tag">' + escapeHtml(t) + '</span>').join('');
 
-    // 选集列表（把链接里的 ac 提取出来）
-    episodeList = [];
+    // 检查是否有 AcFun 链接
     const links = anime.links || {};
-    for (const key of ['a', 'b', 'mfuns']) {
-        if (!links[key]) continue;
-        if (key === 'a') {
-            const m = links[key].match(/acfun\.cn\/a\/aa(\d+)/);
-            if (m) {
-                // 是合集链接——留给 loadAndPlay 去处理
-                currentAnime._collectionId = m[1];
-            } else {
-                const m2 = links[key].match(/acfun\.cn\/v\/ac(\d+)/);
-                if (m2) episodeList.push({ ac: m2[1], p: 1, title: anime.title });
-            }
-        } else if (key === 'mfuns') {
-            const m = links[key].match(/mfuns\.net\/video\/(\d+)/);
-            if (m) episodeList.push({ mfuns: m[1], p: 1, title: anime.title });
+    let hasAcfun = false;
+    for (const k of Object.keys(links)) {
+        if (k === 'a' || (typeof links[k] === 'string' && links[k].includes('acfun'))) {
+            hasAcfun = true;
+            break;
+        }
+    }
+
+    // 收集分集 ac 号
+    episodeList = [];
+    const collectionMatch = (links.a || '').match(/acfun\.cn\/a\/aa(\d+)/);
+    if (collectionMatch) {
+        currentAnime._collectionId = collectionMatch[1];
+    } else {
+        const singleMatch = (links.a || '').match(/acfun\.cn\/v\/ac(\d+)/);
+        if (singleMatch) {
+            episodeList.push({ ac: singleMatch[1], p: 1, title: anime.title });
         }
     }
     renderPodList();
@@ -775,32 +718,26 @@ async function loadAndPlay(anime) {
             }
         } catch (e) {}
     }
-    // 否则直接用第一个 ac
     if (episodeList.length > 0 && episodeList[0].ac) {
         await loadCurrentEpisode();
         return;
     }
-    // 兜底：从 links 里提取单视频
+    // 兜底
     const links = anime.links || {};
-    for (const k of ['a', 'b', 'mfuns']) {
-        if (!links[k]) continue;
-        const m = links[k].match(/acfun\.cn\/v\/ac(\d+)/);
-        if (m) {
-            episodeList = [{ ac: m[1], p: 1, title: anime.title }];
-            currentEpIdx = 0;
-            renderPodList();
-            await loadCurrentEpisode();
-            return;
-        }
+    const m = (links.a || '').match(/acfun\.cn\/v\/ac(\d+)/);
+    if (m) {
+        episodeList = [{ ac: m[1], p: 1, title: anime.title }];
+        currentEpIdx = 0;
+        renderPodList();
+        await loadCurrentEpisode();
+        return;
     }
-    showStatus('没有可播放的源');
+    showStatus('此番剧暂无 AcFun 播放源');
 }
 
 async function loadCurrentEpisode() {
     const ep = episodeList[currentEpIdx];
-    if (!ep) return;
-
-    if (!ep.ac) {
+    if (!ep || !ep.ac) {
         showStatus('此集暂无可播放的 AcFun 源');
         return;
     }
@@ -819,13 +756,22 @@ async function loadCurrentEpisode() {
             return;
         }
 
-        // 更新副标题
+        const pages = data.pages || [];
+
+        // ⭐ 关键：多P 走合并，单P 走直连
+        if (pages.length > 1) {
+            await playMerged(ep.ac, data.urls, pages);
+        } else {
+            playSingle(data.urls[0]);
+        }
+
+        // 更新页面标题
         if (currentAnime) {
-            document.getElementById('videoTitleText').textContent =
+            document.getElementById('videoTitle').textContent =
                 currentAnime.title + (episodeList.length > 1 ? ' · ' + ep.title : '');
         }
 
-        // 更新 URL
+        // 更新 URL 的 ep 参数
         const newUrl = new URL(location.href);
         newUrl.searchParams.set('ep', ep.p || (currentEpIdx + 1));
         history.replaceState({}, '', newUrl);
@@ -838,21 +784,23 @@ async function loadCurrentEpisode() {
             if (i === currentEpIdx) el.insertAdjacentHTML('beforeend', '<span class="playing-dot"></span>');
         });
 
-        // 播视频
-        playSingle(data.urls[0]);
-
-        // 播完后 +1
-        fetch(`${API_BASE}/api/view`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ animeId: currentAnime ? currentAnime.id : 0 })
-        }).catch(() => {});
+        // 播放量 +1
+        if (currentAnime) {
+            fetch(`${API_BASE}/api/view`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ animeId: currentAnime.id })
+            }).catch(() => {});
+        }
 
     } catch (e) {
         showStatus('网络错误：' + e.message);
     }
 }
 
+// ============================================================
+// 单P：直连播放
+// ============================================================
 function playSingle(quality) {
     if (!quality || !quality.url) {
         showStatus('无可用清晰度');
@@ -881,6 +829,91 @@ function playSingle(quality) {
         video.play().catch(() => {});
         hideStatus();
     }
+}
+
+// ============================================================
+// 多P：前端合并（分片走 AcFun 直连，不走 Worker）
+// ============================================================
+async function playMerged(ac, urls, pages) {
+    showStatus('合并分P中...（' + pages.length + ' 个分P）');
+
+    const qualityKw = ((urls[0].quality || '').match(/\d+/) || ['1080'])[0];
+
+    let merged = '#EXTM3U\n#EXT-X-VERSION:3\n#EXT-X-PLAYLIST-TYPE:VOD\n';
+    let hasContent = false;
+    let maxDur = 0;
+
+    for (const pg of pages) {
+        try {
+            const res = await fetch(`${API_BASE}/api/acfun/${ac}?p=${pg.p}`);
+            const pData = await res.json();
+            if (!pData.ok || !pData.urls) continue;
+
+            const target = pData.urls.find(u => u.quality.includes(qualityKw)) || pData.urls[0];
+            if (!target) continue;
+
+            // 直连 fetch m3u8 内容（浏览器直接访问 AcFun CDN）
+            const m3u8Res = await fetch(target.url);
+            if (!m3u8Res.ok) continue;
+            const m3u8Text = await m3u8Res.text();
+
+            const baseUrl = target.url.substring(0, target.url.lastIndexOf('/') + 1);
+            const targetOrigin = new URL(target.url).origin;
+
+            let expectUrl = false;
+            for (const line of m3u8Text.split('\n')) {
+                const trimmed = line.trim();
+                if (!trimmed) continue;
+                if (trimmed.startsWith('#EXTINF')) {
+                    const m = trimmed.match(/#EXTINF:([\d.]+)/);
+                    if (m) maxDur = Math.max(maxDur, parseFloat(m[1]));
+                    merged += trimmed + '\n';
+                    expectUrl = true;
+                } else if (expectUrl && !trimmed.startsWith('#')) {
+                    let u = trimmed;
+                    if (!u.startsWith('http')) {
+                        u = u.startsWith('/') ? targetOrigin + u : baseUrl + u;
+                    }
+                    merged += u + '\n';
+                    hasContent = true;
+                    expectUrl = false;
+                }
+            }
+            merged += '#EXT-X-DISCONTINUITY\n';
+        } catch (e) {
+            console.warn('P' + pg.p + ' 合并失败：', e.message);
+        }
+    }
+
+    if (!hasContent) {
+        console.warn('合并失败，回退到单P');
+        playSingle(urls[0]);
+        return;
+    }
+
+    // ⭐ 加 ENDLIST 让进度条能拖
+    merged += '#EXT-X-ENDLIST\n';
+    merged = merged.replace(
+        '#EXT-X-PLAYLIST-TYPE:VOD\n',
+        '#EXT-X-PLAYLIST-TYPE:VOD\n#EXT-X-TARGETDURATION:' + Math.ceil(maxDur || 10) + '\n'
+    );
+
+    const blob = new Blob([merged], { type: 'application/vnd.apple.mpegurl' });
+    const blobUrl = URL.createObjectURL(blob);
+
+    if (hls) { hls.destroy(); hls = null; }
+    hls = new Hls({ enableWorker: true });
+    hls.loadSource(blobUrl);
+    hls.attachMedia(video);
+    hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        hideStatus();
+        video.play().catch(() => {});
+        lastDanmuTime = 0;
+    });
+    hls.on(Hls.Events.ERROR, (e, data) => {
+        console.error('HLS 错误：', data);
+        if (data.fatal) showStatus('播放错误：' + (data.details || '未知'));
+    });
 }
 
 async function loadStats(animeId) {
@@ -931,7 +964,6 @@ function renderPodList() {
     });
 }
 
-// 简化的 tab 切换（保持原逻辑）
 document.querySelectorAll('.pod-tab').forEach(tab => {
     tab.onclick = () => {
         document.querySelectorAll('.pod-tab').forEach(t => t.classList.remove('on'));
@@ -939,7 +971,6 @@ document.querySelectorAll('.pod-tab').forEach(tab => {
     };
 });
 
-// 加载弹幕
 async function loadDanmu(animeId) {
     danmuList = [];
     lastDanmuTime = 0;
@@ -979,7 +1010,6 @@ video.addEventListener('timeupdate', () => {
     lastDanmuTime = now;
 });
 
-// 发送弹幕
 document.getElementById('dmSend').onclick = sendDanmu;
 document.getElementById('dmInput').addEventListener('keydown', e => {
     if (e.key === 'Enter') sendDanmu();
@@ -989,7 +1019,6 @@ async function sendDanmu() {
     const input = document.getElementById('dmInput');
     const content = input.value.trim();
     if (!content) return;
-
     const user = getCurrentUser();
     if (!user) { alert('请先登录'); location.href = './index.html'; return; }
     if (!currentAnime) { alert('番剧信息未加载'); return; }
@@ -1016,7 +1045,6 @@ async function sendDanmu() {
         const data = await res.json();
         if (data.ok) {
             input.value = '';
-            // 立即显示
             danmuEngine.shoot(content, {
                 color: sendColor,
                 position: sendPosition,
@@ -1049,7 +1077,6 @@ document.getElementById('dmToggle').onclick = function () {
     if (!danmuEngine.enabled) danmuEngine.clear();
 };
 
-// 评论
 async function loadComments(animeId) {
     const list = document.getElementById('commentList');
     const count = document.getElementById('commentCount');
@@ -1150,7 +1177,6 @@ function formatTime(str) {
     return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
 }
 
-// 自动连播
 video.onended = () => {
     if (currentEpIdx < episodeList.length - 1) {
         currentEpIdx++;
@@ -1160,7 +1186,6 @@ video.onended = () => {
     }
 };
 
-// 工具栏
 document.getElementById('likeBtn').onclick = function () { this.classList.toggle('active'); };
 document.getElementById('favBtn').onclick = function () {
     this.classList.toggle('active');
