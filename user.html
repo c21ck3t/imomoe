@@ -41,7 +41,6 @@ input, textarea, select { font-family:inherit; outline:none; border:none; }
 
 .page-wrap { max-width:1100px; margin:20px auto; padding:0 24px; }
 
-/* 顶部横幅 */
 .profile-banner {
     height:160px; border-radius:8px 8px 0 0;
     background:linear-gradient(135deg,#fb7299,#fc8bab);
@@ -52,7 +51,6 @@ input, textarea, select { font-family:inherit; outline:none; border:none; }
     color:rgba(255,255,255,.6); font-size:12px;
 }
 
-/* 资料卡 */
 .profile-card {
     background:#fff; border-radius:0 0 8px 8px;
     padding:20px 24px 24px;
@@ -72,6 +70,7 @@ input, textarea, select { font-family:inherit; outline:none; border:none; }
 .profile-avatar img { width:100%; height:100%; object-fit:cover; }
 .profile-info { flex:1; min-width:0; padding-top:8px; }
 .profile-name { font-size:22px; font-weight:700; margin-bottom:4px; }
+.profile-username { font-size:12px; color:#9499a0; margin-bottom:8px; }
 .profile-signature { font-size:13px; color:#61666d; margin-bottom:12px; min-height:20px; }
 .profile-meta { display:flex; gap:20px; font-size:12px; color:#9499a0; flex-wrap:wrap; }
 .profile-meta span { display:inline-flex; align-items:center; gap:4px; }
@@ -83,7 +82,6 @@ input, textarea, select { font-family:inherit; outline:none; border:none; }
 }
 .btn-edit:hover { background:#fc8bab; }
 
-/* 数据条 */
 .stats-bar {
     background:#fff; border-radius:8px; padding:16px 24px;
     display:flex; gap:40px; margin-bottom:16px;
@@ -93,7 +91,6 @@ input, textarea, select { font-family:inherit; outline:none; border:none; }
 .stat-num { font-size:22px; font-weight:700; color:#18191c; }
 .stat-label { font-size:12px; color:#9499a0; margin-top:2px; }
 
-/* 投稿列表 */
 .section-card { background:#fff; border-radius:8px; overflow:hidden; }
 .section-head {
     padding:14px 24px; border-bottom:1px solid #f1f2f3;
@@ -146,7 +143,6 @@ input, textarea, select { font-family:inherit; outline:none; border:none; }
 }
 .empty-box .emoji { font-size:40px; display:block; margin-bottom:12px; }
 
-/* 编辑弹窗 */
 .modal-mask {
     position:fixed; inset:0;
     background:rgba(0,0,0,.5);
@@ -245,7 +241,6 @@ function getCurrentUser() {
     } catch { return null; }
 }
 
-// URL 参数
 const params = new URLSearchParams(location.search);
 const targetUid = parseInt(params.get('uid'));
 
@@ -253,13 +248,13 @@ if (!targetUid) {
     $('#pageWrap').innerHTML = '<div class="empty-box"><span class="emoji">❓</span>缺少用户参数，请使用 ?uid=1 访问</div>';
 }
 
-// 顶栏用户区
 function renderTopUser() {
     const user = getCurrentUser();
     const box = $('#biliUser');
     if (user) {
-        box.innerHTML = '<a class="avatar" href="./user.html?uid=' + user.uid + '" style="color:#fff">' + escapeHtml(user.username[0].toUpperCase()) + '</a>' +
-                        '<a class="username" href="./user.html?uid=' + user.uid + '">' + escapeHtml(user.username) + '</a>';
+        const name = user.nickname || user.username;
+        box.innerHTML = '<a class="avatar" href="./user.html?uid=' + user.uid + '" style="color:#fff">' + escapeHtml(name[0].toUpperCase()) + '</a>' +
+                        '<a class="username" href="./user.html?uid=' + user.uid + '">' + escapeHtml(name) + '</a>';
     } else {
         box.innerHTML = '<a class="login-link" href="./index.html">登录</a>';
     }
@@ -273,9 +268,6 @@ $('#topSearch').addEventListener('keydown', e => {
     }
 });
 
-// ============================================================
-// 加载用户数据
-// ============================================================
 async function loadProfile() {
     if (!targetUid) return;
 
@@ -300,18 +292,16 @@ async function loadProfile() {
     }
 }
 
-// ============================================================
-// 渲染页面
-// ============================================================
 function renderPage(user, animes) {
     const me = getCurrentUser();
     const isSelf = me && me.uid === user.id;
 
-    document.title = user.username + ' 的个人主页 - 櫻花动漫';
+    const showName = user.displayName || user.nickname || user.username;
+    document.title = showName + ' 的个人主页 - 櫻花动漫';
 
     const avatarHtml = user.avatarUrl
-        ? '<img src="' + escapeHtml(user.avatarUrl) + '" onerror="this.style.display=\'none\';this.parentNode.textContent=\'' + escapeHtml(user.username[0].toUpperCase()) + '\'">'
-        : escapeHtml(user.username[0].toUpperCase());
+        ? '<img src="' + escapeHtml(user.avatarUrl) + '" onerror="this.style.display=\'none\';this.parentNode.textContent=\'' + escapeHtml(showName[0].toUpperCase()) + '\'">'
+        : escapeHtml(showName[0].toUpperCase());
 
     const signature = user.signature || '这个人很懒，什么都没写~';
 
@@ -320,16 +310,20 @@ function renderPage(user, animes) {
     const birthdayHtml = user.birthday ? '<span>🎂 ' + escapeHtml(user.birthday) + '</span>' : '';
     const joinDate = user.createdAt ? '<span>📅 ' + user.createdAt.slice(0, 10) + ' 加入</span>' : '';
 
+    // 用户名单独显示一行（小字），如果跟昵称不同
+    const usernameLine = (user.nickname && user.nickname !== user.username)
+        ? '<div class="profile-username">@' + escapeHtml(user.username) + '</div>'
+        : '';
+
     let html = '';
 
-    // 横幅
     html += '<div class="profile-banner"><div class="banner-text">UID: ' + user.id + '</div></div>';
 
-    // 资料卡
     html += '<div class="profile-card">';
     html += '  <div class="profile-avatar">' + avatarHtml + '</div>';
     html += '  <div class="profile-info">';
-    html += '    <div class="profile-name">' + escapeHtml(user.username) + '</div>';
+    html += '    <div class="profile-name">' + escapeHtml(showName) + '</div>';
+    html += usernameLine;
     html += '    <div class="profile-signature">' + escapeHtml(signature) + '</div>';
     html += '    <div class="profile-meta">' + genderHtml + birthdayHtml + joinDate + '</div>';
     html += '  </div>';
@@ -338,7 +332,6 @@ function renderPage(user, animes) {
     }
     html += '</div>';
 
-    // 数据条
     html += '<div class="stats-bar">';
     html += '  <div class="stat-item"><div class="stat-num">' + (user.followingCount || 0) + '</div><div class="stat-label">关注</div></div>';
     html += '  <div class="stat-item"><div class="stat-num">' + (user.followerCount || 0) + '</div><div class="stat-label">粉丝</div></div>';
@@ -347,7 +340,6 @@ function renderPage(user, animes) {
     html += '  <div class="stat-item"><div class="stat-num">' + (user.stats?.animes || 0) + '</div><div class="stat-label">投稿</div></div>';
     html += '</div>';
 
-    // 投稿列表
     html += '<div class="section-card">';
     html += '  <div class="section-head">TA 的投稿 <span class="count">（' + animes.length + ' 部）</span></div>';
 
@@ -388,9 +380,6 @@ function renderPage(user, animes) {
     }
 }
 
-// ============================================================
-// 编辑资料弹窗
-// ============================================================
 function openEditModal(user) {
     const me = getCurrentUser();
     if (!me) return;
@@ -407,9 +396,14 @@ function openEditModal(user) {
             '<div class="modal-body">' +
                 '<div class="form-msg" id="editMsg"></div>' +
                 '<div class="form-row">' +
+                    '<label>昵称（2-20 字符，可重复检查）</label>' +
+                    '<input type="text" id="e-nickname" maxlength="20" placeholder="起个好听的昵称" value="' + escapeHtml(user.nickname || '') + '">' +
+                    '<div class="hint">留空则显示用户名 @' + escapeHtml(user.username) + '</div>' +
+                '</div>' +
+                '<div class="form-row">' +
                     '<label>头像链接（外链 URL）</label>' +
                     '<input type="text" id="e-avatar" placeholder="https://...jpg" value="' + escapeHtml(user.avatarUrl || '') + '">' +
-                    '<div class="hint">填图片外链，留空则显示用户名首字母</div>' +
+                    '<div class="hint">填图片外链，留空则显示昵称首字母</div>' +
                 '</div>' +
                 '<div class="form-row">' +
                     '<label>个性签名</label>' +
@@ -445,6 +439,14 @@ function openEditModal(user) {
     $('#saveBtn2').onclick = async () => {
         const msg = $('#editMsg');
         const saveBtn = $('#saveBtn2');
+        const nicknameVal = $('#e-nickname').value.trim();
+
+        if (nicknameVal && (nicknameVal.length < 2 || nicknameVal.length > 20)) {
+            msg.textContent = '昵称需 2-20 个字符';
+            msg.className = 'form-msg err';
+            return;
+        }
+
         saveBtn.disabled = true;
         saveBtn.textContent = '保存中...';
 
@@ -456,6 +458,7 @@ function openEditModal(user) {
                     'Authorization': 'Bearer ' + me.token
                 },
                 body: JSON.stringify({
+                    nickname: nicknameVal,
                     avatarUrl: $('#e-avatar').value.trim(),
                     signature: $('#e-signature').value.trim(),
                     gender: $('#e-gender').value,
@@ -466,7 +469,14 @@ function openEditModal(user) {
             if (data.ok) {
                 msg.textContent = '保存成功！';
                 msg.className = 'form-msg ok';
-                setTimeout(() => { close(); loadProfile(); }, 600);
+
+                // 更新 localStorage 里的昵称
+                if (me) {
+                    me.nickname = nicknameVal;
+                    localStorage.setItem('imomoe_user', JSON.stringify(me));
+                }
+
+                setTimeout(() => { close(); loadProfile(); renderTopUser(); }, 600);
             } else {
                 msg.textContent = data.error || '保存失败';
                 msg.className = 'form-msg err';
@@ -482,7 +492,6 @@ function openEditModal(user) {
     };
 }
 
-// 启动
 loadProfile();
 </script>
 
