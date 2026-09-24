@@ -2,270 +2,584 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<title>管理后台 - 添加番剧</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>管理后台 - 櫻花动漫</title>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
-body { font:14px/1.6 "Microsoft YaHei",Arial,sans-serif; background:#f4f4f4; color:#333; padding:20px; }
-.wrap { max-width:900px; margin:0 auto; }
-h1 { font-size:22px; margin-bottom:20px; color:#00a1d6; }
-.card { background:#fff; border:1px solid #e2e2e2; border-radius:4px; padding:20px; margin-bottom:20px; }
-.card h2 { font-size:16px; margin-bottom:15px; color:#333; border-left:4px solid #00a1d6; padding-left:10px; }
-.row { margin-bottom:14px; }
-.row label { display:block; font-size:13px; color:#666; margin-bottom:5px; }
-.row label .req { color:#f00; }
-.row input[type=text], .row input[type=number], .row select, .row textarea {
-    width:100%; padding:8px 10px; border:1px solid #ccc; border-radius:3px;
-    font-size:14px; font-family:inherit;
+html, body {
+    font:14px/1.6 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+    color:#18191c; background:#f1f2f3;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
 }
-.row input:focus, .row select:focus, .row textarea:focus { border-color:#00a1d6; outline:none; }
-.row-flex { display:flex; gap:12px; }
-.row-flex > div { flex:1; }
-.hint { font-size:12px; color:#999; margin-top:4px; }
-.chk-group { display:flex; gap:16px; margin-top:6px; }
-.chk-group label { display:inline-flex; align-items:center; gap:4px; font-size:13px; cursor:pointer; }
+a { color:inherit; text-decoration:none; }
+button { font-family:inherit; cursor:pointer; border:none; outline:none; background:none; color:inherit; }
+input, textarea, select { font-family:inherit; outline:none; border:none; }
+
+.header {
+    background:#fff; height:56px; padding:0 24px;
+    display:flex; align-items:center; gap:20px;
+    box-shadow:0 1px 2px rgba(0,0,0,.04);
+    position:sticky; top:0; z-index:100;
+}
+.logo { display:flex; align-items:center; gap:8px; font-size:18px; font-weight:bold; color:#fb7299; }
+.logo svg { width:28px; height:28px; }
+.header .spacer { flex:1; }
+.header .user-area { display:flex; align-items:center; gap:10px; font-size:13px; color:#61666d; }
+.header .avatar {
+    width:32px; height:32px; border-radius:50%;
+    background:linear-gradient(135deg,#fb7299,#fc8bab);
+    color:#fff; display:flex; align-items:center; justify-content:center;
+    font-weight:bold; font-size:14px;
+}
+.header .username { color:#00aeec; font-weight:500; }
+.header .back-link { padding:6px 12px; font-size:14px; border-radius:6px; }
+.header .back-link:hover { background:#f1f2f3; }
+
+.wrap { max-width:1200px; margin:20px auto; padding:0 24px; }
+
+.toolbar {
+    background:#fff; border-radius:8px; padding:16px 20px;
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:16px;
+}
+.toolbar h1 { font-size:20px; font-weight:600; }
+.toolbar .actions { display:flex; gap:8px; }
 .btn {
-    display:inline-block; padding:10px 22px; background:#00a1d6; color:#fff;
-    border:none; border-radius:3px; font-size:14px; cursor:pointer;
-    font-family:inherit; margin-right:8px;
+    padding:8px 18px; border-radius:6px;
+    font-size:13px; font-weight:600;
+    transition:all .15s;
+    display:inline-flex; align-items:center; gap:6px;
 }
-.btn:hover { background:#0088b8; }
-.btn.gray { background:#999; }
-.btn.gray:hover { background:#777; }
-.btn.green { background:#22aa55; }
-.btn.green:hover { background:#1a8844; }
-#output { width:100%; height:400px; font-family:Consolas,Monaco,monospace; font-size:12px; padding:12px; border:1px solid #ccc; border-radius:3px; background:#fafafa; }
-.msg { padding:10px 15px; border-radius:3px; margin-bottom:15px; display:none; }
-.msg.ok { background:#e6f7e6; color:#22aa55; border:1px solid #22aa55; display:block; }
-.msg.err { background:#ffe6e6; color:#f00; border:1px solid #f00; display:block; }
-.count { font-size:13px; color:#666; margin-bottom:10px; }
+.btn-primary { background:#fb7299; color:#fff; }
+.btn-primary:hover { background:#fc8bab; }
+.btn-secondary { background:#f1f2f3; color:#61666d; }
+.btn-secondary:hover { background:#e3e5e7; }
+.btn-danger { background:#f55; color:#fff; }
+.btn-danger:hover { background:#d44; }
+.btn-sm { padding:4px 10px; font-size:12px; }
+
+.list-card { background:#fff; border-radius:8px; overflow:hidden; }
+.list-item {
+    display:flex; align-items:center; gap:14px;
+    padding:14px 20px;
+    border-bottom:1px solid #f1f2f3;
+    transition:background .15s;
+}
+.list-item:last-child { border-bottom:none; }
+.list-item:hover { background:#f9f9fa; }
+.list-item .cover {
+    width:80px; height:50px;
+    border-radius:4px; overflow:hidden;
+    background:#f1f2f3; flex-shrink:0;
+}
+.list-item .cover img { width:100%; height:100%; object-fit:cover; display:block; }
+.list-item .info { flex:1; min-width:0; }
+.list-item .title {
+    font-size:14px; font-weight:600; color:#18191c;
+    margin-bottom:4px;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.list-item .meta {
+    font-size:12px; color:#9499a0;
+    display:flex; gap:12px; flex-wrap:wrap;
+}
+.list-item .meta .badge {
+    display:inline-block; padding:1px 6px;
+    background:#e5f4ff; color:#00aeec;
+    border-radius:3px; font-size:11px;
+}
+.list-item .meta .badge.acfun { background:#e5f4ff; color:#00aeec; }
+.list-item .meta .badge.bili { background:#ffe6ee; color:#fb7299; }
+.list-item .meta .badge.mfuns { background:#e6f7ee; color:#22aa55; }
+.list-item .meta .badge.none { background:#f1f2f3; color:#9499a0; }
+.list-item .ops { display:flex; gap:6px; flex-shrink:0; }
+
+.empty {
+    padding:60px 20px; text-align:center;
+    color:#9499a0; font-size:14px;
+}
+.empty .emoji { font-size:36px; display:block; margin-bottom:10px; }
+
+/* 模态框 */
+.modal-mask {
+    position:fixed; inset:0;
+    background:rgba(0,0,0,.5);
+    display:flex; align-items:center; justify-content:center;
+    z-index:9999; padding:20px;
+    overflow-y:auto;
+}
+.modal-box {
+    background:#fff; border-radius:10px;
+    width:100%; max-width:720px;
+    max-height:calc(100vh - 40px);
+    display:flex; flex-direction:column;
+    box-shadow:0 12px 40px rgba(0,0,0,.2);
+}
+.modal-header {
+    padding:18px 24px;
+    border-bottom:1px solid #f1f2f3;
+    display:flex; justify-content:space-between; align-items:center;
+}
+.modal-header h2 { font-size:18px; font-weight:600; }
+.modal-close {
+    font-size:24px; color:#9499a0; line-height:1;
+    background:none; border:none; cursor:pointer;
+}
+.modal-close:hover { color:#f00; }
+.modal-body {
+    padding:20px 24px;
+    overflow-y:auto; flex:1;
+}
+.modal-footer {
+    padding:14px 24px;
+    border-top:1px solid #f1f2f3;
+    display:flex; justify-content:flex-end; gap:10px;
+}
+
+.form-row { margin-bottom:16px; }
+.form-row label {
+    display:block; font-size:13px; color:#61666d;
+    margin-bottom:6px; font-weight:500;
+}
+.form-row label .req { color:#f00; }
+.form-row input[type="text"],
+.form-row input[type="number"],
+.form-row textarea,
+.form-row select {
+    width:100%; padding:8px 12px;
+    background:#f9f9fa; border:1px solid #e3e5e7;
+    border-radius:6px; font-size:13px;
+    color:#18191c;
+    transition:all .15s;
+}
+.form-row input:focus,
+.form-row textarea:focus,
+.form-row select:focus {
+    border-color:#00aeec; background:#fff;
+}
+.form-row textarea { min-height:80px; resize:vertical; }
+.form-row .hint { font-size:12px; color:#9499a0; margin-top:4px; }
+.form-row-flex { display:flex; gap:12px; }
+.form-row-flex > div { flex:1; }
+.form-msg {
+    padding:10px 14px; border-radius:6px;
+    font-size:13px; margin-bottom:16px; display:none;
+}
+.form-msg.err { background:#ffe6e6; color:#f00; display:block; }
+.form-msg.ok { background:#e6f7e6; color:#22aa55; display:block; }
 </style>
 </head>
 <body>
-<div class="wrap">
 
-<h1>🌸 番剧管理后台</h1>
-
-<div id="msg" class="msg"></div>
-
-<div class="card">
-    <h2>添加新番剧</h2>
-    <div class="row">
-        <label>标题 <span class="req">*</span></label>
-        <input type="text" id="f-title" placeholder="例如：玲音">
-    </div>
-    <div class="row">
-        <label>别名（英文逗号分隔，可留空）</label>
-        <input type="text" id="f-alias" placeholder="例如：lain, 铃音">
-    </div>
-    <div class="row">
-        <label>显示位置 <span class="req">*</span></label>
-        <select id="f-scope">
-            <option value="bangumi">只在番剧页显示</option>
-            <option value="home">只在首页显示</option>
-            <option value="both">首页和番剧页都显示</option>
-        </select>
-    </div>
-    <div class="row">
-        <label>首页显示标题（可留空）</label>
-        <input type="text" id="f-homeTitle">
-    </div>
-    <div class="row">
-        <label>番剧页显示标题（可留空）</label>
-        <input type="text" id="f-bangumiTitle">
-    </div>
-    <div class="row row-flex">
-        <div>
-            <label>竖版封面链接 <span class="req">*</span></label>
-            <input type="text" id="f-coverV" placeholder="https://...jpg">
-        </div>
-        <div>
-            <label>横版封面链接</label>
-            <input type="text" id="f-coverH" placeholder="https://...jpg">
-        </div>
-    </div>
-    <div class="row">
-        <label>标签（英文逗号分隔）</label>
-        <input type="text" id="f-tags" placeholder="例如：4K, 悬疑, 科幻">
-    </div>
-    <div class="row row-flex">
-        <div><label>年份</label><input type="text" id="f-year" placeholder="1998"></div>
-        <div><label>月份</label><input type="text" id="f-month" placeholder="7月"></div>
-        <div><label>总集数</label><input type="number" id="f-totalEp" placeholder="13"></div>
-        <div><label>时长</label><input type="text" id="f-duration" placeholder="23:59"></div>
-    </div>
-    <div class="row row-flex">
-        <div><label>评分</label><input type="text" id="f-score" placeholder="9.7"></div>
-        <div><label>播放量</label><input type="number" id="f-views" placeholder="423000"></div>
-        <div><label>弹幕数</label><input type="number" id="f-danmu" placeholder="25600"></div>
-    </div>
+<div class="header">
+    <a class="logo" href="./index.html">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l7 4.5-7 4.5z"/></svg>
+        櫻花动漫
+    </a>
+    <a class="back-link" href="./index.html">← 返回首页</a>
+    <div class="spacer"></div>
+    <div class="user-area" id="userArea"></div>
 </div>
 
-<div class="card">
-    <h2>观看链接</h2>
-    <div class="row">
-        <label>B 站链接</label>
-        <input type="text" id="f-b" placeholder="https://www.bilibili.com/video/BV...">
-    </div>
-    <div class="row">
-        <label>A 站链接</label>
-        <input type="text" id="f-a" placeholder="https://www.acfun.cn/a/...">
-    </div>
-    <div class="row">
-        <label>MFuns 链接</label>
-        <input type="text" id="f-mfuns" placeholder="https://www.mfuns.net/video/...">
-    </div>
-    <div class="row">
-        <label>首页只显示哪些链接？（不选则默认只显示 B 站）</label>
-        <div class="chk-group">
-            <label><input type="checkbox" class="hl-chk" value="a"> A 站</label>
-            <label><input type="checkbox" class="hl-chk" value="b"> B 站</label>
-            <label><input type="checkbox" class="hl-chk" value="mfuns"> MFuns</label>
-        </div>
-    </div>
-    <div class="row">
-        <label>番剧页只显示哪些链接？（不选则默认显示全部）</label>
-        <div class="chk-group">
-            <label><input type="checkbox" class="bl-chk" value="a"> A 站</label>
-            <label><input type="checkbox" class="bl-chk" value="b"> B 站</label>
-            <label><input type="checkbox" class="bl-chk" value="mfuns"> MFuns</label>
-        </div>
+<div class="wrap" id="wrap">
+    <div class="empty">
+        <span class="emoji">⏳</span>
+        加载中...
     </div>
 </div>
-
-<div class="card">
-    <h2>操作</h2>
-    <button class="btn green" onclick="addAnime()">➕ 添加到列表</button>
-    <button class="btn" onclick="generateDataJs()">📄 生成 data.js</button>
-    <button class="btn gray" onclick="resetForm()">🔄 清空表单</button>
-    <div class="count" id="count" style="margin-top:15px;"></div>
-</div>
-
-<div class="card">
-    <h2>生成的 data.js 内容</h2>
-    <div class="hint" style="margin-bottom:10px;">
-        复制下面的内容，粘贴到项目里的 <b>data.js</b> 文件（全部覆盖），然后上传 GitHub 即可。
-    </div>
-    <textarea id="output" readonly placeholder="点击"生成 data.js"按钮后，内容会出现在这里"></textarea>
-    <div style="margin-top:10px;">
-        <button class="btn" onclick="copyOutput()">📋 复制全部</button>
-        <button class="btn gray" onclick="downloadDataJs()">💾 下载 data.js</button>
-    </div>
-</div>
-
-</div>
-
-<script src="data.js"></script>
 
 <script>
-let currentList = JSON.parse(JSON.stringify(animeData));
+const API_BASE = 'https://api.imomoe.dpdns.org';
 
-function updateCount() {
-    document.getElementById('count').textContent = '当前列表共 ' + currentList.length + ' 部番剧';
-}
-updateCount();
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
 
-function showMsg(text, type) {
-    const el = document.getElementById('msg');
-    el.textContent = text;
-    el.className = 'msg ' + type;
-    setTimeout(() => { el.className = 'msg'; }, 3000);
+function escapeHtml(str) {
+    return String(str || '').replace(/[&<>"']/g, m => ({
+        '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+    }[m]));
 }
 
-function getFormData() {
-    const title = document.getElementById('f-title').value.trim();
-    if (!title) { showMsg('标题必填', 'err'); return null; }
-    const coverV = document.getElementById('f-coverV').value.trim();
-    if (!coverV) { showMsg('竖版封面链接必填', 'err'); return null; }
-    const aliasRaw = document.getElementById('f-alias').value.trim();
-    const tagsRaw  = document.getElementById('f-tags').value.trim();
+function getCurrentUser() {
+    try {
+        const raw = localStorage.getItem('imomoe_user');
+        return raw ? JSON.parse(raw) : null;
+    } catch { return null; }
+}
+
+let myAnimes = [];
+
+// ============================================================
+// 渲染用户区
+// ============================================================
+function renderUserArea() {
+    const area = $('#userArea');
+    const user = getCurrentUser();
+    if (user) {
+        area.innerHTML = '<div class="avatar">' + escapeHtml(user.username[0].toUpperCase()) + '</div>' +
+                         '<span class="username">' + escapeHtml(user.username) + '</span>' +
+                         '<button class="logout-btn" id="logoutBtn" style="padding:4px 10px;background:#eee;color:#666;border:1px solid #ddd;border-radius:3px;cursor:pointer;font-size:12px;">退出</button>';
+        $('#logoutBtn').onclick = () => {
+            localStorage.removeItem('imomoe_user');
+            location.href = './index.html';
+        };
+    } else {
+        area.innerHTML = '<a href="./index.html" style="color:#fb7299;font-weight:600;">去登录</a>';
+    }
+}
+
+// ============================================================
+// 加载我的番剧列表
+// ============================================================
+async function loadMyAnimes() {
+    const user = getCurrentUser();
+    if (!user) {
+        renderNoLogin();
+        return;
+    }
+
+    $('#wrap').innerHTML = '<div class="empty"><span class="emoji">⏳</span>加载中...</div>';
+
+    try {
+        const res = await fetch(`${API_BASE}/api/user/${user.uid}/animes`);
+        const data = await res.json();
+        if (!data.ok) {
+            $('#wrap').innerHTML = '<div class="empty"><span class="emoji">😢</span>加载失败：' + escapeHtml(data.error || '未知错误') + '</div>';
+            return;
+        }
+        myAnimes = data.list || [];
+        renderList();
+    } catch (e) {
+        $('#wrap').innerHTML = '<div class="empty"><span class="emoji">😢</span>网络错误：' + escapeHtml(e.message) + '</div>';
+    }
+}
+
+// ============================================================
+// 渲染列表
+// ============================================================
+function getSourceBadge(anime) {
+    const links = anime.links || {};
+    const badges = [];
+    if (links.a) badges.push('<span class="badge acfun">A站</span>');
+    if (links.b) badges.push('<span class="badge bili">B站</span>');
+    if (links.mfuns) badges.push('<span class="badge mfuns">MFuns</span>');
+    if (badges.length === 0) badges.push('<span class="badge none">无源</span>');
+    return badges.join(' ');
+}
+
+function renderList() {
+    const user = getCurrentUser();
+    if (!user) { renderNoLogin(); return; }
+
+    let html = '';
+    html += '<div class="toolbar">';
+    html += '  <h1>我的番剧 <span style="font-size:14px;color:#9499a0;font-weight:normal;">（共 ' + myAnimes.length + ' 部）</span></h1>';
+    html += '  <div class="actions">';
+    html += '    <button class="btn btn-primary" id="newBtn">+ 添加番剧</button>';
+    html += '  </div>';
+    html += '</div>';
+
+    if (myAnimes.length === 0) {
+        html += '<div class="list-card"><div class="empty">';
+        html += '<span class="emoji">📺</span>还没有添加任何番剧，点上方按钮开始吧~';
+        html += '</div></div>';
+    } else {
+        html += '<div class="list-card">';
+        myAnimes.forEach(a => {
+            html += '<div class="list-item">';
+            html += '  <div class="cover"><img src="' + escapeHtml(a.coverH || a.coverV) + '" onerror="this.src=\'data:image/svg+xml;utf8,' +
+                encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="80" height="50"><rect width="80" height="50" fill="#e2e2e2"/></svg>') + '\'"></div>';
+            html += '  <div class="info">';
+            html += '    <div class="title">' + escapeHtml(a.title) + '</div>';
+            html += '    <div class="meta">';
+            html += '      <span>' + escapeHtml(a.iv || ('iv' + a.id)) + '</span>';
+            html += '      <span>' + getSourceBadge(a) + '</span>';
+            html += '      <span>' + (a.year || '') + '年' + (a.month || '') + '</span>';
+            html += '      <span>' + (a.totalEp ? '全' + a.totalEp + '话' : '') + '</span>';
+            html += '    </div>';
+            html += '  </div>';
+            html += '  <div class="ops">';
+            html += '    <button class="btn btn-secondary btn-sm" data-action="view" data-id="' + a.id + '">查看</button>';
+            html += '    <button class="btn btn-primary btn-sm" data-action="edit" data-id="' + a.id + '">编辑</button>';
+            html += '    <button class="btn btn-danger btn-sm" data-action="delete" data-id="' + a.id + '">删除</button>';
+            html += '  </div>';
+            html += '</div>';
+        });
+        html += '</div>';
+    }
+
+    $('#wrap').innerHTML = html;
+
+    $('#newBtn').onclick = () => openForm(null);
+
+    document.querySelectorAll('[data-action]').forEach(btn => {
+        const action = btn.getAttribute('data-action');
+        const id = parseInt(btn.getAttribute('data-id'));
+        if (action === 'view') {
+            btn.onclick = () => window.open('./acfun-player.html?iv=iv' + id, '_blank');
+        } else if (action === 'edit') {
+            btn.onclick = () => openForm(id);
+        } else if (action === 'delete') {
+            btn.onclick = () => deleteAnime(id);
+        }
+    });
+}
+
+function renderNoLogin() {
+    $('#wrap').innerHTML = '<div class="empty">' +
+        '<span class="emoji">🔒</span>' +
+        '请先登录后再访问管理后台<br><br>' +
+        '<a href="./index.html" style="color:#fb7299;font-weight:600;">→ 去登录</a>' +
+        '</div>';
+}
+
+// ============================================================
+// 打开表单（新建 / 编辑）
+// ============================================================
+function openForm(editId) {
+    const isEdit = editId !== null && editId !== undefined;
+    let anime = { links: {} };
+    if (isEdit) {
+        const found = myAnimes.find(x => x.id === editId);
+        if (found) anime = found;
+    }
+
+    const links = anime.links || {};
+
+    const modal = document.createElement('div');
+    modal.className = 'modal-mask';
+    modal.id = 'formModal';
+    modal.innerHTML =
+        '<div class="modal-box">' +
+            '<div class="modal-header">' +
+                '<h2>' + (isEdit ? '编辑番剧' : '添加番剧') + '</h2>' +
+                '<button class="modal-close" id="formClose">×</button>' +
+            '</div>' +
+            '<div class="modal-body">' +
+                '<div class="form-msg" id="formMsg"></div>' +
+
+                '<div class="form-row">' +
+                    '<label>标题 <span class="req">*</span></label>' +
+                    '<input type="text" id="f-title" placeholder="例如：玲音" value="' + escapeHtml(anime.title || '') + '">' +
+                '</div>' +
+
+                '<div class="form-row">' +
+                    '<label>别名（英文逗号分隔）</label>' +
+                    '<input type="text" id="f-alias" placeholder="例如：lain, 铃音" value="' + escapeHtml((anime.alias || []).join(', ')) + '">' +
+                '</div>' +
+
+                '<div class="form-row form-row-flex">' +
+                    '<div>' +
+                        '<label>竖版封面链接 <span class="req">*</span></label>' +
+                        '<input type="text" id="f-coverV" placeholder="https://...jpg" value="' + escapeHtml(anime.coverV || '') + '">' +
+                    '</div>' +
+                    '<div>' +
+                        '<label>横版封面链接</label>' +
+                        '<input type="text" id="f-coverH" placeholder="https://...jpg" value="' + escapeHtml(anime.coverH || '') + '">' +
+                    '</div>' +
+                '</div>' +
+
+                '<div class="form-row">' +
+                    '<label>显示位置</label>' +
+                    '<select id="f-scope">' +
+                        '<option value="bangumi"' + (anime.scope === 'bangumi' ? ' selected' : '') + '>只在番剧页</option>' +
+                        '<option value="home"' + (anime.scope === 'home' ? ' selected' : '') + '>只在首页</option>' +
+                        '<option value="both"' + (anime.scope === 'both' ? ' selected' : '') + '>首页 + 番剧页</option>' +
+                    '</select>' +
+                '</div>' +
+
+                '<div class="form-row">' +
+                    '<label>首页显示标题（可空，默认用标题）</label>' +
+                    '<input type="text" id="f-homeTitle" value="' + escapeHtml(anime.homeTitle || '') + '">' +
+                '</div>' +
+
+                '<div class="form-row">' +
+                    '<label>番剧页显示标题（可空）</label>' +
+                    '<input type="text" id="f-bangumiTitle" value="' + escapeHtml(anime.bangumiTitle || '') + '">' +
+                '</div>' +
+
+                '<div class="form-row">' +
+                    '<label>标签（英文逗号分隔）</label>' +
+                    '<input type="text" id="f-tags" placeholder="例如：4K, 悬疑, 科幻" value="' + escapeHtml((anime.tags || []).join(', ')) + '">' +
+                '</div>' +
+
+                '<div class="form-row form-row-flex">' +
+                    '<div><label>年份</label><input type="text" id="f-year" value="' + escapeHtml(anime.year || '') + '" placeholder="1998"></div>' +
+                    '<div><label>月份</label><input type="text" id="f-month" value="' + escapeHtml(anime.month || '') + '" placeholder="7月"></div>' +
+                    '<div><label>总集数</label><input type="number" id="f-totalEp" value="' + (anime.totalEp || '') + '" placeholder="13"></div>' +
+                    '<div><label>时长</label><input type="text" id="f-duration" value="' + escapeHtml(anime.duration || '') + '" placeholder="23:59"></div>' +
+                '</div>' +
+
+                '<div class="form-row">' +
+                    '<label>评分</label>' +
+                    '<input type="text" id="f-score" value="' + (anime.score || '') + '" placeholder="9.7">' +
+                '</div>' +
+
+                '<div class="form-row">' +
+                    '<label>简介</label>' +
+                    '<textarea id="f-description" placeholder="番剧简介...">' + escapeHtml(anime.description || '') + '</textarea>' +
+                '</div>' +
+
+                '<div class="form-row">' +
+                    '<label>A站链接（acfun.cn）</label>' +
+                    '<input type="text" id="f-link-a" placeholder="https://www.acfun.cn/a/aaXXXXXXX 或 /v/acXXXXXXX" value="' + escapeHtml(links.a || '') + '">' +
+                    '<div class="hint">支持合集（/a/aa开头）和单视频（/v/ac开头）</div>' +
+                '</div>' +
+
+                '<div class="form-row">' +
+                    '<label>B站链接（bilibili.com）</label>' +
+                    '<input type="text" id="f-link-b" placeholder="https://www.bilibili.com/video/BVxxxxx" value="' + escapeHtml(links.b || '') + '">' +
+                    '<div class="hint">B站链接会以外链形式打开（新窗口）</div>' +
+                '</div>' +
+
+                '<div class="form-row">' +
+                    '<label>MFuns 链接</label>' +
+                    '<input type="text" id="f-link-mfuns" placeholder="https://www.mfuns.net/video/xxxxx" value="' + escapeHtml(links.mfuns || '') + '">' +
+                '</div>' +
+
+            '</div>' +
+            '<div class="modal-footer">' +
+                '<button class="btn btn-secondary" id="formCancel">取消</button>' +
+                '<button class="btn btn-primary" id="formSubmit">' + (isEdit ? '保存' : '创建') + '</button>' +
+            '</div>' +
+        '</div>';
+
+    document.body.appendChild(modal);
+
+    $('#formClose').onclick = closeForm;
+    $('#formCancel').onclick = closeForm;
+    modal.addEventListener('click', e => { if (e.target === modal) closeForm(); });
+
+    $('#formSubmit').onclick = () => submitForm(isEdit ? editId : null);
+
+    function closeForm() {
+        const m = document.getElementById('formModal');
+        if (m) m.remove();
+    }
+}
+
+// ============================================================
+// 提交表单
+// ============================================================
+async function submitForm(editId) {
+    const user = getCurrentUser();
+    if (!user) { alert('请先登录'); return; }
+
+    const title = $('#f-title').value.trim();
+    const coverV = $('#f-coverV').value.trim();
+    const msg = $('#formMsg');
+
+    if (!title) { msg.textContent = '标题必填'; msg.className = 'form-msg err'; return; }
+    if (!coverV) { msg.textContent = '竖版封面必填'; msg.className = 'form-msg err'; return; }
 
     const links = {};
-    const b = document.getElementById('f-b').value.trim();
-    const a = document.getElementById('f-a').value.trim();
-    const mfuns = document.getElementById('f-mfuns').value.trim();
-    if (b) links.b = b;
-    if (a) links.a = a;
-    if (mfuns) links.mfuns = mfuns;
-    if (Object.keys(links).length === 0) { showMsg('至少要填一个观看链接', 'err'); return null; }
+    const aLink = $('#f-link-a').value.trim();
+    const bLink = $('#f-link-b').value.trim();
+    const mfunsLink = $('#f-link-mfuns').value.trim();
+    if (aLink) links.a = aLink;
+    if (bLink) links.b = bLink;
+    if (mfunsLink) links.mfuns = mfunsLink;
 
-    const obj = {
+    if (Object.keys(links).length === 0) {
+        msg.textContent = '至少要填一个链接'; msg.className = 'form-msg err'; return;
+    }
+
+    const payload = {
         title: title,
-        scope: document.getElementById('f-scope').value,
+        alias: $('#f-alias').value.trim() ? $('#f-alias').value.split(',').map(s => s.trim()).filter(Boolean) : [],
         coverV: coverV,
-        tags: tagsRaw ? tagsRaw.split(',').map(s => s.trim()).filter(Boolean) : [],
-        year: document.getElementById('f-year').value.trim(),
-        month: document.getElementById('f-month').value.trim(),
-        totalEp: parseInt(document.getElementById('f-totalEp').value) || 0,
-        views: parseInt(document.getElementById('f-views').value) || 0,
-        danmu: parseInt(document.getElementById('f-danmu').value) || 0,
-        duration: document.getElementById('f-duration').value.trim() || '24:00',
-        score: parseFloat(document.getElementById('f-score').value) || 0,
+        coverH: $('#f-coverH').value.trim(),
+        scope: $('#f-scope').value,
+        homeTitle: $('#f-homeTitle').value.trim() || null,
+        bangumiTitle: $('#f-bangumiTitle').value.trim() || null,
+        tags: $('#f-tags').value.trim() ? $('#f-tags').value.split(',').map(s => s.trim()).filter(Boolean) : [],
+        year: $('#f-year').value.trim(),
+        month: $('#f-month').value.trim(),
+        totalEp: parseInt($('#f-totalEp').value) || 0,
+        duration: $('#f-duration').value.trim() || '24:00',
+        score: parseFloat($('#f-score').value) || 0,
+        description: $('#f-description').value.trim(),
         links: links
     };
 
-    const coverH = document.getElementById('f-coverH').value.trim();
-    if (coverH) obj.coverH = coverH;
-    const aliasArr = aliasRaw ? aliasRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
-    if (aliasArr.length) obj.alias = aliasArr;
-    const homeTitle = document.getElementById('f-homeTitle').value.trim();
-    if (homeTitle) obj.homeTitle = homeTitle;
-    const bangumiTitle = document.getElementById('f-bangumiTitle').value.trim();
-    if (bangumiTitle) obj.bangumiTitle = bangumiTitle;
-    const hl = Array.from(document.querySelectorAll('.hl-chk:checked')).map(c => c.value);
-    if (hl.length) obj.homeLinks = hl;
-    const bl = Array.from(document.querySelectorAll('.bl-chk:checked')).map(c => c.value);
-    if (bl.length) obj.bangumiLinks = bl;
+    const submitBtn = $('#formSubmit');
+    submitBtn.disabled = true;
+    submitBtn.textContent = '提交中...';
 
-    return obj;
-}
+    try {
+        const url = editId
+            ? `${API_BASE}/api/anime/${editId}`
+            : `${API_BASE}/api/anime`;
+        const method = editId ? 'PUT' : 'POST';
 
-function addAnime() {
-    const obj = getFormData();
-    if (!obj) return;
-    if (currentList.find(x => x.title === obj.title)) {
-        if (!confirm('已存在同名番剧「' + obj.title + '」，仍然添加？')) return;
+        const res = await fetch(url, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + user.token
+            },
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+
+        if (data.ok) {
+            msg.textContent = editId ? '保存成功！' : '创建成功！iv' + data.id;
+            msg.className = 'form-msg ok';
+            setTimeout(() => {
+                const m = document.getElementById('formModal');
+                if (m) m.remove();
+                loadMyAnimes();
+            }, 800);
+        } else {
+            msg.textContent = data.error || '操作失败';
+            msg.className = 'form-msg err';
+            submitBtn.disabled = false;
+            submitBtn.textContent = editId ? '保存' : '创建';
+        }
+    } catch (e) {
+        msg.textContent = '网络错误：' + e.message;
+        msg.className = 'form-msg err';
+        submitBtn.disabled = false;
+        submitBtn.textContent = editId ? '保存' : '创建';
     }
-    currentList.push(obj);
-    updateCount();
-    showMsg('✅ 已添加「' + obj.title + '」到列表', 'ok');
 }
 
-function resetForm() {
-    document.querySelectorAll('.card input, .card select, .card textarea').forEach(el => {
-        if (el.type === 'checkbox') el.checked = false;
-        else el.value = '';
-    });
-    document.getElementById('f-scope').value = 'bangumi';
-    showMsg('表单已清空', 'ok');
+// ============================================================
+// 删除番剧
+// ============================================================
+async function deleteAnime(id) {
+    const user = getCurrentUser();
+    if (!user) { alert('请先登录'); return; }
+
+    const anime = myAnimes.find(x => x.id === id);
+    if (!anime) return;
+
+    if (!confirm('确定删除「' + anime.title + '」？\n\n删除后不会立即从数据库清除，但网站上将不再显示。')) return;
+
+    try {
+        const res = await fetch(`${API_BASE}/api/anime/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': 'Bearer ' + user.token
+            }
+        });
+        const data = await res.json();
+        if (data.ok) {
+            loadMyAnimes();
+        } else {
+            alert(data.error || '删除失败');
+        }
+    } catch (e) {
+        alert('网络错误：' + e.message);
+    }
 }
 
-function generateDataJs() {
-    if (currentList.length === 0) { showMsg('列表为空', 'err'); return; }
-    const content = 'const animeData = ' + JSON.stringify(currentList, null, 4) + ';\n';
-    document.getElementById('output').value = content;
-    showMsg('✅ 已生成，请复制或下载', 'ok');
-}
-
-function copyOutput() {
-    const ta = document.getElementById('output');
-    if (!ta.value) { showMsg('还没有内容', 'err'); return; }
-    ta.select();
-    document.execCommand('copy');
-    showMsg('📋 已复制到剪贴板', 'ok');
-}
-
-function downloadDataJs() {
-    const ta = document.getElementById('output');
-    if (!ta.value) { showMsg('还没有内容', 'err'); return; }
-    const blob = new Blob([ta.value], { type: 'text/javascript;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'data.js';
-    a.click();
-    URL.revokeObjectURL(url);
-    showMsg('💾 已下载 data.js', 'ok');
-}
+// ============================================================
+// 启动
+// ============================================================
+renderUserArea();
+loadMyAnimes();
 </script>
 
 </body>
