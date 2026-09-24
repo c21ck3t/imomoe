@@ -170,10 +170,9 @@ async function loadCurrent() {
 
         currentPages = data.pages || [];
         renderSubP();
-        renderPages();  // 更新选集高亮
+        renderPages();
         setupPlayer(data.urls, item.title, item.p);
 
-        // 更新 URL
         const newUrl = new URL(location.href);
         newUrl.searchParams.set('p', item.p);
         newUrl.searchParams.set('sub', currentSubP);
@@ -183,7 +182,7 @@ async function loadCurrent() {
     }
 }
 
-// 渲染分P按钮
+// 渲染分P
 function renderSubP() {
     const section = document.getElementById('subPSection');
     const list = document.getElementById('subPList');
@@ -210,7 +209,7 @@ function renderSubP() {
     });
 }
 
-// 渲染选集按钮
+// 渲染选集
 function renderPages() {
     const pagesSection = document.getElementById('pagesSection');
     const pagesList = document.getElementById('pagesList');
@@ -265,21 +264,24 @@ function setupPlayer(urls, videoTitle, p) {
     }
 
     function playAt(item, btn) {
-        const proxy = API_BASE + '/api/video-proxy?url=' + encodeURIComponent(item.url);
+        // ============================================================
+        // 直连模式：浏览器直接加载 AcFun CDN，不走 Worker 代理
+        // ============================================================
+        const directUrl = item.url;
         const isM3u8 = item.url.includes('.m3u8');
 
         if (hls) { hls.destroy(); hls = null; }
 
         if (isM3u8 && window.Hls && Hls.isSupported()) {
             hls = new Hls({ enableWorker: true });
-            hls.loadSource(proxy);
+            hls.loadSource(directUrl);
             hls.attachMedia(video);
             hls.on(Hls.Events.MANIFEST_PARSED, () => video.play().catch(() => {}));
             hls.on(Hls.Events.ERROR, (e, data) => {
                 console.error('HLS 错误：', data);
             });
         } else {
-            video.src = proxy;
+            video.src = directUrl;
             video.play().catch(() => {});
         }
 
@@ -290,7 +292,8 @@ function setupPlayer(urls, videoTitle, p) {
             '来源：AcFun' +
             (playlist.length > 1 ? ' · 第 ' + p + ' 集' : '') +
             (currentPages.length > 1 ? ' · P' + currentSubP : '') +
-            ' · 清晰度：' + (item.quality || '默认');
+            ' · 清晰度：' + (item.quality || '默认') +
+            ' · 直连';
 
         if (btn) {
             qualityList.querySelectorAll('.quality-btn').forEach(b => b.classList.remove('on'));
@@ -306,16 +309,14 @@ function setupPlayer(urls, videoTitle, p) {
         qualityList.appendChild(btn);
     });
 
-    // 自动连播：先播完当前集所有分P，再跳下一集的 P1
+    // 自动连播
     video.onended = () => {
-        // 1. 如果当前集还有未播的分P，播下一分P
         if (currentPages.length > 1 && currentSubP < currentPages.length) {
             currentSubP++;
             loadCurrent();
             window.scrollTo({ top: 0, behavior: 'smooth' });
             return;
         }
-        // 2. 当前集所有分P播完，跳到下一集的 P1
         if (currentIndex < playlist.length - 1) {
             currentIndex++;
             currentSubP = 1;
