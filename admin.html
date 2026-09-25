@@ -93,6 +93,8 @@ input, textarea, select { font-family:inherit; outline:none; border:none; }
 .list-item .meta .badge.bili { background:#ffe6ee; color:#fb7299; }
 .list-item .meta .badge.mfuns { background:#e6f7ee; color:#22aa55; }
 .list-item .meta .badge.none { background:#f1f2f3; color:#9499a0; }
+.list-item .meta .badge.ongoing { background:#fff0e6; color:#ff8800; }
+.list-item .meta .badge.finished { background:#e6f7ee; color:#22aa55; }
 .list-item .ops { display:flex; gap:6px; flex-shrink:0; }
 
 .empty {
@@ -101,7 +103,6 @@ input, textarea, select { font-family:inherit; outline:none; border:none; }
 }
 .empty .emoji { font-size:36px; display:block; margin-bottom:10px; }
 
-/* 模态框 */
 .modal-mask {
     position:fixed; inset:0;
     background:rgba(0,0,0,.5);
@@ -210,9 +211,6 @@ function getCurrentUser() {
 
 let myAnimes = [];
 
-// ============================================================
-// 渲染用户区
-// ============================================================
 function renderUserArea() {
     const area = $('#userArea');
     const user = getCurrentUser();
@@ -229,9 +227,6 @@ function renderUserArea() {
     }
 }
 
-// ============================================================
-// 加载我的番剧列表
-// ============================================================
 async function loadMyAnimes() {
     const user = getCurrentUser();
     if (!user) {
@@ -255,9 +250,6 @@ async function loadMyAnimes() {
     }
 }
 
-// ============================================================
-// 渲染列表
-// ============================================================
 function getSourceBadge(anime) {
     const links = anime.links || {};
     const badges = [];
@@ -266,6 +258,11 @@ function getSourceBadge(anime) {
     if (links.mfuns) badges.push('<span class="badge mfuns">MFuns</span>');
     if (badges.length === 0) badges.push('<span class="badge none">无源</span>');
     return badges.join(' ');
+}
+
+function getAirBadge(anime) {
+    if (anime.airStatus === 'ongoing') return '<span class="badge ongoing">连载</span>';
+    return '<span class="badge finished">完结</span>';
 }
 
 function renderList() {
@@ -295,6 +292,7 @@ function renderList() {
             html += '    <div class="meta">';
             html += '      <span>' + escapeHtml(a.iv || ('iv' + a.id)) + '</span>';
             html += '      <span>' + getSourceBadge(a) + '</span>';
+            html += '      <span>' + getAirBadge(a) + '</span>';
             html += '      <span>' + (a.year || '') + '年' + (a.month || '') + '</span>';
             html += '      <span>' + (a.totalEp ? '全' + a.totalEp + '话' : '') + '</span>';
             html += '    </div>';
@@ -334,9 +332,6 @@ function renderNoLogin() {
         '</div>';
 }
 
-// ============================================================
-// 打开表单（新建 / 编辑）
-// ============================================================
 function openForm(editId) {
     const isEdit = editId !== null && editId !== undefined;
     let anime = { links: {} };
@@ -386,6 +381,14 @@ function openForm(editId) {
                         '<option value="bangumi"' + (anime.scope === 'bangumi' ? ' selected' : '') + '>只在番剧页</option>' +
                         '<option value="home"' + (anime.scope === 'home' ? ' selected' : '') + '>只在首页</option>' +
                         '<option value="both"' + (anime.scope === 'both' ? ' selected' : '') + '>首页 + 番剧页</option>' +
+                    '</select>' +
+                '</div>' +
+
+                '<div class="form-row">' +
+                    '<label>放送状态</label>' +
+                    '<select id="f-airStatus">' +
+                        '<option value="ongoing"' + (anime.airStatus === 'ongoing' ? ' selected' : '') + '>连载动画</option>' +
+                        '<option value="finished"' + (!anime.airStatus || anime.airStatus === 'finished' ? ' selected' : '') + '>完结动画</option>' +
                     '</select>' +
                 '</div>' +
 
@@ -459,9 +462,6 @@ function openForm(editId) {
     }
 }
 
-// ============================================================
-// 提交表单
-// ============================================================
 async function submitForm(editId) {
     const user = getCurrentUser();
     if (!user) { alert('请先登录'); return; }
@@ -491,6 +491,7 @@ async function submitForm(editId) {
         coverV: coverV,
         coverH: $('#f-coverH').value.trim(),
         scope: $('#f-scope').value,
+        airStatus: $('#f-airStatus').value,
         homeTitle: $('#f-homeTitle').value.trim() || null,
         bangumiTitle: $('#f-bangumiTitle').value.trim() || null,
         tags: $('#f-tags').value.trim() ? $('#f-tags').value.split(',').map(s => s.trim()).filter(Boolean) : [],
@@ -545,9 +546,6 @@ async function submitForm(editId) {
     }
 }
 
-// ============================================================
-// 删除番剧
-// ============================================================
 async function deleteAnime(id) {
     const user = getCurrentUser();
     if (!user) { alert('请先登录'); return; }
@@ -575,9 +573,6 @@ async function deleteAnime(id) {
     }
 }
 
-// ============================================================
-// 启动
-// ============================================================
 renderUserArea();
 loadMyAnimes();
 </script>
