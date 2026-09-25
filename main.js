@@ -1,11 +1,8 @@
 const API_BASE = 'https://api.imomoe.dpdns.org';
 const TURNSTILE_SITE_KEY = '0x4AAAAAAFCmsfXtjAYGzUTa';
 
-// 全局数据
 let animeData = [];
 let statsMap = {};
-
-// Turnstile 状态
 let turnstileWidgetId = null;
 
 const $ = (s) => document.querySelector(s);
@@ -18,9 +15,6 @@ function escapeHtml(str) {
     }[m]));
 }
 
-// ============================================================
-// 用户系统
-// ============================================================
 function getCurrentUser() {
     try {
         const raw = localStorage.getItem('imomoe_user');
@@ -50,9 +44,6 @@ function refreshUserArea() {
     }
 }
 
-// ============================================================
-// Turnstile 工具
-// ============================================================
 function ensureTurnstile(cb) {
     if (window.turnstile) { cb(); return; }
     let tries = 0;
@@ -94,9 +85,6 @@ function resetTurnstile() {
     }
 }
 
-// ============================================================
-// 登录 / 注册模态框
-// ============================================================
 function showLoginModal() {
     if (document.getElementById('imomoeModal')) return;
     const modal = document.createElement('div');
@@ -149,7 +137,6 @@ function showLoginModal() {
             return;
         }
 
-        // 注册模式：先检查 Turnstile
         let tsToken = '';
         if (mode === 'register') {
             tsToken = getTurnstileToken();
@@ -182,7 +169,6 @@ function showLoginModal() {
                 msg.className = 'modal-msg err';
                 btn.disabled = false;
                 btn.textContent = mode === 'login' ? '登录' : '注册';
-                // 注册失败要重置 Turnstile（token 一次性）
                 if (mode === 'register') resetTurnstile();
             }
         } catch (e) {
@@ -200,9 +186,6 @@ function showLoginModal() {
     });
 }
 
-// ============================================================
-// 卡片动作判断
-// ============================================================
 function getCardAction(anime, page) {
     const links = anime.links || {};
     const pageLinks = page === 'home' ? (anime.homeLinks || null) : (anime.bangumiLinks || null);
@@ -236,9 +219,6 @@ function sourceBadgeHTML(source) {
     return '';
 }
 
-// ============================================================
-// 卡片 HTML
-// ============================================================
 function cardHTML(anime, page, forSearch) {
     const title = page === 'home' ? (anime.homeTitle || anime.title)
                 : (anime.bangumiTitle || anime.title);
@@ -286,9 +266,6 @@ function rankHTML(anime, i, page) {
     '</li>';
 }
 
-// ============================================================
-// 番剧 index 卡片
-// ============================================================
 function idxCardHTML(anime) {
     const action = getCardAction(anime, 'bangumi');
     const source = action ? action.source : 'none';
@@ -336,9 +313,6 @@ function bindIdxCardEvents(scope) {
     });
 }
 
-// ============================================================
-// 数据加载
-// ============================================================
 async function loadAnimeData() {
     try {
         const res = await fetch(API_BASE + '/api/animes?scope=all');
@@ -370,9 +344,6 @@ async function loadAllStats() {
     });
 }
 
-// ============================================================
-// 页面渲染
-// ============================================================
 function renderHome() {
     const homeData = animeData.filter(a => a.scope === 'home' || a.scope === 'both');
     const hotData = [...homeData].sort((a, b) => (statsMap[b.id]?.views || 0) - (statsMap[a.id]?.views || 0));
@@ -394,6 +365,9 @@ function renderHome() {
 
 function renderBangumi() {
     const all = animeData.filter(a => a.scope === 'bangumi' || a.scope === 'both');
+    const ongoing = all.filter(a => a.airStatus === 'ongoing');
+    const finished = all.filter(a => !a.airStatus || a.airStatus === 'finished');
+
     const sec = (title, data) => {
         return '<div class="container-row">' +
             '<div class="b-l">' +
@@ -413,13 +387,13 @@ function renderBangumi() {
         '<li><a href="#part-twoelement">完结动画</a></li>' +
         '<li><a href="#bangumi-index">番剧index</a></li>' +
     '</ul></div></div></div>';
-    html += sec('连载动画', all.slice(0, 8));
-    html += sec('完结动画', all.slice(8, 16));
+    html += sec('连载动画', ongoing.slice(0, 8));
+    html += sec('完结动画', finished.slice(0, 8));
     return html;
 }
 
 function renderBangumiTwo() {
-    const all = animeData.filter(a => a.scope === 'bangumi' || a.scope === 'both');
+    const all = animeData.filter(a => (a.scope === 'bangumi' || a.scope === 'both') && a.airStatus === 'ongoing');
     const hot = [...all].sort((a, b) => (statsMap[b.id]?.views || 0) - (statsMap[a.id]?.views || 0));
     let html = '<div class="container-top-wrapper"><div class="main-inner">';
     html += '<div class="fcname"><ul class="n_num">' +
@@ -438,7 +412,7 @@ function renderBangumiTwo() {
 }
 
 function renderPartTwoelement() {
-    const all = animeData.filter(a => a.scope === 'bangumi' || a.scope === 'both');
+    const all = animeData.filter(a => (a.scope === 'bangumi' || a.scope === 'both') && (!a.airStatus || a.airStatus === 'finished'));
     const hot = [...all].sort((a, b) => (statsMap[b.id]?.views || 0) - (statsMap[a.id]?.views || 0));
     let html = '<div class="container-top-wrapper"><div class="main-inner">';
     html += '<div class="fcname"><ul class="n_num">' +
@@ -456,9 +430,6 @@ function renderPartTwoelement() {
     return html;
 }
 
-// ============================================================
-// 番剧 index（完整标签索引）
-// ============================================================
 const idxState = { tag: '全部', quality: '全部', year: '全部', month: '全部' };
 
 function filterIdxData() {
@@ -634,9 +605,6 @@ function renderTopArea(hash) {
     }
 }
 
-// ============================================================
-// 路由
-// ============================================================
 function render() {
     const rawHash = location.hash.replace('#', '') || 'bangumi';
     const main = $('#mainContent');
