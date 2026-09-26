@@ -319,7 +319,7 @@ async function loadAnimeData() {
         const data = await res.json();
         if (data.ok && Array.isArray(data.list)) {
             animeData = data.list;
-            loadAllStats();
+            await loadAllStats();
         }
     } catch (e) {
         console.error('加载番剧失败：', e);
