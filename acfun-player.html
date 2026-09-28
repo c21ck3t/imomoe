@@ -99,51 +99,11 @@ input, textarea { font-family:inherit; outline:none; border:none; }
 }
 .dm-toggle.off { opacity:.5; }
 
-/* 选集卡 */
-.episode-card { background:#fff; border-radius:8px; margin-top:8px; padding:16px 20px 20px; }
-.episode-head {
-    font-size:15px; font-weight:600;
-    margin-bottom:14px;
-    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
-}
-.episode-head .amt { font-size:12px; font-weight:normal; color:#9499a0; }
-.episode-head .tabs { display:flex; gap:6px; margin-left:auto; font-size:12px; }
-.episode-head .tabs a {
-    padding:3px 10px; border-radius:4px; color:#61666d;
-}
-.episode-head .tabs a.on { background:#e5f4ff; color:#00aeec; font-weight:600; }
-.episode-grid {
-    display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(115px,1fr));
-    gap:8px;
-}
-.episode-item {
-    padding:9px 10px;
-    background:#f6f7f8; border-radius:6px;
-    text-align:left; cursor:pointer;
-    border:1px solid transparent;
-    transition:all .15s;
-    overflow:hidden;
-}
-.episode-item:hover { background:#e3e5e7; }
-.episode-item.on { background:#fff0f5; border-color:#fb7299; }
-.episode-item .ep-num {
-    display:block; font-size:13px; font-weight:600;
-    color:#18191c; margin-bottom:2px;
-}
-.episode-item.on .ep-num { color:#fb7299; }
-.episode-item .ep-title {
-    display:block; font-size:11px; color:#9499a0;
-    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
-}
-.episode-item.on .ep-title { color:#fb7299; opacity:.8; }
-
-/* 弹幕发送条 */
+/* 弹幕输入条 */
 .dm-input-area {
     background:#fff; padding:10px 16px;
     display:flex; flex-direction:column; gap:8px;
     border-bottom:1px solid #f1f2f3;
-    border-radius:0 0 8px 8px;
 }
 .dm-input-row { display:flex; gap:8px; align-items:center; }
 .dm-input-row input[type="text"] {
@@ -189,7 +149,8 @@ input, textarea { font-family:inherit; outline:none; border:none; }
     box-shadow:0 1px 2px rgba(0,0,0,.06);
 }
 
-.video-toolbar { background:#fff; padding:12px 16px; display:flex; align-items:center; gap:4px; margin-top:8px; border-radius:8px; }
+/* 工具栏 */
+.video-toolbar { background:#fff; padding:12px 16px; display:flex; align-items:center; gap:4px; border-radius:0 0 8px 8px; }
 .toolbar-btn {
     display:inline-flex; flex-direction:column; align-items:center; gap:2px;
     padding:6px 16px; font-size:12px; color:#61666d;
@@ -200,46 +161,114 @@ input, textarea { font-family:inherit; outline:none; border:none; }
 .toolbar-btn.active { color:#fb7299; }
 .toolbar-btn.active svg { fill:#fb7299; }
 
-.video-info-card {
-    background:#fff; padding:16px; margin-top:8px;
-    display:flex; gap:16px; border-radius:8px;
+/* 标题栏（简洁版，不带封面） */
+.video-title-bar {
+    background:#fff; padding:14px 20px 12px;
+    margin-top:8px; border-radius:8px 8px 0 0;
 }
-.video-info-card .cover {
-    width:130px; height:174px; border-radius:6px;
-    overflow:hidden; flex-shrink:0; background:#f1f2f3;
-}
-.video-info-card .cover img { width:100%; height:100%; object-fit:cover; display:block; }
-.video-info-card .info { flex:1; min-width:0; }
-.video-info-card .title {
-    font-size:18px; font-weight:600; line-height:1.4;
+.video-title-bar .title {
+    font-size:17px; font-weight:600; line-height:1.4;
     margin-bottom:8px; word-break:break-word;
 }
-.video-info-card .stat-row {
+.video-title-bar .stats {
     display:flex; gap:14px; font-size:12px; color:#9499a0;
-    margin-bottom:10px; flex-wrap:wrap;
+    flex-wrap:wrap;
 }
-.video-info-card .meta-line {
-    font-size:13px; color:#61666d; line-height:1.7;
-    margin-bottom:6px; word-break:break-word;
+
+/* 移动端选集 */
+.episode-card-mobile {
+    background:#fff; padding:12px 16px 14px;
+    border-top:1px solid #f1f2f3;
 }
-.video-info-card .desc {
-    font-size:13px; color:#61666d; line-height:1.7;
-    margin-top:6px; word-break:break-word;
+.episode-card-mobile .ep-head {
+    display:flex; justify-content:space-between; align-items:baseline;
+    font-size:14px; font-weight:600; margin-bottom:10px;
 }
-.video-info-card .desc.collapsed {
-    display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical;
-    overflow:hidden;
+.episode-card-mobile .ep-head .amt {
+    font-size:12px; font-weight:normal; color:#9499a0;
 }
-.video-info-card .toggle-desc {
-    color:#00aeec; cursor:pointer; font-size:13px;
+.episode-card-mobile .ep-scroll {
+    display:flex; gap:8px; overflow-x:auto;
+    padding-bottom:4px; -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+}
+.episode-card-mobile .ep-scroll::-webkit-scrollbar { display:none; }
+.episode-card-mobile .ep-btn {
+    flex:0 0 auto; min-width:82px;
+    padding:8px 10px; background:#f6f7f8;
+    border-radius:6px; text-align:left;
+    border:1px solid transparent;
+    transition:all .15s;
+}
+.episode-card-mobile .ep-btn.on {
+    background:#fff0f5; border-color:#fb7299;
+}
+.episode-card-mobile .ep-btn .num {
+    display:block; font-size:13px; font-weight:600; color:#18191c;
+}
+.episode-card-mobile .ep-btn.on .num { color:#fb7299; }
+.episode-card-mobile .ep-btn .t {
+    display:block; font-size:11px; color:#9499a0;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+    max-width:80px;
+}
+.episode-card-mobile .ep-btn.on .t { color:#fb7299; opacity:.8; }
+
+/* Tab：简介 | 评论 */
+.content-tabs {
+    background:#fff;
+    padding:0 20px;
+    display:flex; gap:24px;
+    border-top:1px solid #f1f2f3;
+    margin-top:0;
+}
+.content-tabs a {
+    padding:12px 0;
+    font-size:15px; color:#61666d;
+    border-bottom:2px solid transparent;
+    cursor:pointer; position:relative;
+}
+.content-tabs a.on {
+    color:#18191c; font-weight:600;
+    border-bottom-color:#fb7299;
+}
+.content-tabs a .cnt {
+    font-size:12px; color:#9499a0; font-weight:normal;
     margin-left:4px;
 }
-.video-info-card .actions {
-    display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;
+
+.tab-panel {
+    background:#fff; padding:16px 20px;
+    border-radius:0 0 8px 8px;
+    margin-bottom:8px;
+}
+.tab-panel.intro-panel { }
+.tab-panel.comment-panel { padding-top:0; }
+
+/* 简介面板 */
+.intro-meta {
+    font-size:13px; color:#61666d; line-height:1.8;
+    margin-bottom:10px; word-break:break-word;
+}
+.intro-meta span { margin-right:0; }
+.intro-desc {
+    font-size:13px; color:#61666d; line-height:1.7;
+    word-break:break-word; white-space:pre-wrap;
+}
+.intro-desc.collapsed {
+    display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical;
+    overflow:hidden;
+}
+.intro-toggle {
+    color:#00aeec; cursor:pointer; font-size:13px;
+    display:inline-block; margin-top:6px;
+}
+.intro-actions {
+    display:flex; gap:10px; margin-top:14px; flex-wrap:wrap;
     align-items:center;
 }
 .btn-follow {
-    padding:6px 20px; background:#fb7299; color:#fff;
+    padding:7px 22px; background:#fb7299; color:#fff;
     border-radius:16px; font-size:13px; font-weight:600;
 }
 .btn-follow.on { background:#f1f2f3; color:#61666d; }
@@ -249,19 +278,9 @@ input, textarea { font-family:inherit; outline:none; border:none; }
 }
 .score-box .num { font-size:18px; }
 .score-box .unit { font-size:12px; }
-.score-box .cnt { color:#9499a0; font-size:11px; font-weight:normal; margin-left:4px; }
 
-.comment-card { background:#fff; border-radius:8px; margin-top:8px; padding:16px 20px; }
-.comment-head {
-    font-size:16px; font-weight:600;
-    padding-bottom:12px; border-bottom:1px solid #f1f2f3; margin-bottom:14px;
-    display:flex; align-items:center; gap:12px; flex-wrap:wrap;
-}
-.comment-head .count { font-size:13px; font-weight:normal; color:#9499a0; }
-.comment-head .tabs { display:flex; gap:12px; margin-left:auto; font-size:13px; font-weight:normal; }
-.comment-head .tabs a { color:#9499a0; padding-bottom:2px; }
-.comment-head .tabs a.on { color:#18191c; font-weight:600; border-bottom:2px solid #fb7299; }
-.comment-input-area { display:flex; gap:12px; margin-bottom:20px; }
+/* 评论面板 */
+.comment-input-area { display:flex; gap:12px; margin-bottom:20px; padding-top:16px; }
 .comment-avatar {
     flex-shrink:0; width:40px; height:40px; border-radius:50%;
     background:linear-gradient(135deg,#fb7299,#fc8bab);
@@ -285,6 +304,13 @@ input, textarea { font-family:inherit; outline:none; border:none; }
     text-align:center; color:#9499a0; font-size:13px; margin-bottom:20px;
 }
 .comment-login-tip a { color:#fb7299; font-weight:600; }
+.comment-sort {
+    display:flex; gap:12px; font-size:13px;
+    padding-bottom:12px; border-bottom:1px solid #f1f2f3;
+    margin-bottom:4px;
+}
+.comment-sort a { color:#9499a0; padding-bottom:2px; cursor:pointer; }
+.comment-sort a.on { color:#18191c; font-weight:600; }
 .comment-item { display:flex; gap:12px; padding:14px 0; border-bottom:1px solid #f6f7f8; }
 .comment-item:last-child { border-bottom:none; }
 .comment-item .avatar {
@@ -300,6 +326,7 @@ input, textarea { font-family:inherit; outline:none; border:none; }
 .comment-item .content { font-size:14px; line-height:1.7; word-break:break-word; white-space:pre-wrap; }
 .comment-empty, .comment-loading { text-align:center; color:#9499a0; padding:40px 0; font-size:13px; }
 
+/* PC 右侧栏 */
 .side-card { background:#fff; border-radius:8px; margin-bottom:12px; overflow:hidden; }
 .side-head {
     padding:12px 16px; font-size:14px; font-weight:600;
@@ -307,10 +334,51 @@ input, textarea { font-family:inherit; outline:none; border:none; }
     display:flex; align-items:center; justify-content:space-between;
 }
 .side-head .amt { font-size:12px; font-weight:normal; color:#9499a0; }
+.side-head.clickable { cursor:pointer; user-select:none; }
+.side-head.clickable:hover { background:#f9f9fa; }
+.side-head .arrow {
+    display:inline-block; font-size:10px;
+    transition:transform .2s; margin-left:4px;
+}
+.side-head.collapsed .arrow { transform:rotate(-90deg); }
 
-.dm-list { max-height:260px; overflow-y:auto; padding:8px 0; }
+/* PC 选集 */
+.episode-grid {
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(95px,1fr));
+    gap:6px;
+    padding:12px 16px;
+    max-height:360px;
+    overflow-y:auto;
+}
+.episode-grid::-webkit-scrollbar { width:6px; }
+.episode-grid::-webkit-scrollbar-thumb { background:#e3e5e7; border-radius:3px; }
+.episode-item {
+    padding:8px 10px;
+    background:#f6f7f8; border-radius:6px;
+    text-align:left; cursor:pointer;
+    border:1px solid transparent;
+    transition:all .15s;
+    overflow:hidden;
+}
+.episode-item:hover { background:#e3e5e7; }
+.episode-item.on { background:#fff0f5; border-color:#fb7299; }
+.episode-item .ep-num {
+    display:block; font-size:13px; font-weight:600;
+    color:#18191c; margin-bottom:2px;
+}
+.episode-item.on .ep-num { color:#fb7299; }
+.episode-item .ep-title {
+    display:block; font-size:11px; color:#9499a0;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.episode-item.on .ep-title { color:#fb7299; opacity:.8; }
+
+/* 弹幕列表 */
+.dm-list { max-height:300px; overflow-y:auto; padding:6px 0; }
 .dm-list::-webkit-scrollbar { width:6px; }
 .dm-list::-webkit-scrollbar-thumb { background:#e3e5e7; border-radius:3px; }
+.dm-list.collapsed { display:none; }
 .dm-row {
     padding:6px 16px; font-size:12px;
     display:flex; gap:10px; align-items:center;
@@ -318,10 +386,11 @@ input, textarea { font-family:inherit; outline:none; border:none; }
 }
 .dm-row .t { color:#00aeec; font-weight:600; flex-shrink:0; min-width:36px; }
 .dm-row .c { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:#18191c; }
-.dm-row .u { color:#9499a0; flex-shrink:0; max-width:80px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.dm-row.empty { justify-content:center; color:#9499a0; padding:20px; }
+.dm-row .u { color:#9499a0; flex-shrink:0; max-width:70px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.dm-row.empty { justify-content:center; color:#9499a0; padding:24px; }
 
-.related-list { padding:8px 0; max-height:600px; overflow-y:auto; }
+/* 相关推荐 */
+.related-list { padding:6px 0; max-height:600px; overflow-y:auto; }
 .related-list::-webkit-scrollbar { width:6px; }
 .related-list::-webkit-scrollbar-thumb { background:#e3e5e7; border-radius:3px; }
 .related-item {
@@ -343,12 +412,25 @@ input, textarea { font-family:inherit; outline:none; border:none; }
 }
 .related-item .sub { font-size:11px; color:#9499a0; display:flex; gap:8px; }
 
+/* 响应式：移动端 */
 @media (max-width:1100px) {
-    .main-container { grid-template-columns:1fr; padding:0 12px; margin:12px auto; gap:12px; }
-    .right-col { position:static; }
+    .main-container { grid-template-columns:1fr; padding:0; margin:0; gap:0; }
+    .right-col { position:static; padding:0 0 12px; }
     .bili-search { width:180px; }
     .bili-nav { display:none; }
-    .video-info-card .cover { width:110px; height:147px; }
+    .episode-card-mobile { border-radius:0; }
+    .video-title-bar { border-radius:0; margin-top:0; }
+    .content-tabs { }
+    .tab-panel { border-radius:0; margin-bottom:8px; }
+    .side-card { border-radius:0; margin-bottom:8px; }
+    .related-list { max-height:none; }
+
+    /* 移动端只在底部展示相关推荐 */
+    .side-card.episode-card-pc { display:none !important; }
+    .side-card.dm-list-card { display:none; }
+}
+@media (min-width:1101px) {
+    .episode-card-mobile { display:none; }
 }
 @media (max-width:640px) {
     .bili-header { padding:0 12px; gap:8px; height:50px; }
@@ -358,15 +440,13 @@ input, textarea { font-family:inherit; outline:none; border:none; }
     .bili-search input { height:30px; padding:0 30px 0 10px; font-size:12px; }
     .bili-search .search-icon { right:10px; }
     .bili-user .avatar { width:28px; height:28px; font-size:12px; }
-    .video-info-card { padding:12px; gap:10px; }
-    .video-info-card .cover { width:90px; height:120px; }
-    .video-info-card .title { font-size:15px; }
-    .toolbar-btn { padding:6px 10px; min-width:48px; font-size:11px; }
+    .toolbar-btn { padding:6px 12px; min-width:50px; font-size:11px; }
     .toolbar-btn svg { width:20px; height:20px; }
-    .comment-card { padding:14px 14px; }
-    .episode-grid { grid-template-columns:repeat(auto-fill,minmax(95px,1fr)); }
-    .episode-item { padding:8px; }
-    .episode-item .ep-num { font-size:12px; }
+    .video-title-bar { padding:12px 14px 10px; }
+    .video-title-bar .title { font-size:15px; }
+    .tab-panel { padding:14px; }
+    .content-tabs { padding:0 14px; gap:20px; }
+    .dm-input-area { padding:10px 14px; }
 }
 </style>
 </head>
@@ -448,7 +528,7 @@ input, textarea { font-family:inherit; outline:none; border:none; }
         <div class="video-toolbar">
             <button class="toolbar-btn" id="likeBtn">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 22V10l5-8c1 0 2 .9 2 2v5h5.5c1.4 0 2.5 1.1 2.5 2.5l-1.5 8c-.3 1.4-1.5 2.5-3 2.5H7z"/></svg>
-                <span id="likeLabel">点赞</span>
+                <span>点赞</span>
             </button>
             <button class="toolbar-btn" id="favBtn">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg>
@@ -460,59 +540,76 @@ input, textarea { font-family:inherit; outline:none; border:none; }
             </button>
         </div>
 
-        <div class="video-info-card">
-            <div class="cover">
-                <img id="infoCover" src="" alt="" onerror="this.style.display='none'">
-            </div>
-            <div class="info">
-                <div class="title" id="infoTitle">加载中...</div>
-                <div class="stat-row" id="infoStats"></div>
-                <div class="meta-line" id="infoMeta"></div>
-                <div class="desc collapsed" id="infoDesc"></div>
-                <div class="actions">
-                    <button class="btn-follow" id="followBtn">+ 追番</button>
-                    <div class="score-box" id="scoreBox" style="display:none;">
-                        <span class="num">0</span><span class="unit">分</span>
-                        <span class="cnt"></span>
-                    </div>
-                </div>
-            </div>
+        <!-- 简洁标题栏 -->
+        <div class="video-title-bar">
+            <div class="title" id="infoTitle">加载中...</div>
+            <div class="stats" id="infoStats"></div>
         </div>
 
-        <!-- 选集卡：像 B站 一样的集数网格 -->
-        <div class="episode-card" id="episodeCard" style="display:none;">
-            <div class="episode-head">
+        <!-- 移动端选集（横向滚动） -->
+        <div class="episode-card-mobile" id="episodeCardMobile" style="display:none;">
+            <div class="ep-head">
                 <span>选集</span>
-                <span class="amt" id="epAmt"></span>
+                <span class="amt" id="epAmtMobile"></span>
             </div>
-            <div class="episode-grid" id="episodeGrid"></div>
+            <div class="ep-scroll" id="episodeGridMobile"></div>
         </div>
 
-        <div class="comment-card">
-            <div class="comment-head">
-                评论 <span class="count" id="commentCount">0</span>
-                <div class="tabs">
-                    <a href="javascript:;" class="on" data-sort="hot">最热</a>
-                    <a href="javascript:;" data-sort="new">最新</a>
+        <!-- Tab：简介 | 评论 -->
+        <div class="content-tabs">
+            <a href="javascript:;" class="on" data-tab="intro">简介</a>
+            <a href="javascript:;" data-tab="comment">评论 <span class="cnt" id="commentCount">0</span></a>
+        </div>
+
+        <!-- 简介面板 -->
+        <div class="tab-panel intro-panel" id="introPanel">
+            <div class="intro-meta" id="infoMeta"></div>
+            <div class="intro-desc collapsed" id="infoDesc"></div>
+            <span class="intro-toggle" id="introToggle" style="display:none;">展开更多</span>
+            <div class="intro-actions">
+                <button class="btn-follow" id="followBtn">+ 追番</button>
+                <div class="score-box" id="scoreBox" style="display:none;">
+                    <span class="num">0</span><span class="unit">分</span>
                 </div>
             </div>
+        </div>
+
+        <!-- 评论面板 -->
+        <div class="tab-panel comment-panel" id="commentPanel" style="display:none;">
             <div id="commentInputWrap"></div>
+            <div class="comment-sort">
+                <a href="javascript:;" class="on" data-sort="hot">最热</a>
+                <a href="javascript:;" data-sort="new">最新</a>
+            </div>
             <div id="commentList"><div class="comment-loading">加载中...</div></div>
         </div>
     </div>
 
+    <!-- PC 右侧栏 -->
     <div class="right-col">
-        <div class="side-card">
+        <!-- PC 选集 -->
+        <div class="side-card episode-card-pc" id="episodeCardPC" style="display:none;">
             <div class="side-head">
-                <span>弹幕列表</span>
-                <span class="amt" id="dmCount">0</span>
+                <span>选集</span>
+                <span class="amt" id="epAmtPC"></span>
             </div>
-            <div class="dm-list" id="dmList"><div class="dm-row empty">暂无弹幕</div></div>
+            <div class="episode-grid" id="episodeGridPC"></div>
         </div>
-        <div class="side-card">
-            <div class="side-head">
-                <span>相关推荐</span>
+
+        <!-- 弹幕列表（可折叠） -->
+        <div class="side-card dm-list-card">
+            <div class="side-head clickable collapsed" id="dmListHead">
+                <span>弹幕列表</span>
+                <span class="amt"><span id="dmCount">0</span><span class="arrow">▼</span></span>
             </div>
+            <div class="dm-list collapsed" id="dmList">
+                <div class="dm-row empty">暂无弹幕</div>
+            </div>
+        </div>
+
+        <!-- 相关推荐 -->
+        <div class="side-card">
+            <div class="side-head"><span>相关推荐</span></div>
             <div class="related-list" id="relatedList"><div class="dm-row empty">加载中...</div></div>
         </div>
     </div>
@@ -677,15 +774,46 @@ document.getElementById('fontSizeGroup').addEventListener('click', (e) => {
     sendFontSize = btn.dataset.size;
 });
 
-document.querySelectorAll('.comment-head .tabs a').forEach(a => {
+// Tab 切换
+document.querySelectorAll('.content-tabs a').forEach(a => {
     a.onclick = () => {
-        document.querySelectorAll('.comment-head .tabs a').forEach(x => x.classList.remove('on'));
+        document.querySelectorAll('.content-tabs a').forEach(x => x.classList.remove('on'));
+        a.classList.add('on');
+        const tab = a.dataset.tab;
+        document.getElementById('introPanel').style.display = (tab === 'intro') ? 'block' : 'none';
+        document.getElementById('commentPanel').style.display = (tab === 'comment') ? 'block' : 'none';
+    };
+});
+
+// 评论排序
+document.querySelectorAll('.comment-sort a').forEach(a => {
+    a.onclick = () => {
+        document.querySelectorAll('.comment-sort a').forEach(x => x.classList.remove('on'));
         a.classList.add('on');
         commentSort = a.dataset.sort;
         renderComments();
     };
 });
 
+// 弹幕列表折叠
+document.getElementById('dmListHead').onclick = function () {
+    this.classList.toggle('collapsed');
+    document.getElementById('dmList').classList.toggle('collapsed');
+};
+
+// 简介展开
+document.getElementById('introToggle').onclick = function () {
+    const desc = document.getElementById('infoDesc');
+    if (desc.classList.contains('collapsed')) {
+        desc.classList.remove('collapsed');
+        this.textContent = '收起';
+    } else {
+        desc.classList.add('collapsed');
+        this.textContent = '展开更多';
+    }
+};
+
+// 初始化
 if (!animeId && !albumId && !singleId) {
     showStatus('缺少参数：?iv=iv1 或 ?id=1');
 } else if (animeId) {
@@ -746,7 +874,7 @@ async function initByAlbumId(albumId) {
         currentEpIdx = 0;
         document.getElementById('infoTitle').textContent = urlTitle || ('合集 ' + albumId);
         document.title = (urlTitle || ('合集 ' + albumId)) + ' - 櫻花动漫';
-        renderEpisodeList();
+        renderEpisodeLists();
         await loadCurrentEpisode();
     } catch (e) {
         showStatus('网络错误：' + e.message);
@@ -758,7 +886,7 @@ async function initByAcId(ac) {
     episodeList = [{ ac, p: 1, title: urlTitle || '视频' }];
     currentEpIdx = 0;
     document.getElementById('infoTitle').textContent = urlTitle || '视频';
-    renderEpisodeList();
+    renderEpisodeLists();
     await loadCurrentEpisode();
 }
 
@@ -766,14 +894,13 @@ function renderAnimeInfo(anime) {
     document.title = anime.title + ' - 櫻花动漫';
 
     document.getElementById('infoTitle').textContent = anime.title;
-    document.getElementById('infoCover').src = anime.coverV || anime.coverH || '';
     document.getElementById('infoDesc').textContent = anime.description || '暂无简介';
 
     const metaParts = [];
     if (anime.year) metaParts.push(anime.year + '年' + (anime.month || ''));
     if (anime.totalEp) metaParts.push('全' + anime.totalEp + '话');
     if (anime.duration) metaParts.push('单集 ' + anime.duration);
-    if ((anime.tags || []).length) metaParts.push(anime.tags.join(' · '));
+    if ((anime.tags || []).length) metaParts.push('标签：' + anime.tags.join(' · '));
     document.getElementById('infoMeta').innerHTML =
         metaParts.map(p => '<span>' + escapeHtml(p) + '</span>').join('　|　');
 
@@ -785,20 +912,8 @@ function renderAnimeInfo(anime) {
 
     const descEl = document.getElementById('infoDesc');
     setTimeout(() => {
-        if (descEl.scrollHeight > descEl.clientHeight) {
-            const tog = document.createElement('span');
-            tog.className = 'toggle-desc';
-            tog.textContent = '展开';
-            tog.onclick = () => {
-                if (descEl.classList.contains('collapsed')) {
-                    descEl.classList.remove('collapsed');
-                    tog.textContent = '收起';
-                } else {
-                    descEl.classList.add('collapsed');
-                    tog.textContent = '展开';
-                }
-            };
-            descEl.parentNode.insertBefore(tog, descEl.nextSibling);
+        if (descEl.scrollHeight > descEl.clientHeight + 4) {
+            document.getElementById('introToggle').style.display = 'inline-block';
         }
     }, 100);
 
@@ -816,22 +931,28 @@ function renderAnimeInfo(anime) {
 }
 
 // ============================================================
-// 选集列表渲染（B站风）
+// 选集渲染（PC + Mobile 两份）
 // ============================================================
-function renderEpisodeList() {
-    const card = document.getElementById('episodeCard');
-    const grid = document.getElementById('episodeGrid');
-    const amt = document.getElementById('epAmt');
+function renderEpisodeLists() {
+    const hasEpisodes = episodeList && episodeList.length > 1;
 
-    if (!episodeList || episodeList.length === 0) {
-        card.style.display = 'none';
+    const cardPC = document.getElementById('episodeCardPC');
+    const cardMobile = document.getElementById('episodeCardMobile');
+
+    if (!hasEpisodes) {
+        cardPC.style.display = 'none';
+        cardMobile.style.display = 'none';
         return;
     }
 
-    card.style.display = 'block';
-    amt.textContent = '全 ' + episodeList.length + ' 话';
+    cardPC.style.display = '';
+    cardMobile.style.display = '';
 
-    grid.innerHTML = episodeList.map((ep, i) => {
+    const epCountText = '全 ' + episodeList.length + ' 话';
+    document.getElementById('epAmtPC').textContent = epCountText;
+    document.getElementById('epAmtMobile').textContent = epCountText;
+
+    const gridHtml = episodeList.map((ep, i) => {
         const epNumText = '第' + (i + 1) + '话';
         let epTitle = ep.title || '';
         if (epTitle === epNumText || epTitle === ('第' + (i + 1) + '集') || epTitle === ('第 ' + (i + 1) + ' 集')) {
@@ -843,10 +964,13 @@ function renderEpisodeList() {
         '</button>';
     }).join('');
 
-    grid.querySelectorAll('.episode-item').forEach(btn => {
+    document.getElementById('episodeGridPC').innerHTML = gridHtml;
+    document.getElementById('episodeGridMobile').innerHTML = gridHtml;
+
+    document.querySelectorAll('.episode-item').forEach(btn => {
         btn.onclick = () => {
             currentEpIdx = parseInt(btn.dataset.idx);
-            renderEpisodeList();
+            renderEpisodeLists();
             loadCurrentEpisode();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         };
@@ -864,7 +988,7 @@ async function loadAndPlay(anime) {
                     ac: item.ac, p: item.p, title: item.title || ('第' + item.p + '集')
                 }));
                 currentEpIdx = 0;
-                renderEpisodeList();
+                renderEpisodeLists();
                 await loadCurrentEpisode();
                 return;
             }
@@ -872,7 +996,7 @@ async function loadAndPlay(anime) {
     }
 
     if (episodeList.length > 0 && episodeList[0].ac) {
-        renderEpisodeList();
+        renderEpisodeLists();
         await loadCurrentEpisode();
         return;
     }
@@ -883,7 +1007,7 @@ async function loadAndPlay(anime) {
     if (m) {
         episodeList = [{ ac: m[1], p: 1, title: anime.title }];
         currentEpIdx = 0;
-        renderEpisodeList();
+        renderEpisodeLists();
         await loadCurrentEpisode();
         return;
     }
@@ -943,8 +1067,7 @@ async function loadCurrentEpisode() {
         newUrl.searchParams.set('ep', ep.p || (currentEpIdx + 1));
         history.replaceState({}, '', newUrl);
 
-        // 更新选集选中态
-        renderEpisodeList();
+        renderEpisodeLists();
 
         if (currentAnime) {
             fetch(`${API_BASE}/api/view`, {
@@ -1427,7 +1550,7 @@ document.getElementById('followBtn').onclick = function () {
 video.onended = () => {
     if (currentEpIdx < episodeList.length - 1) {
         currentEpIdx++;
-        renderEpisodeList();
+        renderEpisodeLists();
         loadCurrentEpisode();
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
