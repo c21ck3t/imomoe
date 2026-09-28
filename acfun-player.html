@@ -100,176 +100,144 @@ input, textarea { font-family:inherit; outline:none; border:none; }
 }
 .dm-toggle.off { opacity:.5; }
 
-/* 弹幕输入条 */
-.dm-input-area {
-    background:#fff; padding:10px 16px;
-    display:flex; flex-direction:column; gap:8px;
+/* ============================================================
+   Tab 行（简介 | 评论 | 右侧弹幕输入）
+   ============================================================ */
+.tab-bar {
+    background:#fff; border-radius:0 0 8px 8px;
+    padding:0 20px;
+    display:flex; align-items:center; gap:24px;
     border-bottom:1px solid #f1f2f3;
+    min-height:48px;
 }
-.dm-input-row { display:flex; gap:8px; align-items:center; }
-.dm-input-row input[type="text"] {
-    flex:1; background:#f1f2f3; border-radius:18px;
-    padding:7px 14px; font-size:13px; color:#18191c;
+.tab-links { display:flex; gap:24px; }
+.tab-links a {
+    padding:14px 0;
+    font-size:15px; color:#61666d;
+    border-bottom:2px solid transparent;
+    cursor:pointer;
 }
-.dm-input-row input[type="text"]::placeholder { color:#9499a0; }
-.dm-input-row button.send {
+.tab-links a.on {
+    color:#18191c; font-weight:600;
+    border-bottom-color:#fb7299;
+}
+.tab-links a .cnt {
+    font-size:12px; color:#9499a0; font-weight:normal;
+    margin-left:4px;
+}
+
+/* 弹幕输入条（tab 右侧） */
+.dm-inline {
+    margin-left:auto;
+    display:flex; align-items:center; gap:6px;
+    position:relative;
+}
+.dm-inline input[type="text"] {
+    width:220px; height:32px; padding:0 14px;
+    background:#f1f2f3; border-radius:16px;
+    font-size:13px; color:#18191c;
+}
+.dm-inline input[type="text"]::placeholder { color:#9499a0; }
+.dm-inline button {
+    width:32px; height:32px; border-radius:50%;
+    background:#f1f2f3; color:#61666d;
+    display:flex; align-items:center; justify-content:center;
+    font-size:15px;
+}
+.dm-inline button.send-btn {
+    width:auto; padding:0 14px; border-radius:16px;
     background:#fb7299; color:#fff;
-    padding:7px 18px; border-radius:18px;
     font-size:13px; font-weight:600;
 }
-.dm-input-row button.send:disabled { background:#e3e5e7; color:#9499a0; cursor:not-allowed; }
-.dm-input-row button.settings-btn {
-    display:none;
-    width:34px; height:34px; border-radius:50%;
-    background:#f1f2f3; color:#61666d;
-    font-size:16px; flex-shrink:0;
+.dm-inline button.send-btn:disabled { background:#e3e5e7; color:#9499a0; cursor:not-allowed; }
+
+/* 弹幕设置浮层 */
+.dm-settings-popup {
+    position:absolute; top:44px; right:0;
+    background:#fff; border-radius:8px;
+    box-shadow:0 6px 24px rgba(0,0,0,.12);
+    padding:14px 16px;
+    display:none; flex-direction:column; gap:12px;
+    font-size:12px; color:#61666d;
+    z-index:20; width:340px;
 }
-.dm-settings { display:flex; gap:12px; align-items:center; flex-wrap:wrap; font-size:12px; color:#61666d; }
-.dm-settings .group { display:flex; gap:5px; align-items:center; }
-.dm-settings .label { color:#9499a0; }
-.color-dots { display:flex; gap:3px; }
+.dm-settings-popup.open { display:flex; }
+.dm-settings-popup .group { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+.dm-settings-popup .label { color:#9499a0; min-width:36px; }
+.color-dots { display:flex; gap:4px; }
 .color-dot {
-    width:16px; height:16px; border-radius:50%;
+    width:18px; height:18px; border-radius:50%;
     cursor:pointer; border:2px solid transparent;
-    transition:transform .15s, border-color .15s;
 }
-.color-dot:hover { transform:scale(1.15); }
-.color-dot.on { border-color:#00aeec; transform:scale(1.15); }
+.color-dot.on { border-color:#00aeec; }
 .color-custom {
-    position:relative; width:20px; height:20px;
+    position:relative; width:22px; height:22px;
     border-radius:50%; cursor:pointer;
     background:conic-gradient(red, yellow, lime, aqua, blue, magenta, red);
     border:2px solid #e3e5e7; overflow:hidden;
 }
 .color-custom input[type="color"] {
-    position:absolute; inset:0; opacity:0;
-    cursor:pointer; width:100%; height:100%;
+    position:absolute; inset:0; opacity:0; cursor:pointer;
 }
 .btn-group { display:flex; gap:2px; background:#f1f2f3; border-radius:6px; padding:2px; }
 .btn-group button {
-    padding:3px 9px; font-size:12px;
+    padding:3px 10px; font-size:12px;
     color:#61666d; border-radius:4px;
-    transition:all .15s;
 }
 .btn-group button.on {
     background:#fff; color:#00aeec; font-weight:600;
     box-shadow:0 1px 2px rgba(0,0,0,.06);
 }
 
+/* ============================================================
+   Tab 内容
+   ============================================================ */
+.tab-panel {
+    background:#fff; padding:16px 20px;
+    border-radius:8px;
+    margin-top:8px;
+    margin-bottom:8px;
+}
+.tab-panel.comment-panel { padding-top:0; }
+
+/* 简介面板内的标题 */
+.intro-title-block {
+    padding-bottom:14px;
+    border-bottom:1px solid #f1f2f3;
+    margin-bottom:14px;
+}
+.intro-title-block .title {
+    font-size:17px; font-weight:600; line-height:1.4;
+    margin-bottom:8px; word-break:break-word;
+}
+.intro-title-block .stats {
+    display:flex; gap:14px; font-size:12px; color:#9499a0;
+    flex-wrap:wrap;
+}
+
 /* 工具栏 */
-.video-toolbar { background:#fff; padding:12px 16px; display:flex; align-items:center; gap:4px; }
+.video-toolbar {
+    display:flex; align-items:center;
+    gap:8px; padding-bottom:14px;
+    border-bottom:1px solid #f1f2f3;
+    margin-bottom:14px;
+}
 .toolbar-btn {
     display:inline-flex; flex-direction:column; align-items:center; gap:2px;
-    padding:6px 16px; font-size:12px; color:#61666d;
-    border-radius:6px; min-width:56px;
+    padding:6px 20px; font-size:12px; color:#61666d;
+    border-radius:6px; min-width:64px;
+    transition:all .15s;
 }
 .toolbar-btn:hover { background:#f1f2f3; }
 .toolbar-btn svg { width:24px; height:24px; }
 .toolbar-btn.active { color:#fb7299; }
 .toolbar-btn.active svg { fill:#fb7299; }
+.toolbar-btn .num { font-weight:600; }
 
-/* Tab：简介 | 评论 —— 紧跟工具栏下面 */
-.content-tabs {
-    background:#fff;
-    padding:0 20px;
-    display:flex; gap:24px;
-    border-bottom:1px solid #f1f2f3;
-}
-.content-tabs a {
-    padding:14px 0;
-    font-size:15px; color:#61666d;
-    border-bottom:2px solid transparent;
-    cursor:pointer;
-}
-.content-tabs a.on {
-    color:#18191c; font-weight:600;
-    border-bottom-color:#fb7299;
-}
-.content-tabs a .cnt {
-    font-size:12px; color:#9499a0; font-weight:normal;
-    margin-left:4px;
-}
-
-.tab-panel {
-    background:#fff; padding:20px;
-    border-radius:0 0 8px 8px;
-    margin-bottom:8px;
-}
-.tab-panel.intro-panel { padding-top:0; }
-.tab-panel.comment-panel { padding-top:0; }
-
-/* 移动端标题（放在 introPanel 内） */
-.video-title-bar-mobile {
-    display:none;
-    padding:14px 0 12px;
-}
-.video-title-bar-mobile .title {
-    font-size:16px; font-weight:600; line-height:1.4;
-    margin-bottom:8px; word-break:break-word;
-}
-.video-title-bar-mobile .stats {
-    display:flex; gap:14px; font-size:12px; color:#9499a0;
-    flex-wrap:wrap;
-}
-
-/* PC 简介卡 */
-.intro-card {
-    display:flex; gap:16px;
-    padding:20px 0 16px;
-    border-bottom:1px solid #f1f2f3;
-    margin-bottom:16px;
-}
-.intro-cover {
-    width:130px; height:174px; border-radius:6px;
-    overflow:hidden; flex-shrink:0; background:#f1f2f3;
-}
-.intro-cover img { width:100%; height:100%; object-fit:cover; display:block; }
-.intro-info { flex:1; min-width:0; }
-.intro-title {
-    font-size:18px; font-weight:600; line-height:1.4;
-    margin-bottom:10px; word-break:break-word;
-}
-.intro-stats {
-    display:flex; gap:14px; font-size:12px; color:#9499a0;
-    margin-bottom:10px; flex-wrap:wrap;
-}
-.intro-meta {
-    font-size:13px; color:#61666d; line-height:1.8;
-    margin-bottom:12px; word-break:break-word;
-}
-.intro-actions {
-    display:flex; gap:12px; align-items:center;
-    flex-wrap:wrap; margin-top:12px;
-}
-.btn-follow {
-    padding:7px 22px; background:#fb7299; color:#fff;
-    border-radius:16px; font-size:13px; font-weight:600;
-}
-.btn-follow.on { background:#f1f2f3; color:#61666d; }
-.score-box {
-    display:inline-flex; align-items:baseline; gap:2px;
-    color:#ff8800; font-weight:bold;
-}
-.score-box .num { font-size:20px; }
-.score-box .unit { font-size:12px; }
-
-.intro-desc {
-    font-size:13px; color:#61666d; line-height:1.7;
-    word-break:break-word; white-space:pre-wrap;
-}
-.intro-desc.collapsed {
-    display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical;
-    overflow:hidden;
-}
-.intro-toggle {
-    color:#00aeec; cursor:pointer; font-size:13px;
-    display:inline-block; margin-top:6px;
-}
-
-/* 移动端选集（横向滚动） */
+/* 移动端选集 */
 .episode-card-mobile {
     display:none;
-    padding:14px 0;
+    padding-bottom:14px;
     border-bottom:1px solid #f1f2f3;
     margin-bottom:14px;
 }
@@ -291,7 +259,6 @@ input, textarea { font-family:inherit; outline:none; border:none; }
     padding:8px 10px; background:#f6f7f8;
     border-radius:6px; text-align:left;
     border:1px solid transparent;
-    transition:all .15s;
 }
 .episode-card-mobile .ep-btn.on {
     background:#fff0f5; border-color:#fb7299;
@@ -307,10 +274,21 @@ input, textarea { font-family:inherit; outline:none; border:none; }
 }
 .episode-card-mobile .ep-btn.on .t { color:#fb7299; opacity:.8; }
 
-/* 移动端追番按钮 */
-.mobile-actions {
-    display:none;
-    margin-top:16px;
+.intro-meta {
+    font-size:12px; color:#9499a0; line-height:1.8;
+    margin-bottom:12px;
+}
+.intro-desc {
+    font-size:13px; color:#61666d; line-height:1.7;
+    word-break:break-word; white-space:pre-wrap;
+}
+.intro-desc.collapsed {
+    display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical;
+    overflow:hidden;
+}
+.intro-toggle {
+    color:#00aeec; cursor:pointer; font-size:13px;
+    display:inline-block; margin-top:6px;
 }
 
 /* 评论 */
@@ -332,7 +310,6 @@ input, textarea { font-family:inherit; outline:none; border:none; }
     padding:6px 20px; border-radius:6px;
     background:#fb7299; color:#fff; font-size:13px; font-weight:600;
 }
-.comment-input-box .submit-btn:disabled { background:#e3e5e7; color:#9499a0; cursor:not-allowed; }
 .comment-login-tip {
     padding:20px; background:#f6f7f8; border-radius:8px;
     text-align:center; color:#9499a0; font-size:13px; margin-bottom:20px;
@@ -384,14 +361,11 @@ input, textarea { font-family:inherit; outline:none; border:none; }
     max-height:360px;
     overflow-y:auto;
 }
-.episode-grid::-webkit-scrollbar { width:6px; }
-.episode-grid::-webkit-scrollbar-thumb { background:#e3e5e7; border-radius:3px; }
 .episode-item {
     padding:8px 10px;
     background:#f6f7f8; border-radius:6px;
     text-align:left; cursor:pointer;
     border:1px solid transparent;
-    transition:all .15s;
     overflow:hidden;
 }
 .episode-item:hover { background:#e3e5e7; }
@@ -408,8 +382,6 @@ input, textarea { font-family:inherit; outline:none; border:none; }
 .episode-item.on .ep-title { color:#fb7299; opacity:.8; }
 
 .dm-list { max-height:300px; overflow-y:auto; padding:6px 0; }
-.dm-list::-webkit-scrollbar { width:6px; }
-.dm-list::-webkit-scrollbar-thumb { background:#e3e5e7; border-radius:3px; }
 .dm-list.collapsed { display:none; }
 .dm-row {
     padding:6px 16px; font-size:12px;
@@ -422,11 +394,9 @@ input, textarea { font-family:inherit; outline:none; border:none; }
 .dm-row.empty { justify-content:center; color:#9499a0; padding:24px; }
 
 .related-list { padding:6px 0; max-height:600px; overflow-y:auto; }
-.related-list::-webkit-scrollbar { width:6px; }
-.related-list::-webkit-scrollbar-thumb { background:#e3e5e7; border-radius:3px; }
 .related-item {
     display:flex; gap:10px; padding:8px 16px;
-    cursor:pointer; transition:background .15s;
+    cursor:pointer;
 }
 .related-item:hover { background:#f6f7f8; }
 .related-item .cover {
@@ -441,20 +411,13 @@ input, textarea { font-family:inherit; outline:none; border:none; }
     display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;
     margin-bottom:4px;
 }
-.related-item .sub { font-size:11px; color:#9499a0; display:flex; gap:8px; }
+.related-item .sub { font-size:11px; color:#9499a0; }
 
-/* PC / 移动 切换 */
+/* 移动端切 */
 @media (min-width:1101px) {
-    .video-title-bar-mobile { display:none !important; }
     .episode-card-mobile { display:none !important; }
-    .mobile-actions { display:none !important; }
     .episode-card-pc { display:block; }
     .dm-list-card { display:block; }
-    .dm-input-row button.settings-btn { display:none; }
-    .dm-settings { display:flex; }
-    .intro-cover { display:block; }
-    .intro-title, .intro-stats, .intro-actions { display:flex; }
-    .intro-title { display:block; }
 }
 @media (max-width:1100px) {
     .main-container { grid-template-columns:1fr; padding:0; margin:0; gap:0; }
@@ -462,33 +425,16 @@ input, textarea { font-family:inherit; outline:none; border:none; }
     .bili-search { width:180px; }
     .bili-nav { display:none; }
     .player-wrap { border-radius:0; }
-    .video-toolbar { }
-    .content-tabs { }
-    .tab-panel { border-radius:0; margin-bottom:8px; }
+    .tab-bar { border-radius:0; }
+    .tab-panel { border-radius:0; margin-top:8px; }
     .side-card { border-radius:0; margin-bottom:8px; }
     .related-list { max-height:none; }
     .episode-card-pc { display:none !important; }
     .dm-list-card { display:none !important; }
-
-    /* 移动端标题、选集、追番按钮显示 */
-    .video-title-bar-mobile { display:block; }
     .episode-card-mobile { display:block; }
-    .mobile-actions { display:block; }
 
-    /* 移动端隐藏 PC 简介卡的封面/标题/数据/追番 */
-    .intro-card { display:block; padding:14px 0; border-bottom:none; margin-bottom:0; }
-    .intro-cover { display:none !important; }
-    .intro-info { display:block; }
-    .intro-title, .intro-stats, .intro-actions { display:none !important; }
-    .intro-meta { margin-bottom:0; font-size:12px; color:#9499a0; line-height:1.7; }
-
-    /* 移动端标签隐藏 */
-    .tag-part { display:none !important; }
-
-    /* 移动端弹幕设置按钮 */
-    .dm-input-row button.settings-btn { display:flex; align-items:center; justify-content:center; }
-    .dm-settings { display:none; flex-direction:column; align-items:flex-start; gap:10px; padding-top:6px; }
-    .dm-settings.open { display:flex; }
+    .dm-inline input[type="text"] { width:130px; }
+    .dm-settings-popup { width:calc(100vw - 32px); right:-30px; }
 }
 @media (max-width:640px) {
     .bili-header { padding:0 12px; gap:8px; height:50px; }
@@ -496,14 +442,17 @@ input, textarea { font-family:inherit; outline:none; border:none; }
     .bili-logo svg { width:22px; height:22px; }
     .bili-search { width:120px; }
     .bili-search input { height:30px; padding:0 30px 0 10px; font-size:12px; }
-    .bili-search .search-icon { right:10px; }
     .bili-user .avatar { width:28px; height:28px; font-size:12px; }
-    .toolbar-btn { padding:6px 12px; min-width:50px; font-size:11px; }
-    .toolbar-btn svg { width:20px; height:20px; }
-    .content-tabs { padding:0 14px; gap:20px; }
+    .tab-bar { padding:0 14px; gap:12px; min-height:46px; }
+    .tab-links { gap:18px; }
+    .tab-links a { padding:12px 0; font-size:14px; }
     .tab-panel { padding:14px; }
-    .dm-input-area { padding:10px 14px; }
-    .video-title-bar-mobile .title { font-size:15px; }
+    .intro-title-block .title { font-size:15px; }
+    .toolbar-btn { padding:6px 16px; min-width:56px; }
+    .toolbar-btn svg { width:22px; height:22px; }
+    .dm-inline input[type="text"] { width:110px; height:30px; font-size:12px; }
+    .dm-inline button { width:30px; height:30px; font-size:14px; }
+    .dm-inline button.send-btn { padding:0 12px; font-size:12px; }
 }
 </style>
 </head>
@@ -541,98 +490,76 @@ input, textarea { font-family:inherit; outline:none; border:none; }
             <button class="dm-toggle" id="dmToggle">弹幕 开</button>
         </div>
 
-        <div class="dm-input-area">
-            <div class="dm-input-row">
-                <input type="text" id="dmInput" placeholder="发个弹幕见证当下..." maxlength="50">
-                <button class="send" id="dmSend">发送</button>
-                <button class="settings-btn" id="dmSettingsBtn" title="弹幕设置">⚙</button>
+        <!-- Tab 行：简介 | 评论 | 右侧弹幕输入 -->
+        <div class="tab-bar">
+            <div class="tab-links">
+                <a href="javascript:;" class="on" data-tab="intro">简介</a>
+                <a href="javascript:;" data-tab="comment">评论 <span class="cnt" id="commentCount">0</span></a>
             </div>
-            <div class="dm-settings" id="dmSettingsBox">
-                <div class="group">
-                    <span class="label">颜色</span>
-                    <div class="color-dots" id="colorDots">
-                        <div class="color-dot on" data-color="#ffffff" style="background:#fff;border:2px solid #e3e5e7;"></div>
-                        <div class="color-dot" data-color="#ff0000" style="background:#ff0000;"></div>
-                        <div class="color-dot" data-color="#ff8800" style="background:#ff8800;"></div>
-                        <div class="color-dot" data-color="#ffdd00" style="background:#ffdd00;"></div>
-                        <div class="color-dot" data-color="#00cc00" style="background:#00cc00;"></div>
-                        <div class="color-dot" data-color="#00aeec" style="background:#00aeec;"></div>
-                        <div class="color-dot" data-color="#9900ff" style="background:#9900ff;"></div>
-                        <div class="color-dot" data-color="#ff6699" style="background:#ff6699;"></div>
+            <div class="dm-inline">
+                <input type="text" id="dmInput" placeholder="点我发弹幕" maxlength="50">
+                <button class="send-btn" id="dmSend">发送</button>
+                <button id="dmSettingsBtn" title="弹幕设置">⚙</button>
+                <div class="dm-settings-popup" id="dmSettingsBox">
+                    <div class="group">
+                        <span class="label">颜色</span>
+                        <div class="color-dots" id="colorDots">
+                            <div class="color-dot on" data-color="#ffffff" style="background:#fff;border:2px solid #e3e5e7;"></div>
+                            <div class="color-dot" data-color="#ff0000" style="background:#ff0000;"></div>
+                            <div class="color-dot" data-color="#ff8800" style="background:#ff8800;"></div>
+                            <div class="color-dot" data-color="#ffdd00" style="background:#ffdd00;"></div>
+                            <div class="color-dot" data-color="#00cc00" style="background:#00cc00;"></div>
+                            <div class="color-dot" data-color="#00aeec" style="background:#00aeec;"></div>
+                            <div class="color-dot" data-color="#9900ff" style="background:#9900ff;"></div>
+                            <div class="color-dot" data-color="#ff6699" style="background:#ff6699;"></div>
+                        </div>
+                        <div class="color-custom" title="自定义颜色">
+                            <input type="color" id="colorCustom" value="#ffffff">
+                        </div>
                     </div>
-                    <div class="color-custom" title="自定义颜色">
-                        <input type="color" id="colorCustom" value="#ffffff">
+                    <div class="group">
+                        <span class="label">类型</span>
+                        <div class="btn-group" id="positionGroup">
+                            <button data-pos="scroll" class="on">滚动</button>
+                            <button data-pos="top">顶部</button>
+                            <button data-pos="bottom">底部</button>
+                        </div>
                     </div>
-                </div>
-                <div class="group">
-                    <span class="label">类型</span>
-                    <div class="btn-group" id="positionGroup">
-                        <button data-pos="scroll" class="on">滚动</button>
-                        <button data-pos="top">顶部</button>
-                        <button data-pos="bottom">底部</button>
-                    </div>
-                </div>
-                <div class="group">
-                    <span class="label">字号</span>
-                    <div class="btn-group" id="fontSizeGroup">
-                        <button data-size="small">小</button>
-                        <button data-size="medium" class="on">中</button>
-                        <button data-size="large">大</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="video-toolbar">
-            <button class="toolbar-btn" id="likeBtn">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 22V10l5-8c1 0 2 .9 2 2v5h5.5c1.4 0 2.5 1.1 2.5 2.5l-1.5 8c-.3 1.4-1.5 2.5-3 2.5H7z"/></svg>
-                <span>点赞</span>
-            </button>
-            <button class="toolbar-btn" id="favBtn">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg>
-                <span id="favLabel">收藏</span>
-            </button>
-            <button class="toolbar-btn" id="shareBtn">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
-                <span>分享</span>
-            </button>
-        </div>
-
-        <!-- Tab：紧跟工具栏下面 -->
-        <div class="content-tabs">
-            <a href="javascript:;" class="on" data-tab="intro">简介</a>
-            <a href="javascript:;" data-tab="comment">评论 <span class="cnt" id="commentCount">0</span></a>
-        </div>
-
-        <!-- 简介面板 -->
-        <div class="tab-panel intro-panel" id="introPanel">
-            <!-- 移动端：标题 + 数据 -->
-            <div class="video-title-bar-mobile">
-                <div class="title" id="infoTitleMobile">加载中...</div>
-                <div class="stats" id="infoStatsMobile"></div>
-            </div>
-
-            <!-- PC：封面卡 -->
-            <div class="intro-card">
-                <div class="intro-cover"><img id="infoCover" src="" onerror="this.style.display='none'"></div>
-                <div class="intro-info">
-                    <div class="intro-title" id="infoTitle">加载中...</div>
-                    <div class="intro-stats" id="infoStats"></div>
-                    <div class="intro-meta" id="infoMeta"></div>
-                    <div class="intro-actions">
-                        <button class="btn-follow" id="followBtn">+ 追番</button>
-                        <div class="score-box" id="scoreBox" style="display:none;">
-                            <span class="num">0</span><span class="unit">分</span>
+                    <div class="group">
+                        <span class="label">字号</span>
+                        <div class="btn-group" id="fontSizeGroup">
+                            <button data-size="small">小</button>
+                            <button data-size="medium" class="on">中</button>
+                            <button data-size="large">大</button>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- 移动端：meta（PC 也会用，但内部只有移动端显示） -->
-            <div class="intro-meta-mobile" id="infoMetaMobile" style="display:none;"></div>
+        <!-- 简介面板 -->
+        <div class="tab-panel intro-panel" id="introPanel">
+            <div class="intro-title-block">
+                <div class="title" id="infoTitle">加载中...</div>
+                <div class="stats" id="infoStats"></div>
+            </div>
 
-            <!-- 移动端：选集 -->
-            <div class="episode-card-mobile" id="episodeCardMobile">
+            <div class="video-toolbar">
+                <button class="toolbar-btn" id="likeBtn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 22V10l5-8c1 0 2 .9 2 2v5h5.5c1.4 0 2.5 1.1 2.5 2.5l-1.5 8c-.3 1.4-1.5 2.5-3 2.5H7z"/></svg>
+                    <span class="num" id="likeCount">0</span>
+                </button>
+                <button class="toolbar-btn" id="favBtn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg>
+                    <span class="num" id="favCount">0</span>
+                </button>
+                <button class="toolbar-btn" id="shareBtn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+                    <span class="num" id="shareCount">0</span>
+                </button>
+            </div>
+
+            <div class="episode-card-mobile" id="episodeCardMobile" style="display:none;">
                 <div class="ep-head">
                     <span>选集</span>
                     <span class="amt" id="epAmtMobile"></span>
@@ -640,14 +567,10 @@ input, textarea { font-family:inherit; outline:none; border:none; }
                 <div class="ep-scroll" id="episodeGridMobile"></div>
             </div>
 
-            <!-- 简介文本 -->
+            <div class="intro-meta" id="infoMeta"></div>
+
             <div class="intro-desc collapsed" id="infoDesc"></div>
             <span class="intro-toggle" id="introToggle" style="display:none;">展开更多</span>
-
-            <!-- 移动端：追番按钮 -->
-            <div class="mobile-actions">
-                <button class="btn-follow" id="followBtnMobile">+ 追番</button>
-            </div>
         </div>
 
         <!-- 评论面板 -->
@@ -661,9 +584,7 @@ input, textarea { font-family:inherit; outline:none; border:none; }
         </div>
     </div>
 
-    <!-- PC 右侧栏 -->
     <div class="right-col">
-        <!-- 弹幕列表（折叠） -->
         <div class="side-card dm-list-card">
             <div class="side-head clickable collapsed" id="dmListHead">
                 <span>弹幕列表</span>
@@ -674,7 +595,6 @@ input, textarea { font-family:inherit; outline:none; border:none; }
             </div>
         </div>
 
-        <!-- 选集 -->
         <div class="side-card episode-card-pc" id="episodeCardPC" style="display:none;">
             <div class="side-head">
                 <span>选集</span>
@@ -683,7 +603,6 @@ input, textarea { font-family:inherit; outline:none; border:none; }
             <div class="episode-grid" id="episodeGridPC"></div>
         </div>
 
-        <!-- 相关推荐 -->
         <div class="side-card">
             <div class="side-head"><span>相关推荐</span></div>
             <div class="related-list" id="relatedList"><div class="dm-row empty">加载中...</div></div>
@@ -700,6 +619,12 @@ function escapeHtml(s) {
     }[m]));
 }
 
+function fmtCount(n) {
+    if (!n) return '0';
+    if (n > 10000) return (n / 10000).toFixed(1) + '万';
+    return String(n);
+}
+
 class DanmuEngine {
     constructor(layerEl) {
         this.layer = layerEl;
@@ -710,15 +635,10 @@ class DanmuEngine {
     pickTrack() {
         const now = Date.now();
         for (let i = 0; i < this.tracks; i++) {
-            if (this.trackFree[i] < now) {
-                this.trackFree[i] = now + 8000;
-                return i;
-            }
+            if (this.trackFree[i] < now) { this.trackFree[i] = now + 8000; return i; }
         }
         let min = 0;
-        for (let i = 1; i < this.tracks; i++) {
-            if (this.trackFree[i] < this.trackFree[min]) min = i;
-        }
+        for (let i = 1; i < this.tracks; i++) if (this.trackFree[i] < this.trackFree[min]) min = i;
         this.trackFree[min] = now + 8000;
         return min;
     }
@@ -728,24 +648,17 @@ class DanmuEngine {
         const position = opts.position || 'scroll';
         const fontSize = opts.fontSize || 'medium';
         const isSelf = opts.isSelf || false;
-
         const el = document.createElement('div');
         el.className = 'dm-item ' + position + (isSelf ? ' self' : '');
         el.textContent = content;
         el.style.color = color;
-
         const sizeMap = { small: '14px', medium: '20px', large: '28px' };
         el.style.fontSize = sizeMap[fontSize] || '20px';
-
         if (position === 'scroll') {
             const track = this.pickTrack();
             el.style.top = (track * 36 + 10) + 'px';
-        } else if (position === 'top') {
-            el.style.top = '60px';
-        } else if (position === 'bottom') {
-            el.style.bottom = '60px';
-        }
-
+        } else if (position === 'top') { el.style.top = '60px'; }
+        else if (position === 'bottom') { el.style.bottom = '60px'; }
         this.layer.appendChild(el);
         const dur = position === 'scroll' ? 8000 : 4000;
         setTimeout(() => el.remove(), dur + 500);
@@ -760,15 +673,9 @@ const params = new URLSearchParams(location.search);
 
 function parseIvParam() {
     const ivParam = params.get('iv');
-    if (ivParam) {
-        const m = ivParam.match(/(\d+)/);
-        if (m) return parseInt(m[1]);
-    }
+    if (ivParam) { const m = ivParam.match(/(\d+)/); if (m) return parseInt(m[1]); }
     const idParam = params.get('id');
-    if (idParam) {
-        const n = parseInt(idParam);
-        if (!isNaN(n)) return n;
-    }
+    if (idParam) { const n = parseInt(idParam); if (!isNaN(n)) return n; }
     return null;
 }
 
@@ -776,7 +683,6 @@ const animeId = parseIvParam();
 const albumId = params.get('album');
 const singleId = params.get('ac');
 const urlTitle = params.get('title') || '';
-// 从 URL 读初始集数（1-based）
 const initialEp = Math.max(1, parseInt(params.get('ep')) || 1);
 
 let hls = null;
@@ -789,9 +695,8 @@ let currentEpIdx = initialEp - 1;
 let commentsData = [];
 let commentSort = 'hot';
 let allAnimeCache = [];
-
-// 竞态控制
 let loadSeq = 0;
+let interactState = { counts: { likes: 0, favs: 0, shares: 0 }, userState: { liked: false, faved: false, shared: false } };
 
 let sendColor = '#ffffff';
 let sendPosition = 'scroll';
@@ -828,9 +733,18 @@ document.getElementById('topSearch').addEventListener('keydown', (e) => {
     }
 });
 
-document.getElementById('dmSettingsBtn').onclick = function () {
+// 弹幕设置浮层开关
+document.getElementById('dmSettingsBtn').onclick = function (e) {
+    e.stopPropagation();
     document.getElementById('dmSettingsBox').classList.toggle('open');
 };
+document.addEventListener('click', (e) => {
+    const box = document.getElementById('dmSettingsBox');
+    if (!box) return;
+    if (box.classList.contains('open') && !box.contains(e.target) && e.target.id !== 'dmSettingsBtn') {
+        box.classList.remove('open');
+    }
+});
 
 document.getElementById('colorDots').addEventListener('click', (e) => {
     const dot = e.target.closest('.color-dot');
@@ -859,9 +773,9 @@ document.getElementById('fontSizeGroup').addEventListener('click', (e) => {
     sendFontSize = btn.dataset.size;
 });
 
-document.querySelectorAll('.content-tabs a').forEach(a => {
+document.querySelectorAll('.tab-links a').forEach(a => {
     a.onclick = () => {
-        document.querySelectorAll('.content-tabs a').forEach(x => x.classList.remove('on'));
+        document.querySelectorAll('.tab-links a').forEach(x => x.classList.remove('on'));
         a.classList.add('on');
         const tab = a.dataset.tab;
         document.getElementById('introPanel').style.display = (tab === 'intro') ? 'block' : 'none';
@@ -908,19 +822,14 @@ function showStatus(text) {
     document.getElementById('playerStatus').classList.remove('hide');
     document.getElementById('statusText').textContent = text;
 }
-function hideStatus() {
-    document.getElementById('playerStatus').classList.add('hide');
-}
+function hideStatus() { document.getElementById('playerStatus').classList.add('hide'); }
 
 async function initByAnimeId(id) {
     showStatus('加载番剧信息...');
     try {
         const res = await fetch(`${API_BASE}/api/anime/${id}`);
         const data = await res.json();
-        if (!data.ok) {
-            showStatus('番剧不存在：' + (data.error || '未知错误'));
-            return;
-        }
+        if (!data.ok) { showStatus('番剧不存在：' + (data.error || '未知错误')); return; }
         currentAnime = data.anime;
 
         const newUrl = new URL(location.href);
@@ -930,13 +839,12 @@ async function initByAnimeId(id) {
 
         renderAnimeInfo(currentAnime);
         await loadStats(currentAnime.id);
+        await loadInteract(currentAnime.id);
         await loadDanmu(currentAnime.id);
         loadComments(currentAnime.id);
         loadRelated();
         await loadAndPlay(currentAnime);
-    } catch (e) {
-        showStatus('网络错误：' + e.message);
-    }
+    } catch (e) { showStatus('网络错误：' + e.message); }
 }
 
 async function initByAlbumId(albumId) {
@@ -944,22 +852,14 @@ async function initByAlbumId(albumId) {
     try {
         const res = await fetch(`${API_BASE}/api/acfun-collection/${albumId}`);
         const data = await res.json();
-        if (!data.ok) {
-            showStatus('合集不存在：' + (data.error || '未知错误'));
-            return;
-        }
-        episodeList = data.list.map(item => ({
-            ac: item.ac, p: item.p, title: item.title || ('第' + item.p + '集')
-        }));
+        if (!data.ok) { showStatus('合集不存在：' + (data.error || '未知错误')); return; }
+        episodeList = data.list.map(item => ({ ac: item.ac, p: item.p, title: item.title || ('第' + item.p + '集') }));
         if (currentEpIdx >= episodeList.length) currentEpIdx = 0;
         document.getElementById('infoTitle').textContent = urlTitle || ('合集 ' + albumId);
-        document.getElementById('infoTitleMobile').textContent = urlTitle || ('合集 ' + albumId);
         document.title = (urlTitle || ('合集 ' + albumId)) + ' - 櫻花动漫';
         renderEpisodeLists();
         await loadCurrentEpisode();
-    } catch (e) {
-        showStatus('网络错误：' + e.message);
-    }
+    } catch (e) { showStatus('网络错误：' + e.message); }
 }
 
 async function initByAcId(ac) {
@@ -967,36 +867,20 @@ async function initByAcId(ac) {
     episodeList = [{ ac, p: 1, title: urlTitle || '视频' }];
     currentEpIdx = 0;
     document.getElementById('infoTitle').textContent = urlTitle || '视频';
-    document.getElementById('infoTitleMobile').textContent = urlTitle || '视频';
     renderEpisodeLists();
     await loadCurrentEpisode();
 }
 
 function renderAnimeInfo(anime) {
     document.title = anime.title + ' - 櫻花动漫';
-
     document.getElementById('infoTitle').textContent = anime.title;
-    document.getElementById('infoTitleMobile').textContent = anime.title;
-    document.getElementById('infoCover').src = anime.coverV || anime.coverH || '';
     document.getElementById('infoDesc').textContent = anime.description || '暂无简介';
 
     const metaParts = [];
     if (anime.year) metaParts.push(anime.year + '年' + (anime.month || ''));
     if (anime.totalEp) metaParts.push('全' + anime.totalEp + '话');
-    if (anime.duration) metaParts.push('单集 ' + anime.duration);
-
-    let metaHtml = metaParts.map(p => '<span>' + escapeHtml(p) + '</span>').join('　|　');
-    if ((anime.tags || []).length) {
-        metaHtml += '<span class="tag-part">　|　标签：' + escapeHtml(anime.tags.join(' · ')) + '</span>';
-    }
-    document.getElementById('infoMeta').innerHTML = metaHtml;
-    document.getElementById('infoMetaMobile').innerHTML = metaHtml;
-
-    if (anime.score) {
-        const box = document.getElementById('scoreBox');
-        box.style.display = 'inline-flex';
-        box.querySelector('.num').textContent = anime.score;
-    }
+    document.getElementById('infoMeta').innerHTML =
+        metaParts.map(p => '<span>' + escapeHtml(p) + '</span>').join('　|　');
 
     const descEl = document.getElementById('infoDesc');
     setTimeout(() => {
@@ -1020,7 +904,6 @@ function renderAnimeInfo(anime) {
 
 function renderEpisodeLists() {
     const hasEpisodes = episodeList && episodeList.length > 1;
-
     const cardPC = document.getElementById('episodeCardPC');
     const cardMobile = document.getElementById('episodeCardMobile');
 
@@ -1029,7 +912,6 @@ function renderEpisodeLists() {
         if (cardMobile) cardMobile.style.display = 'none';
         return;
     }
-
     if (cardPC) cardPC.style.display = '';
     if (cardMobile) cardMobile.style.display = '';
 
@@ -1037,35 +919,25 @@ function renderEpisodeLists() {
     document.getElementById('epAmtPC').textContent = epCountText;
     document.getElementById('epAmtMobile').textContent = epCountText;
 
-    // PC 版
     document.getElementById('episodeGridPC').innerHTML = episodeList.map((ep, i) => {
         const epNumText = '第' + (i + 1) + '话';
         let epTitle = ep.title || '';
-        if (epTitle === epNumText || epTitle === ('第' + (i + 1) + '集') || epTitle === ('第 ' + (i + 1) + ' 集')) {
-            epTitle = '';
-        }
+        if (epTitle === epNumText || epTitle === ('第' + (i + 1) + '集') || epTitle === ('第 ' + (i + 1) + ' 集')) epTitle = '';
         return '<button type="button" class="episode-item' + (i === currentEpIdx ? ' on' : '') + '" data-idx="' + i + '">' +
             '<span class="ep-num">' + epNumText + '</span>' +
             (epTitle ? '<span class="ep-title">' + escapeHtml(epTitle) + '</span>' : '') +
         '</button>';
     }).join('');
 
-    // 移动端版
     document.getElementById('episodeGridMobile').innerHTML = episodeList.map((ep, i) => {
         const epNumText = '第' + (i + 1) + '话';
         let epTitle = ep.title || '';
-        if (epTitle === epNumText || epTitle === ('第' + (i + 1) + '集') || epTitle === ('第 ' + (i + 1) + ' 集')) {
-            epTitle = '';
-        }
+        if (epTitle === epNumText || epTitle === ('第' + (i + 1) + '集') || epTitle === ('第 ' + (i + 1) + ' 集')) epTitle = '';
         return '<button type="button" class="ep-btn' + (i === currentEpIdx ? ' on' : '') + '" data-idx="' + i + '">' +
             '<span class="num">' + epNumText + '</span>' +
             (epTitle ? '<span class="t">' + escapeHtml(epTitle) + '</span>' : '') +
         '</button>';
     }).join('');
-
-    // 事件委托（一次性绑定在容器上，避免重复绑定）
-    const gridPC = document.getElementById('episodeGridPC');
-    const gridMobile = document.getElementById('episodeGridMobile');
 
     const handleClick = (e) => {
         const btn = e.target.closest('[data-idx]');
@@ -1077,10 +949,8 @@ function renderEpisodeLists() {
         loadCurrentEpisode();
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
-
-    // 用 onpointerdown 避免多次绑定；每次覆盖旧的
-    gridPC.onclick = handleClick;
-    gridMobile.onclick = handleClick;
+    document.getElementById('episodeGridPC').onclick = handleClick;
+    document.getElementById('episodeGridMobile').onclick = handleClick;
 }
 
 async function loadAndPlay(anime) {
@@ -1090,10 +960,7 @@ async function loadAndPlay(anime) {
             const res = await fetch(`${API_BASE}/api/acfun-collection/${anime._collectionId}`);
             const data = await res.json();
             if (data.ok && data.list && data.list.length) {
-                episodeList = data.list.map(item => ({
-                    ac: item.ac, p: item.p, title: item.title || ('第' + item.p + '集')
-                }));
-                // 保留 URL 中的 ep 参数
+                episodeList = data.list.map(item => ({ ac: item.ac, p: item.p, title: item.title || ('第' + item.p + '集') }));
                 if (currentEpIdx >= episodeList.length) currentEpIdx = 0;
                 renderEpisodeLists();
                 await loadCurrentEpisode();
@@ -1101,15 +968,12 @@ async function loadAndPlay(anime) {
             }
         } catch (e) {}
     }
-
     if (episodeList.length > 0 && episodeList[0].ac) {
         renderEpisodeLists();
         await loadCurrentEpisode();
         return;
     }
-
     const links = anime.links || {};
-
     const m = (links.a || '').match(/acfun\.cn\/v\/ac(\d+)/);
     if (m) {
         episodeList = [{ ac: m[1], p: 1, title: anime.title }];
@@ -1118,17 +982,13 @@ async function loadAndPlay(anime) {
         await loadCurrentEpisode();
         return;
     }
-
-    const biliUrl = (links.b || '').trim() ||
-                    Object.values(links).find(v => typeof v === 'string' && v.includes('bilibili'));
+    const biliUrl = (links.b || '').trim() || Object.values(links).find(v => typeof v === 'string' && v.includes('bilibili'));
     if (biliUrl) {
         showStatus('此番剧在 B站播放，正在跳转...');
         setTimeout(() => { window.location.href = biliUrl; }, 800);
         return;
     }
-
-    const mfunsUrl = (links.mfuns || '').trim() ||
-                     Object.values(links).find(v => typeof v === 'string' && v.includes('mfuns'));
+    const mfunsUrl = (links.mfuns || '').trim() || Object.values(links).find(v => typeof v === 'string' && v.includes('mfuns'));
     if (mfunsUrl) {
         const mf = mfunsUrl.match(/mfuns\.net\/video\/(\d+)/);
         if (mf) {
@@ -1137,19 +997,13 @@ async function loadAndPlay(anime) {
             return;
         }
     }
-
     showStatus('此番剧暂无播放源');
 }
 
 async function loadCurrentEpisode() {
-    // 竞态控制：每次调用递增序号
     const mySeq = ++loadSeq;
-
     const ep = episodeList[currentEpIdx];
-    if (!ep || !ep.ac) {
-        showStatus('此集暂无可播放的 AcFun 源');
-        return;
-    }
+    if (!ep || !ep.ac) { showStatus('此集暂无可播放的 AcFun 源'); return; }
 
     showStatus('获取视频地址...');
     if (hls) { hls.destroy(); hls = null; }
@@ -1159,28 +1013,14 @@ async function loadCurrentEpisode() {
 
     try {
         const res = await fetch(`${API_BASE}/api/acfun/${ep.ac}?p=1`);
-
-        // 如果中间有新的 loadCurrentEpisode 被触发，丢弃本次结果
-        if (mySeq !== loadSeq) {
-            console.log('[imomoe] 丢弃过期的集数请求 #' + mySeq);
-            return;
-        }
-
+        if (mySeq !== loadSeq) return;
         const data = await res.json();
-        if (!data.ok || !data.urls || !data.urls.length) {
-            showStatus('获取视频失败：' + (data.error || '未知错误'));
-            return;
-        }
+        if (!data.ok || !data.urls || !data.urls.length) { showStatus('获取视频失败：' + (data.error || '未知错误')); return; }
 
         const pages = data.pages || [];
+        if (pages.length > 1) await playMerged(ep.ac, data.urls, pages);
+        else playSingle(data.urls[0]);
 
-        if (pages.length > 1) {
-            await playMerged(ep.ac, data.urls, pages);
-        } else {
-            playSingle(data.urls[0]);
-        }
-
-        // 更新 URL 的 ep 参数（1-based）
         const newUrl = new URL(location.href);
         newUrl.searchParams.set('ep', ep.p || (currentEpIdx + 1));
         history.replaceState({}, '', newUrl);
@@ -1201,28 +1041,16 @@ async function loadCurrentEpisode() {
 }
 
 function playSingle(quality) {
-    if (!quality || !quality.url) {
-        showStatus('无可用清晰度');
-        return;
-    }
+    if (!quality || !quality.url) { showStatus('无可用清晰度'); return; }
     const directUrl = quality.url;
     const isM3u8 = quality.url.includes('.m3u8');
-
     if (hls) { hls.destroy(); hls = null; }
-
     if (isM3u8 && window.Hls && Hls.isSupported()) {
         hls = new Hls({ enableWorker: true });
         hls.loadSource(directUrl);
         hls.attachMedia(video);
-        hls.on(Hls.Events.MANIFEST_PARSED, () => {
-            hideStatus();
-            video.play().catch(() => {});
-            lastDanmuTime = 0;
-        });
-        hls.on(Hls.Events.ERROR, (e, data) => {
-            console.error('HLS 错误：', data);
-            if (data.fatal) showStatus('播放错误：' + (data.details || '未知'));
-        });
+        hls.on(Hls.Events.MANIFEST_PARSED, () => { hideStatus(); video.play().catch(() => {}); lastDanmuTime = 0; });
+        hls.on(Hls.Events.ERROR, (e, data) => { if (data.fatal) showStatus('播放错误：' + (data.details || '未知')); });
     } else {
         video.src = directUrl;
         video.play().catch(() => {});
@@ -1232,7 +1060,6 @@ function playSingle(quality) {
 
 async function playMerged(ac, urls, pages) {
     showStatus('合并分P中...（' + pages.length + ' 个分P）');
-
     const qualityKw = ((urls[0].quality || '').match(/\d+/) || ['1080'])[0];
     let merged = '#EXTM3U\n#EXT-X-VERSION:3\n#EXT-X-PLAYLIST-TYPE:VOD\n';
     let hasContent = false;
@@ -1243,17 +1070,13 @@ async function playMerged(ac, urls, pages) {
             const res = await fetch(`${API_BASE}/api/acfun/${ac}?p=${pg.p}`);
             const pData = await res.json();
             if (!pData.ok || !pData.urls) continue;
-
             const target = pData.urls.find(u => u.quality.includes(qualityKw)) || pData.urls[0];
             if (!target) continue;
-
             const m3u8Res = await fetch(target.url);
             if (!m3u8Res.ok) continue;
             const m3u8Text = await m3u8Res.text();
-
             const baseUrl = target.url.substring(0, target.url.lastIndexOf('/') + 1);
             const targetOrigin = new URL(target.url).origin;
-
             let expectUrl = false;
             for (const line of m3u8Text.split('\n')) {
                 const trimmed = line.trim();
@@ -1265,48 +1088,26 @@ async function playMerged(ac, urls, pages) {
                     expectUrl = true;
                 } else if (expectUrl && !trimmed.startsWith('#')) {
                     let u = trimmed;
-                    if (!u.startsWith('http')) {
-                        u = u.startsWith('/') ? targetOrigin + u : baseUrl + u;
-                    }
+                    if (!u.startsWith('http')) u = u.startsWith('/') ? targetOrigin + u : baseUrl + u;
                     merged += u + '\n';
                     hasContent = true;
                     expectUrl = false;
                 }
             }
             merged += '#EXT-X-DISCONTINUITY\n';
-        } catch (e) {
-            console.warn('P' + pg.p + ' 合并失败：', e.message);
-        }
+        } catch (e) {}
     }
-
-    if (!hasContent) {
-        console.warn('合并失败，回退到单P');
-        playSingle(urls[0]);
-        return;
-    }
-
+    if (!hasContent) { playSingle(urls[0]); return; }
     merged += '#EXT-X-ENDLIST\n';
-    merged = merged.replace(
-        '#EXT-X-PLAYLIST-TYPE:VOD\n',
-        '#EXT-X-PLAYLIST-TYPE:VOD\n#EXT-X-TARGETDURATION:' + Math.ceil(maxDur || 10) + '\n'
-    );
-
+    merged = merged.replace('#EXT-X-PLAYLIST-TYPE:VOD\n', '#EXT-X-PLAYLIST-TYPE:VOD\n#EXT-X-TARGETDURATION:' + Math.ceil(maxDur || 10) + '\n');
     const blob = new Blob([merged], { type: 'application/vnd.apple.mpegurl' });
     const blobUrl = URL.createObjectURL(blob);
-
     if (hls) { hls.destroy(); hls = null; }
     hls = new Hls({ enableWorker: true });
     hls.loadSource(blobUrl);
     hls.attachMedia(video);
-    hls.on(Hls.Events.MANIFEST_PARSED, () => {
-        hideStatus();
-        video.play().catch(() => {});
-        lastDanmuTime = 0;
-    });
-    hls.on(Hls.Events.ERROR, (e, data) => {
-        console.error('HLS 错误：', data);
-        if (data.fatal) showStatus('播放错误：' + (data.details || '未知'));
-    });
+    hls.on(Hls.Events.MANIFEST_PARSED, () => { hideStatus(); video.play().catch(() => {}); lastDanmuTime = 0; });
+    hls.on(Hls.Events.ERROR, (e, data) => { if (data.fatal) showStatus('播放错误：' + (data.details || '未知')); });
 }
 
 async function loadStats(animeId) {
@@ -1314,16 +1115,76 @@ async function loadStats(animeId) {
         const res = await fetch(`${API_BASE}/api/anime/${animeId}/stats`);
         const data = await res.json();
         if (!data.ok) return;
-
-        const statsHtml =
+        document.getElementById('infoStats').innerHTML =
             '<span>' + data.views.toLocaleString() + ' 播放</span>' +
             '<span>' + data.danmu.toLocaleString() + ' 弹幕</span>' +
             '<span>' + data.comments.toLocaleString() + ' 评论</span>';
-
-        document.getElementById('infoStats').innerHTML = statsHtml;
-        document.getElementById('infoStatsMobile').innerHTML = statsHtml;
     } catch (e) {}
 }
+
+async function loadInteract(animeId) {
+    const user = getCurrentUser();
+    const headers = user ? { 'Authorization': 'Bearer ' + user.token } : {};
+    try {
+        const res = await fetch(`${API_BASE}/api/interact/${animeId}`, { headers });
+        const data = await res.json();
+        if (!data.ok) return;
+        interactState.counts = data.counts;
+        interactState.userState = data.userState;
+        renderInteract();
+    } catch (e) {}
+}
+
+function renderInteract() {
+    const c = interactState.counts;
+    const s = interactState.userState;
+    document.getElementById('likeCount').textContent = fmtCount(c.likes);
+    document.getElementById('favCount').textContent = fmtCount(c.favs);
+    document.getElementById('shareCount').textContent = fmtCount(c.shares);
+    document.getElementById('likeBtn').classList.toggle('active', s.liked);
+    document.getElementById('favBtn').classList.toggle('active', s.faved);
+    document.getElementById('shareBtn').classList.toggle('active', s.shared);
+}
+
+async function toggleInteract(type) {
+    const user = getCurrentUser();
+    if (!user) { alert('请先登录'); location.href = './index.html'; return; }
+    if (!currentAnime) return;
+
+    const s = interactState.userState;
+    let action;
+    if (type === 'like') action = s.liked ? 'remove' : 'add';
+    else if (type === 'fav') action = s.faved ? 'remove' : 'add';
+    else if (type === 'share') {
+        if (s.shared) { alert('已经转发过啦'); return; }
+        action = 'add';
+    }
+
+    try {
+        const res = await fetch(`${API_BASE}/api/interact`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + user.token },
+            body: JSON.stringify({ type, animeId: currentAnime.id, action })
+        });
+        const data = await res.json();
+        if (!data.ok) { alert(data.error || '操作失败'); return; }
+
+        if (type === 'like') { s.liked = (action === 'add'); interactState.counts.likes = data.count; }
+        if (type === 'fav') { s.faved = (action === 'add'); interactState.counts.favs = data.count; }
+        if (type === 'share') { s.shared = true; interactState.counts.shares = data.count; }
+        renderInteract();
+
+        if (type === 'share') {
+            const url = location.href;
+            if (navigator.share) navigator.share({ title: document.title, url }).catch(() => {});
+            else { navigator.clipboard?.writeText(url); alert('链接已复制，转发 +1'); }
+        }
+    } catch (e) { alert('网络错误：' + e.message); }
+}
+
+document.getElementById('likeBtn').onclick = () => toggleInteract('like');
+document.getElementById('favBtn').onclick = () => toggleInteract('fav');
+document.getElementById('shareBtn').onclick = () => toggleInteract('share');
 
 async function loadRelated() {
     const box = document.getElementById('relatedList');
@@ -1334,22 +1195,15 @@ async function loadRelated() {
             if (data.ok && Array.isArray(data.list)) allAnimeCache = data.list;
         }
         const list = allAnimeCache.filter(a => a.id !== animeId).slice(0, 20);
-        if (list.length === 0) {
-            box.innerHTML = '<div class="dm-row empty">暂无推荐</div>';
-            return;
-        }
-        box.innerHTML = list.map(a => {
-            return '<a class="related-item" href="./acfun-player.html?iv=iv' + a.id + '">' +
+        if (list.length === 0) { box.innerHTML = '<div class="dm-row empty">暂无推荐</div>'; return; }
+        box.innerHTML = list.map(a =>
+            '<a class="related-item" href="./acfun-player.html?iv=iv' + a.id + '">' +
                 '<div class="cover"><img src="' + escapeHtml(a.coverH || a.coverV) + '" loading="lazy" onerror="this.style.display=\'none\'"></div>' +
-                '<div class="info">' +
-                    '<div class="title">' + escapeHtml(a.title) + '</div>' +
-                    '<div class="sub"><span>' + (a.year || '') + '</span></div>' +
-                '</div>' +
-            '</a>';
-        }).join('');
-    } catch (e) {
-        box.innerHTML = '<div class="dm-row empty">加载失败</div>';
-    }
+                '<div class="info"><div class="title">' + escapeHtml(a.title) + '</div>' +
+                '<div class="sub"><span>' + (a.year || '') + '</span></div></div>' +
+            '</a>'
+        ).join('');
+    } catch (e) { box.innerHTML = '<div class="dm-row empty">加载失败</div>'; }
 }
 
 async function loadDanmu(animeId) {
@@ -1369,41 +1223,30 @@ async function loadDanmu(animeId) {
             }));
         }
     } catch (e) {}
-
     document.getElementById('dmCount').textContent = danmuList.length;
     renderDanmuList();
 }
 
 function renderDanmuList() {
     const box = document.getElementById('dmList');
-    if (danmuList.length === 0) {
-        box.innerHTML = '<div class="dm-row empty">暂无弹幕</div>';
-        return;
-    }
+    if (danmuList.length === 0) { box.innerHTML = '<div class="dm-row empty">暂无弹幕</div>'; return; }
     box.innerHTML = danmuList.slice(0, 100).map(d => {
         const mm = String(Math.floor(d.time / 60)).padStart(2, '0');
         const ss = String(Math.floor(d.time % 60)).padStart(2, '0');
-        return '<div class="dm-row">' +
-            '<span class="t">' + mm + ':' + ss + '</span>' +
+        return '<div class="dm-row"><span class="t">' + mm + ':' + ss + '</span>' +
             '<span class="c">' + escapeHtml(d.content) + '</span>' +
-            '<span class="u">' + escapeHtml(d.username) + '</span>' +
-        '</div>';
+            '<span class="u">' + escapeHtml(d.username) + '</span></div>';
     }).join('');
 }
 
 video.addEventListener('timeupdate', () => {
     const now = video.currentTime;
-    if (now < lastDanmuTime || now - lastDanmuTime > 2) {
-        lastDanmuTime = now;
-        return;
-    }
+    if (now < lastDanmuTime || now - lastDanmuTime > 2) { lastDanmuTime = now; return; }
     const user = getCurrentUser();
     danmuList.forEach(d => {
         if (d.time > lastDanmuTime && d.time <= now) {
             danmuEngine.shoot(d.content, {
-                color: d.color,
-                position: d.position,
-                fontSize: d.fontSize,
+                color: d.color, position: d.position, fontSize: d.fontSize,
                 isSelf: user && user.username === d.username
             });
         }
@@ -1412,9 +1255,7 @@ video.addEventListener('timeupdate', () => {
 });
 
 document.getElementById('dmSend').onclick = sendDanmu;
-document.getElementById('dmInput').addEventListener('keydown', e => {
-    if (e.key === 'Enter') sendDanmu();
-});
+document.getElementById('dmInput').addEventListener('keydown', e => { if (e.key === 'Enter') sendDanmu(); });
 
 async function sendDanmu() {
     const input = document.getElementById('dmInput');
@@ -1423,54 +1264,28 @@ async function sendDanmu() {
     const user = getCurrentUser();
     if (!user) { alert('请先登录'); location.href = './index.html'; return; }
     if (!currentAnime) { alert('番剧信息未加载'); return; }
-
     const btn = document.getElementById('dmSend');
     btn.disabled = true;
-    btn.textContent = '发送中';
+    btn.textContent = '...';
     try {
         const res = await fetch(`${API_BASE}/api/danmu`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + user.token
-            },
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + user.token },
             body: JSON.stringify({
-                animeId: currentAnime.id,
-                content,
-                timeInVideo: video.currentTime,
-                color: sendColor,
-                position: sendPosition,
-                fontSize: sendFontSize
+                animeId: currentAnime.id, content, timeInVideo: video.currentTime,
+                color: sendColor, position: sendPosition, fontSize: sendFontSize
             })
         });
         const data = await res.json();
         if (data.ok) {
             input.value = '';
-            danmuEngine.shoot(content, {
-                color: sendColor,
-                position: sendPosition,
-                fontSize: sendFontSize,
-                isSelf: true
-            });
-            danmuList.push({
-                time: video.currentTime,
-                content,
-                username: user.nickname || user.username,
-                color: sendColor,
-                position: sendPosition,
-                fontSize: sendFontSize
-            });
+            danmuEngine.shoot(content, { color: sendColor, position: sendPosition, fontSize: sendFontSize, isSelf: true });
+            danmuList.push({ time: video.currentTime, content, username: user.nickname || user.username, color: sendColor, position: sendPosition, fontSize: sendFontSize });
             document.getElementById('dmCount').textContent = danmuList.length;
             renderDanmuList();
-        } else {
-            alert(data.error || '发送失败');
-        }
-    } catch (e) {
-        alert('网络错误：' + e.message);
-    } finally {
-        btn.disabled = false;
-        btn.textContent = '发送';
-    }
+        } else { alert(data.error || '发送失败'); }
+    } catch (e) { alert('网络错误：' + e.message); }
+    finally { btn.disabled = false; btn.textContent = '发送'; }
 }
 
 document.getElementById('dmToggle').onclick = function () {
@@ -1485,34 +1300,22 @@ async function loadComments(animeId) {
     const count = document.getElementById('commentCount');
     list.innerHTML = '<div class="comment-loading">加载中...</div>';
     renderCommentInput();
-
     try {
         const res = await fetch(`${API_BASE}/api/comments/${animeId}`);
         const data = await res.json();
-        if (!Array.isArray(data)) {
-            list.innerHTML = '<div class="comment-empty">加载失败</div>';
-            return;
-        }
+        if (!Array.isArray(data)) { list.innerHTML = '<div class="comment-empty">加载失败</div>'; return; }
         commentsData = data;
         count.textContent = data.length;
         renderComments();
-    } catch (e) {
-        list.innerHTML = '<div class="comment-empty">加载失败</div>';
-    }
+    } catch (e) { list.innerHTML = '<div class="comment-empty">加载失败</div>'; }
 }
 
 function renderComments() {
     const list = document.getElementById('commentList');
-    if (commentsData.length === 0) {
-        list.innerHTML = '<div class="comment-empty">还没有评论，来抢沙发~</div>';
-        return;
-    }
+    if (commentsData.length === 0) { list.innerHTML = '<div class="comment-empty">还没有评论，来抢沙发~</div>'; return; }
     let sorted = [...commentsData];
-    if (commentSort === 'hot') {
-        sorted.sort((a, b) => a.id - b.id);
-    } else {
-        sorted.sort((a, b) => b.id - a.id);
-    }
+    if (commentSort === 'hot') sorted.sort((a, b) => a.id - b.id);
+    else sorted.sort((a, b) => b.id - a.id);
     list.innerHTML = sorted.map(c => renderCommentItem(c)).join('');
     list.querySelectorAll('.comment-del').forEach(btn => {
         btn.onclick = async (e) => {
@@ -1528,46 +1331,30 @@ function renderCommentItem(c) {
     const timeStr = formatTime(c.created_at);
     const avatar = (c.username || '匿')[0].toUpperCase();
     const uid = c.uid || 0;
-
     const user = getCurrentUser();
-    const ADMIN_UIDS = [1];
     const isOwner = user && user.uid === uid;
-    const isAdmin = user && ADMIN_UIDS.includes(user.uid);
-    const canDelete = isOwner || isAdmin;
-
-    const delBtn = canDelete
+    const isAdmin = user && [1].includes(user.uid);
+    const delBtn = (isOwner || isAdmin)
         ? '<button class="comment-del" data-cid="' + c.id + '" style="margin-left:auto;padding:2px 8px;font-size:12px;color:#9499a0;background:none;border:1px solid #e3e5e7;border-radius:4px;cursor:pointer;">删除</button>'
         : '';
-
     return '<div class="comment-item" data-cid="' + c.id + '">' +
         '<div class="avatar">' + avatar + '</div>' +
-        '<div class="body">' +
-            '<div class="head" style="display:flex;align-items:center;gap:8px;">' +
-                '<span class="username"><a href="./user.html?uid=' + uid + '">' + escapeHtml(c.username || '匿名') + '</a></span>' +
-                '<span class="time">' + timeStr + '</span>' +
-                delBtn +
-            '</div>' +
-            '<div class="content">' + escapeHtml(c.content) + '</div>' +
+        '<div class="body"><div class="head" style="display:flex;align-items:center;gap:8px;">' +
+            '<span class="username"><a href="./user.html?uid=' + uid + '">' + escapeHtml(c.username || '匿名') + '</a></span>' +
+            '<span class="time">' + timeStr + '</span>' + delBtn +
         '</div>' +
-    '</div>';
+        '<div class="content">' + escapeHtml(c.content) + '</div></div></div>';
 }
 
 function renderCommentInput() {
     const wrap = document.getElementById('commentInputWrap');
     const user = getCurrentUser();
-    if (!user) {
-        wrap.innerHTML = '<div class="comment-login-tip">请先 <a href="./index.html">登录</a> 后发表评论</div>';
-        return;
-    }
+    if (!user) { wrap.innerHTML = '<div class="comment-login-tip">请先 <a href="./index.html">登录</a> 后发表评论</div>'; return; }
     const name = user.nickname || user.username;
-    wrap.innerHTML =
-        '<div class="comment-input-area">' +
-            '<div class="comment-avatar">' + escapeHtml(name[0].toUpperCase()) + '</div>' +
-            '<div class="comment-input-box">' +
-                '<textarea id="commentInput" placeholder="发一条友善的评论"></textarea>' +
-                '<div class="submit-row"><button class="submit-btn" id="commentSend">发布</button></div>' +
-            '</div>' +
-        '</div>';
+    wrap.innerHTML = '<div class="comment-input-area">' +
+        '<div class="comment-avatar">' + escapeHtml(name[0].toUpperCase()) + '</div>' +
+        '<div class="comment-input-box"><textarea id="commentInput" placeholder="发一条友善的评论"></textarea>' +
+        '<div class="submit-row"><button class="submit-btn" id="commentSend">发布</button></div></div></div>';
     document.getElementById('commentSend').onclick = sendComment;
 }
 
@@ -1578,7 +1365,6 @@ async function sendComment() {
     const user = getCurrentUser();
     if (!user) { alert('请先登录'); return; }
     if (!currentAnime) return;
-
     const btn = document.getElementById('commentSend');
     btn.disabled = true;
     btn.textContent = '发布中';
@@ -1589,24 +1375,15 @@ async function sendComment() {
             body: JSON.stringify({ animeId: currentAnime.id, content })
         });
         const data = await res.json();
-        if (data.ok) {
-            input.value = '';
-            loadComments(currentAnime.id);
-        } else {
-            alert(data.error || '发送失败');
-        }
-    } catch (e) {
-        alert('网络错误：' + e.message);
-    } finally {
-        btn.disabled = false;
-        btn.textContent = '发布';
-    }
+        if (data.ok) { input.value = ''; loadComments(currentAnime.id); }
+        else alert(data.error || '发送失败');
+    } catch (e) { alert('网络错误：' + e.message); }
+    finally { btn.disabled = false; btn.textContent = '发布'; }
 }
 
 async function deleteComment(commentId) {
     const user = getCurrentUser();
     if (!user) { alert('请先登录'); return; }
-
     try {
         const res = await fetch(`${API_BASE}/api/comment/${commentId}`, {
             method: 'DELETE',
@@ -1617,26 +1394,20 @@ async function deleteComment(commentId) {
             commentsData = commentsData.filter(c => c.id !== commentId);
             document.getElementById('commentCount').textContent = commentsData.length;
             renderComments();
-        } else {
-            alert(data.error || '删除失败');
-        }
-    } catch (e) {
-        alert('网络错误：' + e.message);
-    }
+        } else alert(data.error || '删除失败');
+    } catch (e) { alert('网络错误：' + e.message); }
 }
 
 function formatTime(str) {
     if (!str) return '';
     const d = new Date(str.replace(' ', 'T') + 'Z');
     if (isNaN(d.getTime())) return str;
-
     const y = d.getFullYear();
     const m = String(d.getMonth() + 1).padStart(2, '0');
     const day = String(d.getDate()).padStart(2, '0');
     const hh = String(d.getHours()).padStart(2, '0');
     const mi = String(d.getMinutes()).padStart(2, '0');
     const absTime = y + '-' + m + '-' + day + ' ' + hh + ':' + mi;
-
     const now = new Date();
     const diff = (now - d) / 1000;
     let rel = '';
@@ -1644,34 +1415,8 @@ function formatTime(str) {
     else if (diff < 3600) rel = Math.floor(diff / 60) + ' 分钟前';
     else if (diff < 86400) rel = Math.floor(diff / 3600) + ' 小时前';
     else if (diff < 86400 * 7) rel = Math.floor(diff / 86400) + ' 天前';
-
     return rel ? (rel + ' · ' + absTime) : absTime;
 }
-
-document.getElementById('likeBtn').onclick = function () {
-    this.classList.toggle('active');
-};
-document.getElementById('favBtn').onclick = function () {
-    this.classList.toggle('active');
-    document.getElementById('favLabel').textContent = this.classList.contains('active') ? '已收藏' : '收藏';
-};
-document.getElementById('shareBtn').onclick = function () {
-    const url = location.href;
-    if (navigator.share) {
-        navigator.share({ title: document.title, url }).catch(() => {});
-    } else {
-        navigator.clipboard?.writeText(url);
-        alert('链接已复制');
-    }
-};
-document.getElementById('followBtn').onclick = function () {
-    this.classList.toggle('on');
-    this.textContent = this.classList.contains('on') ? '已追番' : '+ 追番';
-};
-document.getElementById('followBtnMobile').onclick = function () {
-    this.classList.toggle('on');
-    this.textContent = this.classList.contains('on') ? '已追番' : '+ 追番';
-};
 
 video.onended = () => {
     if (currentEpIdx < episodeList.length - 1) {
