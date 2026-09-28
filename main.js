@@ -212,10 +212,8 @@ function getCardAction(anime, page) {
     return null;
 }
 
+// 卡片上的源角标——按需求隐藏，全部返回空
 function sourceBadgeHTML(source) {
-    if (source === 'acfun') return '<span class="src-badge acfun">A站</span>';
-    if (source === 'mfuns') return '<span class="src-badge mfuns">MFuns</span>';
-    if (source === 'bili') return '<span class="src-badge bili">B站</span>';
     return '';
 }
 
@@ -260,7 +258,6 @@ function rankHTML(anime, i, page) {
             '<div class="title">' + escapeHtml(title) + '</div>' +
             '<div class="meta">' +
                 '<span>▶ ' + fmt(stats.views) + '</span>' +
-                '<span>' + sourceBadgeHTML(source) + '</span>' +
             '</div>' +
         '</div>' +
     '</li>';
@@ -277,9 +274,6 @@ function idxCardHTML(anime) {
         ' data-action-url="' + escapeHtml(action ? action.url : '') + '">' +
         '<div class="idx-cover">' +
             '<img src="' + escapeHtml(anime.coverV) + '" alt="' + escapeHtml(anime.title) + '" loading="lazy">' +
-            '<div class="x" style="position:absolute;right:3px;bottom:3px;background:rgba(0,0,0,.6);color:#fff;padding:0 4px;font-size:11px;line-height:16px;border-radius:2px;">' +
-                sourceBadgeHTML(source) +
-            '</div>' +
         '</div>' +
         '<div class="idx-title">' + escapeHtml(anime.title) + '</div>' +
         '<div class="idx-meta"><span>' + epText + '</span><span>' + ymText + '</span></div>' +
