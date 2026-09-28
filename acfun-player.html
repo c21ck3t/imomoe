@@ -9,28 +9,29 @@
 * { margin:0; padding:0; box-sizing:border-box; }
 html, body {
     font:14px/1.6 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
-    color:#18191c; background:#f1f2f3;
+    color:#18191c; background:#f4f5f7;
     -webkit-font-smoothing:antialiased;
 }
 a { color:inherit; text-decoration:none; }
 button { font-family:inherit; cursor:pointer; border:none; outline:none; background:none; color:inherit; }
 input, textarea { font-family:inherit; outline:none; border:none; }
 
+/* ============ 顶栏 ============ */
 .bili-header {
-    background:#fff; height:56px; padding:0 24px;
-    display:flex; align-items:center; gap:20px;
+    background:#fff; height:56px; padding:0 20px;
+    display:flex; align-items:center; gap:16px;
     box-shadow:0 1px 2px rgba(0,0,0,.04);
     position:sticky; top:0; z-index:100;
 }
-.bili-logo { display:flex; align-items:center; gap:8px; font-size:18px; font-weight:bold; color:#fb7299; }
-.bili-logo svg { width:28px; height:28px; }
-.bili-nav { display:flex; gap:4px; }
-.bili-nav a { padding:6px 12px; font-size:14px; border-radius:6px; }
-.bili-nav a:hover { background:#f1f2f3; }
-.bili-search { margin-left:auto; position:relative; width:320px; }
-.bili-search input { width:100%; height:34px; padding:0 40px 0 14px; background:#f1f2f3; border-radius:17px; font-size:13px; }
-.bili-search .search-icon { position:absolute; right:14px; top:50%; transform:translateY(-50%); color:#9499a0; pointer-events:none; }
-.bili-user { display:flex; align-items:center; gap:10px; font-size:13px; color:#61666d; }
+.bili-logo { display:flex; align-items:center; gap:6px; font-size:16px; font-weight:bold; color:#fb7299; flex-shrink:0; }
+.bili-logo svg { width:26px; height:26px; }
+.bili-nav { display:flex; gap:2px; flex-shrink:0; }
+.bili-nav a { padding:6px 10px; font-size:13px; border-radius:6px; color:#61666d; }
+.bili-nav a:hover { background:#f1f2f3; color:#18191c; }
+.bili-search { margin-left:auto; position:relative; width:280px; }
+.bili-search input { width:100%; height:32px; padding:0 36px 0 14px; background:#f1f2f3; border-radius:16px; font-size:13px; }
+.bili-search .search-icon { position:absolute; right:12px; top:50%; transform:translateY(-50%); color:#9499a0; pointer-events:none; }
+.bili-user { display:flex; align-items:center; gap:8px; font-size:13px; color:#61666d; flex-shrink:0; }
 .bili-user .avatar {
     width:32px; height:32px; border-radius:50%;
     background:linear-gradient(135deg,#fb7299,#fc8bab);
@@ -40,19 +41,17 @@ input, textarea { font-family:inherit; outline:none; border:none; }
 .bili-user .username { color:#00aeec; font-weight:500; }
 .bili-user .login-link { padding:6px 16px; background:#fb7299; color:#fff; border-radius:6px; font-size:13px; font-weight:500; }
 
+/* ============ 主体两栏 ============ */
 .main-container {
-    max-width:1500px; margin:16px auto; padding:0 24px;
-    display:grid; grid-template-columns:minmax(0,1fr) 380px;
-    gap:20px; align-items:flex-start;
+    max-width:1400px; margin:16px auto; padding:0 20px;
+    display:grid; grid-template-columns:minmax(0,1fr) 350px;
+    gap:16px; align-items:flex-start;
 }
 .left-col { min-width:0; }
-.video-info-head { background:#fff; border-radius:8px 8px 0 0; padding:16px 20px 12px; }
-.video-title { font-size:18px; font-weight:600; line-height:1.4; margin-bottom:10px; word-break:break-word; }
-.video-meta-row { display:flex; flex-wrap:wrap; gap:16px; font-size:13px; color:#9499a0; }
-.video-meta-row .meta-item { display:inline-flex; align-items:center; gap:4px; }
-.video-meta-row .meta-item svg { width:16px; height:16px; }
+.right-col { position:sticky; top:72px; }
 
-.player-wrap { background:#000; position:relative; aspect-ratio:16/9; overflow:hidden; }
+/* ============ 播放器 ============ */
+.player-wrap { background:#000; position:relative; aspect-ratio:16/9; overflow:hidden; border-radius:8px 8px 0 0; }
 .player-wrap video { width:100%; height:100%; display:block; background:#000; }
 .player-status {
     position:absolute; inset:0;
@@ -96,46 +95,44 @@ input, textarea { font-family:inherit; outline:none; border:none; }
     100% { opacity:0; }
 }
 .dm-toggle {
-    position:absolute; right:12px; top:12px;
+    position:absolute; right:12px; bottom:12px;
     background:rgba(0,0,0,.5); color:#fff;
-    padding:5px 12px; border-radius:16px; font-size:12px;
-    z-index:4;
+    padding:4px 12px; border-radius:14px; font-size:12px;
+    z-index:6;
 }
 .dm-toggle.off { opacity:.5; }
 
+/* ============ 弹幕输入条 ============ */
 .dm-input-area {
-    background:#fff; padding:12px 20px;
-    display:flex; flex-direction:column; gap:10px;
-    border-top:1px solid #f1f2f3;
+    background:#fff; padding:10px 16px;
+    display:flex; flex-direction:column; gap:8px;
+    border-bottom:1px solid #f1f2f3;
 }
-.dm-input-row { display:flex; gap:10px; align-items:center; }
+.dm-input-row { display:flex; gap:8px; align-items:center; }
 .dm-input-row input[type="text"] {
-    flex:1; background:#f1f2f3; border-radius:20px;
-    padding:9px 16px; font-size:13px; color:#18191c;
+    flex:1; background:#f1f2f3; border-radius:18px;
+    padding:7px 14px; font-size:13px; color:#18191c;
 }
-.dm-input-row input[type="text"]:focus { background:#e3e5e7; }
 .dm-input-row input[type="text"]::placeholder { color:#9499a0; }
 .dm-input-row button.send {
     background:#fb7299; color:#fff;
-    padding:9px 22px; border-radius:20px;
+    padding:7px 18px; border-radius:18px;
     font-size:13px; font-weight:600;
 }
-.dm-input-row button.send:hover { background:#fc8bab; }
 .dm-input-row button.send:disabled { background:#e3e5e7; color:#9499a0; cursor:not-allowed; }
-
-.dm-settings { display:flex; gap:14px; align-items:center; flex-wrap:wrap; font-size:12px; color:#61666d; }
-.dm-settings .group { display:flex; gap:6px; align-items:center; }
+.dm-settings { display:flex; gap:12px; align-items:center; flex-wrap:wrap; font-size:12px; color:#61666d; }
+.dm-settings .group { display:flex; gap:5px; align-items:center; }
 .dm-settings .label { color:#9499a0; }
-.color-dots { display:flex; gap:4px; }
+.color-dots { display:flex; gap:3px; }
 .color-dot {
-    width:18px; height:18px; border-radius:50%;
+    width:16px; height:16px; border-radius:50%;
     cursor:pointer; border:2px solid transparent;
     transition:transform .15s, border-color .15s;
 }
 .color-dot:hover { transform:scale(1.15); }
 .color-dot.on { border-color:#00aeec; transform:scale(1.15); }
 .color-custom {
-    position:relative; width:22px; height:22px;
+    position:relative; width:20px; height:20px;
     border-radius:50%; cursor:pointer;
     background:conic-gradient(red, yellow, lime, aqua, blue, magenta, red);
     border:2px solid #e3e5e7; overflow:hidden;
@@ -146,44 +143,92 @@ input, textarea { font-family:inherit; outline:none; border:none; }
 }
 .btn-group { display:flex; gap:2px; background:#f1f2f3; border-radius:6px; padding:2px; }
 .btn-group button {
-    padding:4px 10px; font-size:12px;
+    padding:3px 9px; font-size:12px;
     color:#61666d; border-radius:4px;
     transition:all .15s;
 }
-.btn-group button:hover { background:#e3e5e7; }
 .btn-group button.on {
     background:#fff; color:#00aeec; font-weight:600;
     box-shadow:0 1px 2px rgba(0,0,0,.06);
 }
 
-.video-toolbar { background:#fff; padding:8px 20px; display:flex; align-items:center; gap:8px; border-top:1px solid #f1f2f3; }
+/* ============ 操作栏 ============ */
+.video-toolbar { background:#fff; padding:12px 16px; display:flex; align-items:center; gap:4px; }
 .toolbar-btn {
-    display:inline-flex; align-items:center; gap:6px;
-    padding:8px 14px; font-size:13px; color:#61666d;
-    border-radius:6px;
+    display:inline-flex; flex-direction:column; align-items:center; gap:2px;
+    padding:6px 16px; font-size:12px; color:#61666d;
+    border-radius:6px; min-width:56px;
 }
 .toolbar-btn:hover { background:#f1f2f3; }
-.toolbar-btn svg { width:22px; height:22px; }
+.toolbar-btn svg { width:24px; height:24px; }
 .toolbar-btn.active { color:#fb7299; }
 .toolbar-btn.active svg { fill:#fb7299; }
 
-.video-desc { background:#fff; padding:16px 20px; font-size:13px; line-height:1.7; border-top:1px solid #f1f2f3; }
-.video-desc.collapsed { max-height:60px; overflow:hidden; }
-.video-desc .toggle-desc { color:#00aeec; cursor:pointer; font-weight:600; margin-left:6px; }
-.video-tags { background:#fff; padding:8px 20px 16px; display:flex; flex-wrap:wrap; gap:8px; border-top:1px solid #f1f2f3; }
-.video-tags .tag {
-    padding:4px 12px; background:#f1f2f3;
-    color:#61666d; border-radius:14px; font-size:12px;
+/* ============ 番剧信息卡 ============ */
+.video-info-card {
+    background:#fff; padding:16px; margin-top:8px;
+    display:flex; gap:16px; border-radius:8px;
 }
-.video-bottom-rounded { background:#fff; height:8px; border-radius:0 0 8px 8px; }
+.video-info-card .cover {
+    width:130px; height:174px; border-radius:6px;
+    overflow:hidden; flex-shrink:0; background:#f1f2f3;
+}
+.video-info-card .cover img { width:100%; height:100%; object-fit:cover; display:block; }
+.video-info-card .info { flex:1; min-width:0; }
+.video-info-card .title {
+    font-size:18px; font-weight:600; line-height:1.4;
+    margin-bottom:8px; word-break:break-word;
+}
+.video-info-card .stat-row {
+    display:flex; gap:14px; font-size:12px; color:#9499a0;
+    margin-bottom:10px; flex-wrap:wrap;
+}
+.video-info-card .meta-line {
+    font-size:13px; color:#61666d; line-height:1.7;
+    margin-bottom:6px; word-break:break-word;
+}
+.video-info-card .meta-line .label { color:#9499a0; margin-right:4px; }
+.video-info-card .desc {
+    font-size:13px; color:#61666d; line-height:1.7;
+    margin-top:6px; word-break:break-word;
+}
+.video-info-card .desc.collapsed {
+    display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical;
+    overflow:hidden;
+}
+.video-info-card .toggle-desc {
+    color:#00aeec; cursor:pointer; font-size:13px;
+    margin-left:4px;
+}
+.video-info-card .actions {
+    display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;
+    align-items:center;
+}
+.btn-follow {
+    padding:6px 20px; background:#fb7299; color:#fff;
+    border-radius:16px; font-size:13px; font-weight:600;
+}
+.btn-follow.on { background:#f1f2f3; color:#61666d; }
+.score-box {
+    display:inline-flex; align-items:baseline; gap:2px;
+    color:#ff8800; font-weight:bold;
+}
+.score-box .num { font-size:18px; }
+.score-box .unit { font-size:12px; }
+.score-box .cnt { color:#9499a0; font-size:11px; font-weight:normal; margin-left:4px; }
 
-.comment-card { background:#fff; border-radius:8px; margin-top:16px; padding:20px 24px; }
+/* ============ 评论卡 ============ */
+.comment-card { background:#fff; border-radius:8px; margin-top:8px; padding:16px 20px; }
 .comment-head {
     font-size:16px; font-weight:600;
-    padding-bottom:16px; border-bottom:1px solid #f1f2f3; margin-bottom:16px;
+    padding-bottom:12px; border-bottom:1px solid #f1f2f3; margin-bottom:14px;
+    display:flex; align-items:center; gap:12px; flex-wrap:wrap;
 }
-.comment-head .count { font-size:13px; font-weight:normal; color:#9499a0; margin-left:8px; }
-.comment-input-area { display:flex; gap:12px; margin-bottom:24px; }
+.comment-head .count { font-size:13px; font-weight:normal; color:#9499a0; }
+.comment-head .tabs { display:flex; gap:12px; margin-left:auto; font-size:13px; font-weight:normal; }
+.comment-head .tabs a { color:#9499a0; padding-bottom:2px; }
+.comment-head .tabs a.on { color:#18191c; font-weight:600; border-bottom:2px solid #fb7299; }
+.comment-input-area { display:flex; gap:12px; margin-bottom:20px; }
 .comment-avatar {
     flex-shrink:0; width:40px; height:40px; border-radius:50%;
     background:linear-gradient(135deg,#fb7299,#fc8bab);
@@ -204,10 +249,10 @@ input, textarea { font-family:inherit; outline:none; border:none; }
 .comment-input-box .submit-btn:disabled { background:#e3e5e7; color:#9499a0; cursor:not-allowed; }
 .comment-login-tip {
     padding:20px; background:#f6f7f8; border-radius:8px;
-    text-align:center; color:#9499a0; font-size:13px; margin-bottom:24px;
+    text-align:center; color:#9499a0; font-size:13px; margin-bottom:20px;
 }
 .comment-login-tip a { color:#fb7299; font-weight:600; }
-.comment-item { display:flex; gap:12px; padding:16px 0; border-bottom:1px solid #f6f7f8; }
+.comment-item { display:flex; gap:12px; padding:14px 0; border-bottom:1px solid #f6f7f8; }
 .comment-item:last-child { border-bottom:none; }
 .comment-item .avatar {
     flex-shrink:0; width:40px; height:40px; border-radius:50%;
@@ -218,65 +263,78 @@ input, textarea { font-family:inherit; outline:none; border:none; }
 .comment-item .body { flex:1; min-width:0; }
 .comment-item .head { display:flex; align-items:baseline; gap:8px; margin-bottom:4px; }
 .comment-item .username { font-size:13px; color:#00aeec; font-weight:600; }
-.comment-item .username a { color:inherit; }
 .comment-item .time { font-size:12px; color:#9499a0; }
 .comment-item .content { font-size:14px; line-height:1.7; word-break:break-word; white-space:pre-wrap; }
 .comment-empty, .comment-loading { text-align:center; color:#9499a0; padding:40px 0; font-size:13px; }
 
-.right-col { position:sticky; top:72px; }
-.up-card { background:#fff; border-radius:8px; padding:16px; margin-bottom:12px; }
-.up-info { display:flex; align-items:center; gap:12px; margin-bottom:14px; }
-.up-avatar {
-    width:48px; height:48px; border-radius:50%;
-    background:linear-gradient(135deg,#00aeec,#0088b8);
-    display:flex; align-items:center; justify-content:center;
-    color:#fff; font-size:18px; font-weight:bold; flex-shrink:0;
+/* ============ 右侧栏 ============ */
+.side-card { background:#fff; border-radius:8px; margin-bottom:12px; overflow:hidden; }
+.side-head {
+    padding:12px 16px; font-size:14px; font-weight:600;
+    border-bottom:1px solid #f1f2f3;
+    display:flex; align-items:center; justify-content:space-between;
 }
-.up-meta { flex:1; min-width:0; }
-.up-name { font-size:14px; font-weight:600; margin-bottom:2px; }
-.up-name a { color:inherit; }
-.up-name a:hover { color:#00aeec; }
-.up-desc { font-size:12px; color:#9499a0; }
-.up-follow-btn {
-    width:100%; padding:8px;
-    background:#fb7299; color:#fff;
-    border-radius:6px; font-size:13px; font-weight:600;
-}
-.pod-card { background:#fff; border-radius:8px; overflow:hidden; }
-.pod-head {
-    display:flex; align-items:center;
-    padding:12px 16px; border-bottom:1px solid #f1f2f3;
-    font-size:14px; font-weight:600;
-}
-.pod-head .amt { font-size:12px; font-weight:normal; color:#9499a0; margin-left:6px; }
-.pod-head .tabs { margin-left:auto; display:flex; gap:4px; }
-.pod-tab { padding:4px 10px; font-size:12px; border-radius:4px; cursor:pointer; }
-.pod-tab.on { background:#e5f4ff; color:#00aeec; font-weight:600; }
-.pod-list { max-height:560px; overflow-y:auto; padding:8px 0; }
-.pod-list::-webkit-scrollbar { width:6px; }
-.pod-list::-webkit-scrollbar-thumb { background:#e3e5e7; border-radius:3px; }
-.ep-item {
-    display:flex; align-items:center; gap:12px;
-    padding:9px 16px; cursor:pointer; font-size:13px;
-}
-.ep-item:hover { background:#f6f7f8; }
-.ep-item.on { background:#fff0f5; color:#fb7299; font-weight:600; }
-.ep-item .ep-num {
-    flex-shrink:0; min-width:28px; height:22px;
-    padding:0 6px; background:#f1f2f3;
-    border-radius:4px;
-    display:flex; align-items:center; justify-content:center;
-    font-size:12px; color:#61666d;
-}
-.ep-item.on .ep-num { background:#fb7299; color:#fff; }
-.ep-item .ep-title { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.ep-item .playing-dot { width:6px; height:6px; background:#fb7299; border-radius:50%; }
+.side-head .amt { font-size:12px; font-weight:normal; color:#9499a0; }
 
+/* 弹幕列表 */
+.dm-list { max-height:260px; overflow-y:auto; padding:8px 0; }
+.dm-list::-webkit-scrollbar { width:6px; }
+.dm-list::-webkit-scrollbar-thumb { background:#e3e5e7; border-radius:3px; }
+.dm-row {
+    padding:6px 16px; font-size:12px;
+    display:flex; gap:10px; align-items:center;
+    color:#61666d;
+}
+.dm-row .t { color:#00aeec; font-weight:600; flex-shrink:0; min-width:36px; }
+.dm-row .c { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:#18191c; }
+.dm-row .u { color:#9499a0; flex-shrink:0; max-width:80px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.dm-row.empty { justify-content:center; color:#9499a0; padding:20px; }
+
+/* 相关推荐 */
+.related-list { padding:8px 0; max-height:600px; overflow-y:auto; }
+.related-list::-webkit-scrollbar { width:6px; }
+.related-list::-webkit-scrollbar-thumb { background:#e3e5e7; border-radius:3px; }
+.related-item {
+    display:flex; gap:10px; padding:8px 16px;
+    cursor:pointer; transition:background .15s;
+}
+.related-item:hover { background:#f6f7f8; }
+.related-item .cover {
+    width:80px; height:50px; border-radius:4px;
+    overflow:hidden; background:#f1f2f3; flex-shrink:0;
+}
+.related-item .cover img { width:100%; height:100%; object-fit:cover; display:block; }
+.related-item .info { flex:1; min-width:0; }
+.related-item .title {
+    font-size:13px; font-weight:500; line-height:1.4;
+    overflow:hidden; text-overflow:ellipsis;
+    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;
+    margin-bottom:4px;
+}
+.related-item .sub { font-size:11px; color:#9499a0; display:flex; gap:8px; }
+
+/* ============ 响应式 ============ */
 @media (max-width:1100px) {
-    .main-container { grid-template-columns:1fr; padding:0 12px; }
+    .main-container { grid-template-columns:1fr; padding:0 12px; margin:12px auto; gap:12px; }
     .right-col { position:static; }
-    .bili-search { width:200px; }
+    .bili-search { width:180px; }
     .bili-nav { display:none; }
+    .video-info-card .cover { width:110px; height:147px; }
+}
+@media (max-width:640px) {
+    .bili-header { padding:0 12px; gap:8px; height:50px; }
+    .bili-logo { font-size:14px; }
+    .bili-logo svg { width:22px; height:22px; }
+    .bili-search { width:120px; }
+    .bili-search input { height:30px; padding:0 30px 0 10px; font-size:12px; }
+    .bili-search .search-icon { right:10px; }
+    .bili-user .avatar { width:28px; height:28px; font-size:12px; }
+    .video-info-card { padding:12px; gap:10px; }
+    .video-info-card .cover { width:90px; height:120px; }
+    .video-info-card .title { font-size:15px; }
+    .toolbar-btn { padding:6px 10px; min-width:48px; font-size:11px; }
+    .toolbar-btn svg { width:20px; height:20px; }
+    .comment-card { padding:14px 14px; }
 }
 </style>
 </head>
@@ -290,6 +348,7 @@ input, textarea { font-family:inherit; outline:none; border:none; }
     <nav class="bili-nav">
         <a href="./index.html">首页</a>
         <a href="./index.html#bangumi">番剧</a>
+        <a href="./index.html#bangumi-index">索引</a>
     </nav>
     <div class="bili-search">
         <input type="text" placeholder="搜索番剧..." id="topSearch">
@@ -302,12 +361,9 @@ input, textarea { font-family:inherit; outline:none; border:none; }
 </div>
 
 <div class="main-container">
+    <!-- 左栏 -->
     <div class="left-col">
-        <div class="video-info-head">
-            <h1 class="video-title" id="videoTitle">加载中...</h1>
-            <div class="video-meta-row" id="videoMeta"></div>
-        </div>
-
+        <!-- 播放器 -->
         <div class="player-wrap">
             <video id="video" controls playsinline preload="metadata"></video>
             <div class="dm-layer" id="dmLayer"></div>
@@ -318,6 +374,7 @@ input, textarea { font-family:inherit; outline:none; border:none; }
             <button class="dm-toggle" id="dmToggle">弹幕 开</button>
         </div>
 
+        <!-- 弹幕发送条 -->
         <div class="dm-input-area">
             <div class="dm-input-row">
                 <input type="text" id="dmInput" placeholder="发个弹幕见证当下..." maxlength="50">
@@ -359,58 +416,70 @@ input, textarea { font-family:inherit; outline:none; border:none; }
             </div>
         </div>
 
+        <!-- 操作栏 -->
         <div class="video-toolbar">
             <button class="toolbar-btn" id="likeBtn">
-                <svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.77 30.86V11.75H7.55c-2.04 0-3.69 1.64-3.69 3.68v11.75c0 2.03 1.65 3.68 3.69 3.68h2.22z M11.99 30.86V11.71c3-1.08 4.7-3.82 5.11-8.37.16-1.78 1.86-2.52 3.48-1.74 1.6.77 2.66 2.73 2.66 5.34 0 1.56-.2 3.17-.59 4.81h7.08c2.04 0 3.7 1.65 3.7 3.7 0 .3-.04.6-.11.88l-2.33 9.47c-.73 2.97-3.4 5.06-6.46 5.06H11.99z"/></svg>
-                <span>点赞</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 22V10l5-8c1 0 2 .9 2 2v5h5.5c1.4 0 2.5 1.1 2.5 2.5l-1.5 8c-.3 1.4-1.5 2.5-3 2.5H7z"/></svg>
+                <span id="likeLabel">点赞</span>
             </button>
             <button class="toolbar-btn" id="favBtn">
-                <svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M19.8 9.26a2.45 2.45 0 0 1-2.45-1.87l-1.88-3.9c-.58-1.3-2.37-1.3-3.03 0l-1.8 3.9a2.45 2.45 0 0 1-2.45 1.87l-3.9.65c-1.32.16-1.88 1.79-.9 2.76l3.19 3.25a2.45 2.45 0 0 1 .9 2.84l-1.4 4.55c-.25 1.38 1.23 2.35 2.45 1.7l3.6-1.95a2.45 2.45 0 0 1 3.19 0l3.6 1.95c1.23.65 2.62-.32 2.45-1.7l-.82-4.55a2.45 2.45 0 0 1 .9-2.84l3.19-3.25c.98-.97.42-2.6-.9-2.76l-3.9-.65z"/></svg>
-                <span>收藏</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg>
+                <span id="favLabel">收藏</span>
             </button>
             <button class="toolbar-btn" id="shareBtn">
-                <svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M12.6 10.33V5.44c0-.8.67-1.44 1.49-1.44.35 0 .69.12.95.34l10.34 8.39c.73.59.82 1.64.22 2.35-.07.08-.14.15-.22.21l-10.34 8.39c-.63.51-1.57.43-2.1-.18-.22-.26-.34-.59-.34-.93v-4.5c-5.01 0-7.24 1.86-10.04 5.47-.1.12-.57.25-.57-.31 0-7 1.9-12.88 10.6-12.88z"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
                 <span>分享</span>
             </button>
         </div>
 
-        <div class="video-desc collapsed" id="videoDesc">
-            <span id="descText">加载中...</span>
-            <span class="toggle-desc" id="toggleDesc">展开更多</span>
+        <!-- 番剧信息卡 -->
+        <div class="video-info-card" id="videoInfoCard">
+            <div class="cover">
+                <img id="infoCover" src="" alt="" onerror="this.style.display='none'">
+            </div>
+            <div class="info">
+                <div class="title" id="infoTitle">加载中...</div>
+                <div class="stat-row" id="infoStats"></div>
+                <div class="meta-line" id="infoMeta"></div>
+                <div class="desc collapsed" id="infoDesc"></div>
+                <div class="actions">
+                    <button class="btn-follow" id="followBtn">+ 追番</button>
+                    <div class="score-box" id="scoreBox" style="display:none;">
+                        <span class="num">0</span><span class="unit">分</span>
+                        <span class="cnt"></span>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div class="video-tags" id="videoTags"></div>
-        <div class="video-bottom-rounded"></div>
-
+        <!-- 评论区 -->
         <div class="comment-card">
-            <div class="comment-head">评论 <span class="count" id="commentCount">0</span></div>
+            <div class="comment-head">
+                评论 <span class="count" id="commentCount">0</span>
+                <div class="tabs">
+                    <a href="javascript:;" class="on" data-sort="hot">最热</a>
+                    <a href="javascript:;" data-sort="new">最新</a>
+                </div>
+            </div>
             <div id="commentInputWrap"></div>
             <div id="commentList"><div class="comment-loading">加载中...</div></div>
         </div>
     </div>
 
+    <!-- 右栏 -->
     <div class="right-col">
-        <div class="up-card">
-            <div class="up-info">
-                <div class="up-avatar" id="upAvatar">樱</div>
-                <div class="up-meta">
-                    <div class="up-name" id="upName">加载中...</div>
-                    <div class="up-desc" id="upDesc">搬运 / 字幕 / 番剧分享</div>
-                </div>
+        <div class="side-card">
+            <div class="side-head">
+                <span>弹幕列表</span>
+                <span class="amt" id="dmCount">0</span>
             </div>
-            <button class="up-follow-btn" id="upFollowBtn">+ 关注</button>
+            <div class="dm-list" id="dmList"><div class="dm-row empty">暂无弹幕</div></div>
         </div>
-
-        <div class="pod-card">
-            <div class="pod-head">
-                <span>选集</span>
-                <span class="amt" id="podAmt"></span>
-                <div class="tabs">
-                    <div class="pod-tab on" data-tab="eps">选集</div>
-                    <div class="pod-tab" data-tab="quality">清晰度</div>
-                </div>
+        <div class="side-card">
+            <div class="side-head">
+                <span>相关推荐</span>
             </div>
-            <div class="pod-list" id="podList"></div>
+            <div class="related-list" id="relatedList"><div class="dm-row empty">加载中...</div></div>
         </div>
     </div>
 </div>
@@ -514,6 +583,9 @@ let lastDanmuTime = 0;
 let currentAnime = null;
 let episodeList = [];
 let currentEpIdx = 0;
+let commentsData = [];
+let commentSort = 'hot';
+let allAnimeCache = [];
 
 let sendColor = '#ffffff';
 let sendPosition = 'scroll';
@@ -534,8 +606,9 @@ function renderUser() {
     const user = getCurrentUser();
     const box = document.getElementById('biliUser');
     if (user) {
-        box.innerHTML = '<a class="avatar" href="./user.html?uid=' + user.uid + '" style="color:#fff">' + escapeHtml(user.username[0].toUpperCase()) + '</a>' +
-                        '<a class="username" href="./user.html?uid=' + user.uid + '">' + escapeHtml(user.username) + '</a>';
+        const name = user.nickname || user.username;
+        box.innerHTML = '<a class="avatar" href="./user.html?uid=' + user.uid + '" style="color:#fff">' + escapeHtml(name[0].toUpperCase()) + '</a>' +
+                        '<a class="username" href="./user.html?uid=' + user.uid + '">' + escapeHtml(name) + '</a>';
     } else {
         box.innerHTML = '<a class="login-link" href="./index.html">登录</a>';
     }
@@ -549,6 +622,7 @@ document.getElementById('topSearch').addEventListener('keydown', (e) => {
     }
 });
 
+// 弹幕颜色/位置/字号
 document.getElementById('colorDots').addEventListener('click', (e) => {
     const dot = e.target.closest('.color-dot');
     if (!dot) return;
@@ -557,12 +631,10 @@ document.getElementById('colorDots').addEventListener('click', (e) => {
     sendColor = dot.dataset.color;
     document.getElementById('colorCustom').value = sendColor;
 });
-
 document.getElementById('colorCustom').addEventListener('input', (e) => {
     sendColor = e.target.value;
     document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('on'));
 });
-
 document.getElementById('positionGroup').addEventListener('click', (e) => {
     const btn = e.target.closest('button');
     if (!btn) return;
@@ -570,13 +642,22 @@ document.getElementById('positionGroup').addEventListener('click', (e) => {
     btn.classList.add('on');
     sendPosition = btn.dataset.pos;
 });
-
 document.getElementById('fontSizeGroup').addEventListener('click', (e) => {
     const btn = e.target.closest('button');
     if (!btn) return;
     document.querySelectorAll('#fontSizeGroup button').forEach(b => b.classList.remove('on'));
     btn.classList.add('on');
     sendFontSize = btn.dataset.size;
+});
+
+// 评论排序 tab
+document.querySelectorAll('.comment-head .tabs a').forEach(a => {
+    a.onclick = () => {
+        document.querySelectorAll('.comment-head .tabs a').forEach(x => x.classList.remove('on'));
+        a.classList.add('on');
+        commentSort = a.dataset.sort;
+        renderComments();
+    };
 });
 
 // 初始化
@@ -618,6 +699,7 @@ async function initByAnimeId(id) {
         await loadStats(currentAnime.id);
         await loadDanmu(currentAnime.id);
         loadComments(currentAnime.id);
+        loadRelated();
         await loadAndPlay(currentAnime);
     } catch (e) {
         showStatus('网络错误：' + e.message);
@@ -637,8 +719,8 @@ async function initByAlbumId(albumId) {
             ac: item.ac, p: item.p, title: item.title || ('第' + item.p + '集')
         }));
         currentEpIdx = 0;
-        document.getElementById('videoTitle').textContent = urlTitle || ('合集 ' + albumId);
-        renderPodList();
+        document.getElementById('infoTitle').textContent = urlTitle || ('合集 ' + albumId);
+        document.title = (urlTitle || ('合集 ' + albumId)) + ' - 櫻花动漫';
         await loadCurrentEpisode();
     } catch (e) {
         showStatus('网络错误：' + e.message);
@@ -649,22 +731,54 @@ async function initByAcId(ac) {
     showStatus('加载视频...');
     episodeList = [{ ac, p: 1, title: urlTitle || '视频' }];
     currentEpIdx = 0;
-    document.getElementById('videoTitle').textContent = urlTitle || '视频';
-    renderPodList();
+    document.getElementById('infoTitle').textContent = urlTitle || '视频';
     await loadCurrentEpisode();
 }
 
 function renderAnimeInfo(anime) {
-    document.getElementById('videoTitle').textContent = anime.title;
     document.title = anime.title + ' - 櫻花动漫';
 
-    document.getElementById('upName').innerHTML =
-        '<a href="./user.html?uid=' + anime.ownerUid + '">' + escapeHtml(anime.ownerName || '匿名') + '</a>';
-    document.getElementById('upAvatar').textContent = (anime.ownerName || '匿')[0].toUpperCase();
-    document.getElementById('descText').textContent = anime.description || '暂无简介';
-    document.getElementById('videoTags').innerHTML =
-        (anime.tags || []).map(t => '<span class="tag">' + escapeHtml(t) + '</span>').join('');
+    document.getElementById('infoTitle').textContent = anime.title;
+    document.getElementById('infoCover').src = anime.coverV || anime.coverH || '';
+    document.getElementById('infoDesc').textContent = anime.description || '暂无简介';
 
+    // 元信息行
+    const metaParts = [];
+    if (anime.year) metaParts.push(anime.year + '年' + (anime.month || ''));
+    if (anime.totalEp) metaParts.push('全' + anime.totalEp + '话');
+    if (anime.duration) metaParts.push('单集 ' + anime.duration);
+    if ((anime.tags || []).length) metaParts.push(anime.tags.join(' · '));
+    document.getElementById('infoMeta').innerHTML =
+        metaParts.map(p => '<span>' + escapeHtml(p) + '</span>').join('　|　');
+
+    // 评分
+    if (anime.score) {
+        const box = document.getElementById('scoreBox');
+        box.style.display = 'inline-flex';
+        box.querySelector('.num').textContent = anime.score;
+    }
+
+    // 简介展开
+    const descEl = document.getElementById('infoDesc');
+    setTimeout(() => {
+        if (descEl.scrollHeight > descEl.clientHeight) {
+            const tog = document.createElement('span');
+            tog.className = 'toggle-desc';
+            tog.textContent = '展开';
+            tog.onclick = () => {
+                if (descEl.classList.contains('collapsed')) {
+                    descEl.classList.remove('collapsed');
+                    tog.textContent = '收起';
+                } else {
+                    descEl.classList.add('collapsed');
+                    tog.textContent = '展开';
+                }
+            };
+            descEl.parentNode.insertBefore(tog, descEl.nextSibling);
+        }
+    }, 100);
+
+    // links 里提取 ac 号
     const links = anime.links || {};
     episodeList = [];
     const collectionMatch = (links.a || '').match(/acfun\.cn\/a\/aa(\d+)/);
@@ -676,14 +790,10 @@ function renderAnimeInfo(anime) {
             episodeList.push({ ac: singleMatch[1], p: 1, title: anime.title });
         }
     }
-    renderPodList();
 }
 
-// ============================================================
-// ⭐ 核心：加载并播放（带自动跳转）
-// ============================================================
 async function loadAndPlay(anime) {
-    // 1. 优先 AcFun 合集
+    // 1. AcFun 合集
     if (anime._collectionId) {
         showStatus('加载合集列表...');
         try {
@@ -694,14 +804,13 @@ async function loadAndPlay(anime) {
                     ac: item.ac, p: item.p, title: item.title || ('第' + item.p + '集')
                 }));
                 currentEpIdx = 0;
-                renderPodList();
                 await loadCurrentEpisode();
                 return;
             }
         } catch (e) {}
     }
 
-    // 2. 有 ac 号，直接播
+    // 2. 有 ac 号
     if (episodeList.length > 0 && episodeList[0].ac) {
         await loadCurrentEpisode();
         return;
@@ -709,42 +818,36 @@ async function loadAndPlay(anime) {
 
     const links = anime.links || {};
 
-    // 3. 兜底：从 links.a 里提取单视频 ac 号
+    // 3. 单视频 ac 号
     const m = (links.a || '').match(/acfun\.cn\/v\/ac(\d+)/);
     if (m) {
         episodeList = [{ ac: m[1], p: 1, title: anime.title }];
         currentEpIdx = 0;
-        renderPodList();
         await loadCurrentEpisode();
         return;
     }
 
-    // 4. ⭐ 没有 AcFun 源，但有 B站链接 → 自动跳 B站
+    // 4. 只有 B站 → 跳转
     const biliUrl = (links.b || '').trim() ||
                     Object.values(links).find(v => typeof v === 'string' && v.includes('bilibili'));
     if (biliUrl) {
         showStatus('此番剧在 B站播放，正在跳转...');
-        setTimeout(() => {
-            window.location.href = biliUrl;
-        }, 800);
+        setTimeout(() => { window.location.href = biliUrl; }, 800);
         return;
     }
 
-    // 5. ⭐ 有 MFuns 链接 → 跳 MFuns 播放页
+    // 5. MFuns
     const mfunsUrl = (links.mfuns || '').trim() ||
                      Object.values(links).find(v => typeof v === 'string' && v.includes('mfuns'));
     if (mfunsUrl) {
         const mf = mfunsUrl.match(/mfuns\.net\/video\/(\d+)/);
         if (mf) {
             showStatus('此番剧在 MFuns 播放，正在跳转...');
-            setTimeout(() => {
-                window.location.href = './player.html?id=' + mf[1];
-            }, 800);
+            setTimeout(() => { window.location.href = './player.html?id=' + mf[1]; }, 800);
             return;
         }
     }
 
-    // 6. 都没有
     showStatus('此番剧暂无播放源');
 }
 
@@ -777,21 +880,9 @@ async function loadCurrentEpisode() {
             playSingle(data.urls[0]);
         }
 
-        if (currentAnime) {
-            document.getElementById('videoTitle').textContent =
-                currentAnime.title + (episodeList.length > 1 ? ' · ' + ep.title : '');
-        }
-
         const newUrl = new URL(location.href);
         newUrl.searchParams.set('ep', ep.p || (currentEpIdx + 1));
         history.replaceState({}, '', newUrl);
-
-        document.querySelectorAll('.ep-item').forEach((el, i) => {
-            el.classList.toggle('on', i === currentEpIdx);
-            const dot = el.querySelector('.playing-dot');
-            if (dot) dot.remove();
-            if (i === currentEpIdx) el.insertAdjacentHTML('beforeend', '<span class="playing-dot"></span>');
-        });
 
         if (currentAnime) {
             fetch(`${API_BASE}/api/view`, {
@@ -864,8 +955,8 @@ async function playMerged(ac, urls, pages) {
                 const trimmed = line.trim();
                 if (!trimmed) continue;
                 if (trimmed.startsWith('#EXTINF')) {
-                    const m = trimmed.match(/#EXTINF:([\d.]+)/);
-                    if (m) maxDur = Math.max(maxDur, parseFloat(m[1]));
+                    const mm = trimmed.match(/#EXTINF:([\d.]+)/);
+                    if (mm) maxDur = Math.max(maxDur, parseFloat(mm[1]));
                     merged += trimmed + '\n';
                     expectUrl = true;
                 } else if (expectUrl && !trimmed.startsWith('#')) {
@@ -920,55 +1011,48 @@ async function loadStats(animeId) {
         const data = await res.json();
         if (!data.ok) return;
 
-        document.getElementById('videoMeta').innerHTML =
-            '<span class="meta-item">' +
-                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>' +
-                data.views.toLocaleString() +
-            '</span>' +
-            '<span class="meta-item">' +
-                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>' +
-                data.danmu.toLocaleString() +
-            '</span>' +
-            '<span class="meta-item">' +
-                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>' +
-                data.comments.toLocaleString() +
-            '</span>' +
-            '<span class="meta-item">' + new Date().toLocaleDateString('zh-CN') + '</span>';
+        document.getElementById('infoStats').innerHTML =
+            '<span>' + data.views.toLocaleString() + ' 播放</span>' +
+            '<span>' + data.danmu.toLocaleString() + ' 弹幕</span>' +
+            '<span>' + data.comments.toLocaleString() + ' 评论</span>';
     } catch (e) {}
 }
 
-function renderPodList() {
-    const list = document.getElementById('podList');
-    const amt = document.getElementById('podAmt');
-    amt.textContent = '（' + (currentEpIdx + 1) + '/' + episodeList.length + '）';
-    if (episodeList.length <= 1) {
-        list.innerHTML = '<div class="comment-loading" style="padding:20px 0;font-size:12px;">单个视频</div>';
-        return;
+// ============================================================
+// 相关推荐
+// ============================================================
+async function loadRelated() {
+    const box = document.getElementById('relatedList');
+    try {
+        if (!allAnimeCache.length) {
+            const res = await fetch(`${API_BASE}/api/animes?scope=all`);
+            const data = await res.json();
+            if (data.ok && Array.isArray(data.list)) allAnimeCache = data.list;
+        }
+        const list = allAnimeCache.filter(a => a.id !== animeId).slice(0, 20);
+        if (list.length === 0) {
+            box.innerHTML = '<div class="dm-row empty">暂无推荐</div>';
+            return;
+        }
+        box.innerHTML = list.map(a => {
+            const links = a.links || {};
+            const src = links.a ? 'A站' : (links.mfuns ? 'MFuns' : (links.b ? 'B站' : ''));
+            return '<a class="related-item" href="./acfun-player.html?iv=iv' + a.id + '">' +
+                '<div class="cover"><img src="' + escapeHtml(a.coverH || a.coverV) + '" loading="lazy" onerror="this.style.display=\'none\'"></div>' +
+                '<div class="info">' +
+                    '<div class="title">' + escapeHtml(a.title) + '</div>' +
+                    '<div class="sub"><span>' + (a.year || '') + '</span><span>' + src + '</span></div>' +
+                '</div>' +
+            '</a>';
+        }).join('');
+    } catch (e) {
+        box.innerHTML = '<div class="dm-row empty">加载失败</div>';
     }
-    list.innerHTML = episodeList.map((ep, idx) =>
-        '<div class="ep-item' + (idx === currentEpIdx ? ' on' : '') + '" data-idx="' + idx + '">' +
-            '<span class="ep-num">' + (idx + 1) + '</span>' +
-            '<span class="ep-title">' + escapeHtml(ep.title) + '</span>' +
-            (idx === currentEpIdx ? '<span class="playing-dot"></span>' : '') +
-        '</div>'
-    ).join('');
-    list.querySelectorAll('.ep-item').forEach(el => {
-        el.onclick = () => {
-            currentEpIdx = parseInt(el.dataset.idx);
-            renderPodList();
-            loadCurrentEpisode();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        };
-    });
 }
 
-document.querySelectorAll('.pod-tab').forEach(tab => {
-    tab.onclick = () => {
-        document.querySelectorAll('.pod-tab').forEach(t => t.classList.remove('on'));
-        tab.classList.add('on');
-    };
-});
-
+// ============================================================
+// 弹幕加载 + 列表
+// ============================================================
 async function loadDanmu(animeId) {
     danmuList = [];
     lastDanmuTime = 0;
@@ -986,6 +1070,26 @@ async function loadDanmu(animeId) {
             }));
         }
     } catch (e) {}
+
+    document.getElementById('dmCount').textContent = danmuList.length;
+    renderDanmuList();
+}
+
+function renderDanmuList() {
+    const box = document.getElementById('dmList');
+    if (danmuList.length === 0) {
+        box.innerHTML = '<div class="dm-row empty">暂无弹幕</div>';
+        return;
+    }
+    box.innerHTML = danmuList.slice(0, 100).map(d => {
+        const mm = String(Math.floor(d.time / 60)).padStart(2, '0');
+        const ss = String(Math.floor(d.time % 60)).padStart(2, '0');
+        return '<div class="dm-row">' +
+            '<span class="t">' + mm + ':' + ss + '</span>' +
+            '<span class="c">' + escapeHtml(d.content) + '</span>' +
+            '<span class="u">' + escapeHtml(d.username) + '</span>' +
+        '</div>';
+    }).join('');
 }
 
 video.addEventListener('timeupdate', () => {
@@ -1052,11 +1156,13 @@ async function sendDanmu() {
             danmuList.push({
                 time: video.currentTime,
                 content,
-                username: user.username,
+                username: user.nickname || user.username,
                 color: sendColor,
                 position: sendPosition,
                 fontSize: sendFontSize
             });
+            document.getElementById('dmCount').textContent = danmuList.length;
+            renderDanmuList();
         } else {
             alert(data.error || '发送失败');
         }
@@ -1087,25 +1193,39 @@ async function loadComments(animeId) {
     try {
         const res = await fetch(`${API_BASE}/api/comments/${animeId}`);
         const data = await res.json();
-        if (!Array.isArray(data) || data.length === 0) {
-            list.innerHTML = '<div class="comment-empty">还没有评论，来抢沙发~</div>';
-            count.textContent = '0';
+        if (!Array.isArray(data)) {
+            list.innerHTML = '<div class="comment-empty">加载失败</div>';
             return;
         }
+        commentsData = data;
         count.textContent = data.length;
-        list.innerHTML = data.map(c => renderCommentItem(c)).join('');
-
-        list.querySelectorAll('.comment-del').forEach(btn => {
-            btn.onclick = async (e) => {
-                e.stopPropagation();
-                const cid = btn.getAttribute('data-cid');
-                if (!confirm('确定删除这条评论？')) return;
-                await deleteComment(cid);
-            };
-        });
+        renderComments();
     } catch (e) {
         list.innerHTML = '<div class="comment-empty">加载失败</div>';
     }
+}
+
+function renderComments() {
+    const list = document.getElementById('commentList');
+    if (commentsData.length === 0) {
+        list.innerHTML = '<div class="comment-empty">还没有评论，来抢沙发~</div>';
+        return;
+    }
+    let sorted = [...commentsData];
+    if (commentSort === 'hot') {
+        sorted.sort((a, b) => a.id - b.id);
+    } else {
+        sorted.sort((a, b) => b.id - a.id);
+    }
+    list.innerHTML = sorted.map(c => renderCommentItem(c)).join('');
+    list.querySelectorAll('.comment-del').forEach(btn => {
+        btn.onclick = async (e) => {
+            e.stopPropagation();
+            const cid = btn.getAttribute('data-cid');
+            if (!confirm('确定删除这条评论？')) return;
+            await deleteComment(cid);
+        };
+    });
 }
 
 function renderCommentItem(c) {
@@ -1120,8 +1240,7 @@ function renderCommentItem(c) {
     const canDelete = isOwner || isAdmin;
 
     const delBtn = canDelete
-        ? '<button class="comment-del" data-cid="' + c.id + '" title="删除评论" ' +
-          'style="margin-left:auto;padding:2px 8px;font-size:12px;color:#9499a0;background:none;border:1px solid #e3e5e7;border-radius:4px;cursor:pointer;">删除</button>'
+        ? '<button class="comment-del" data-cid="' + c.id + '" style="margin-left:auto;padding:2px 8px;font-size:12px;color:#9499a0;background:none;border:1px solid #e3e5e7;border-radius:4px;cursor:pointer;">删除</button>'
         : '';
 
     return '<div class="comment-item" data-cid="' + c.id + '">' +
@@ -1144,9 +1263,10 @@ function renderCommentInput() {
         wrap.innerHTML = '<div class="comment-login-tip">请先 <a href="./index.html">登录</a> 后发表评论</div>';
         return;
     }
+    const name = user.nickname || user.username;
     wrap.innerHTML =
         '<div class="comment-input-area">' +
-            '<div class="comment-avatar">' + escapeHtml(user.username[0].toUpperCase()) + '</div>' +
+            '<div class="comment-avatar">' + escapeHtml(name[0].toUpperCase()) + '</div>' +
             '<div class="comment-input-box">' +
                 '<textarea id="commentInput" placeholder="发一条友善的评论"></textarea>' +
                 '<div class="submit-row"><button class="submit-btn" id="commentSend">发布</button></div>' +
@@ -1194,25 +1314,13 @@ async function deleteComment(commentId) {
     try {
         const res = await fetch(`${API_BASE}/api/comment/${commentId}`, {
             method: 'DELETE',
-            headers: {
-                'Authorization': 'Bearer ' + user.token
-            }
+            headers: { 'Authorization': 'Bearer ' + user.token }
         });
         const data = await res.json();
         if (data.ok) {
-            const item = document.querySelector('.comment-item[data-cid="' + commentId + '"]');
-            if (item) item.remove();
-
-            const countEl = document.getElementById('commentCount');
-            if (countEl) {
-                const n = Math.max(0, (parseInt(countEl.textContent) || 1) - 1);
-                countEl.textContent = n;
-            }
-
-            const list = document.getElementById('commentList');
-            if (list && list.querySelectorAll('.comment-item').length === 0) {
-                list.innerHTML = '<div class="comment-empty">还没有评论，来抢沙发~</div>';
-            }
+            commentsData = commentsData.filter(c => c.id !== commentId);
+            document.getElementById('commentCount').textContent = commentsData.length;
+            renderComments();
         } else {
             alert(data.error || '删除失败');
         }
@@ -1244,19 +1352,15 @@ function formatTime(str) {
     return rel ? (rel + ' · ' + absTime) : absTime;
 }
 
-video.onended = () => {
-    if (currentEpIdx < episodeList.length - 1) {
-        currentEpIdx++;
-        renderPodList();
-        loadCurrentEpisode();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+// ============================================================
+// 工具栏
+// ============================================================
+document.getElementById('likeBtn').onclick = function () {
+    this.classList.toggle('active');
 };
-
-document.getElementById('likeBtn').onclick = function () { this.classList.toggle('active'); };
 document.getElementById('favBtn').onclick = function () {
     this.classList.toggle('active');
-    this.querySelector('span').textContent = this.classList.contains('active') ? '已收藏' : '收藏';
+    document.getElementById('favLabel').textContent = this.classList.contains('active') ? '已收藏' : '收藏';
 };
 document.getElementById('shareBtn').onclick = function () {
     const url = location.href;
@@ -1267,12 +1371,17 @@ document.getElementById('shareBtn').onclick = function () {
         alert('链接已复制');
     }
 };
+document.getElementById('followBtn').onclick = function () {
+    this.classList.toggle('on');
+    this.textContent = this.classList.contains('on') ? '已追番' : '+ 追番';
+};
 
-document.getElementById('toggleDesc').onclick = function () {
-    const desc = document.getElementById('videoDesc');
-    const expanded = !desc.classList.contains('collapsed');
-    desc.classList.toggle('collapsed');
-    this.textContent = expanded ? '展开更多' : '收起';
+video.onended = () => {
+    if (currentEpIdx < episodeList.length - 1) {
+        currentEpIdx++;
+        loadCurrentEpisode();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
 };
 </script>
 
