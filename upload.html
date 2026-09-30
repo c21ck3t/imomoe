@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>投稿 - 櫻花动漫</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body {
+    font:14px/1.6 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+    color:#18191c; background:#f1f2f3;
+    -webkit-font-smoothing:antialiased;
+}
+a { color:inherit; text-decoration:none; }
+button { font-family:inherit; cursor:pointer; border:none; outline:none; background:none; color:inherit; }
+input, textarea, select { font-family:inherit; outline:none; border:none; }
+
+.header {
+    background:#fff; height:56px; padding:0 24px;
+    display:flex; align-items:center; gap:20px;
+    box-shadow:0 1px 2px rgba(0,0,0,.04);
+    position:sticky; top:0; z-index:100;
+}
+.logo { display:flex; align-items:center; gap:8px; font-size:18px; font-weight:bold; color:#fb7299; }
+.logo svg { width:28px; height:28px; }
+.header .spacer { flex:1; }
+.header .user-area { display:flex; align-items:center; gap:10px; font-size:13px; color:#61666d; }
+.header .avatar {
+    width:32px; height:32px; border-radius:50%;
+    background:linear-gradient(135deg,#fb7299,#fc8bab);
+    color:#fff; display:flex; align-items:center; justify-content:center;
+    font-weight:bold; font-size:14px;
+}
+.header .username { color:#00aeec; font-weight:500; }
+.header .back-link { padding:6px 12px; font-size:14px; border-radius:6px; }
+.header .back-link:hover { background:#f1f2f3; }
+
+.wrap { max-width:860px; margin:20px auto; padding:0 24px; }
+
+.page-title {
+    background:#fff; border-radius:8px; padding:16px 20px;
+    margin-bottom:16px;
+    display:flex; align-items:center; justify-content:space-between;
+}
+.page-title h1 { font-size:20px; font-weight:600; }
+.page-title .actions { display:flex; gap:8px; }
+
+.form-card {
+    background:#fff; border-radius:8px;
+    padding:20px 24px;
+    margin-bottom:16px;
+}
+.form-row { margin-bottom:16px; }
+.form-row label {
+    display:block; font-size:13px; color:#61666d;
+    margin-bottom:6px; font-weight:500;
+}
+.form-row label .req { color:#f00; }
+.form-row input[type="text"],
+.form-row input[type="number"],
+.form-row textarea,
+.form-row select {
+    width:100%; padding:8px 12px;
+    background:#f9f9fa; border:1px solid #e3e5e7;
+    border-radius:6px; font-size:13px;
+    color:#18191c;
+    transition:all .15s;
+}
+.form-row input:focus, .form-row textarea:focus { border-color:#00aeec; background:#fff; }
+.form-row textarea { min-height:80px; resize:vertical; }
+.form-row .hint { font-size:12px; color:#9499a0; margin-top:4px; }
+.form-row-flex { display:flex; gap:12px; }
+.form-row-flex > div { flex:1; }
+
+.btn {
+    padding:8px 18px; border-radius:6px;
+    font-size:13px; font-weight:600;
+    display:inline-flex; align-items:center; gap:6px;
+    transition:all .15s;
+}
+.btn-primary { background:#fb7299; color:#fff; }
+.btn-primary:hover { background:#fc8bab; }
+.btn-secondary { background:#f1f2f3; color:#61666d; }
+.btn-secondary:hover { background:#e3e5e7; }
+.btn-mini { padding:4px 10px; font-size:12px; border-radius:4px; }
+
+.form-msg {
+    padding:10px 14px; border-radius:6px;
+    font-size:13px; margin-bottom:16px; display:none;
+}
+.form-msg.err { background:#ffe6e6; color:#f00; display:block; }
+.form-msg.ok { background:#e6f7e6; color:#22aa55; display:block; }
+
+/* 季卡 */
+.season-section {
+    border: 1px solid #e3e5e7;
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    background: #fafbfc;
+}
+.season-section-title {
+    font-size:14px; font-weight:600;
+    margin-bottom:10px;
+    display:flex; align-items:center; justify-content:space-between;
+}
+.season-tabs {
+    display:flex; gap:6px; flex-wrap:wrap;
+    margin-bottom:12px;
+}
+.season-tab {
+    padding:5px 12px; background:#f1f2f3;
+    border-radius:6px; font-size:13px;
+    cursor:pointer; border:1px solid transparent;
+    display:inline-flex; align-items:center; gap:6px;
+}
+.season-tab.on { background:#fff0f5; color:#fb7299; border-color:#fb7299; font-weight:600; }
+.season-tab .del-x {
+    width:16px; height:16px; border-radius:50%;
+    background:rgba(0,0,0,.06); color:#9499a0;
+    display:inline-flex; align-items:center; justify-content:center;
+    font-size:12px; line-height:1; cursor:pointer;
+}
+.season-tab .del-x:hover { background:#f55; color:#fff; }
+
+.season-editor { background:#fff; border-radius:6px; padding:14px 16px; border:1px solid #e3e5e7; }
+
+.eps-editor-head {
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:8px; font-size:13px; font-weight:600;
+}
+.eps-editor-head .count { font-weight:normal; color:#9499a0; font-size:12px; }
+.eps-editor-actions { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px; }
+.eps-list {
+    max-height:320px; overflow-y:auto;
+    border:1px solid #f1f2f3; border-radius:6px;
+    padding:8px; background:#fff;
+}
+.ep-row {
+    display:flex; align-items:center; gap:8px;
+    padding:5px 4px; border-bottom:1px solid #f6f7f8;
+}
+.ep-row:last-child { border-bottom:none; }
+.ep-row .ep-label {
+    flex-shrink:0; min-width:52px;
+    font-size:12px; color:#61666d; font-weight:600;
+}
+.ep-row input {
+    flex:1; padding:5px 10px;
+    background:#f9f9fa; border:1px solid #e3e5e7;
+    border-radius:4px; font-size:12px;
+}
+.ep-row input:focus { border-color:#00aeec; background:#fff; }
+.ep-row .del-btn {
+    flex-shrink:0; width:22px; height:22px;
+    border-radius:50%; color:#9499a0;
+    font-size:14px; line-height:1;
+    display:inline-flex; align-items:center; justify-content:center;
+}
+.ep-row .del-btn:hover { background:#f55; color:#fff; }
+.eps-empty {
+    padding:24px; text-align:center;
+    color:#9499a0; font-size:12px; line-height:1.8;
+}
+
+/* 我的投稿列表 */
+.my-list { background:#fff; border-radius:8px; overflow:hidden; margin-bottom:16px; }
+.my-list-head { padding:14px 20px; border-bottom:1px solid #f1f2f3; font-size:15px; font-weight:600; }
+.my-item {
+    display:flex; align-items:center; gap:14px;
+    padding:14px 20px;
+    border-bottom:1px solid #f1f2f3;
+}
+.my-item:last-child { border-bottom:none; }
+.my-item .cover {
+    width:80px; height:50px; border-radius:4px;
+    overflow:hidden; background:#f1f2f3; flex-shrink:0;
+}
+.my-item .cover img { width:100%; height:100%; object-fit:cover; display:block; }
+.my-item .info { flex:1; min-width:0; }
+.my-item .title { font-size:14px; font-weight:600; margin-bottom:4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.my-item .meta { font-size:12px; color:#9499a0; display:flex; gap:12px; flex-wrap:wrap; }
+.my-item .badge {
+    display:inline-block; padding:1px 8px; border-radius:3px; font-size:11px;
+}
+.my-item .badge.pending { background:#fff0e6; color:#ff8800; }
+.my-item .badge.approved { background:#e6f7ee; color:#22aa55; }
+.my-item .badge.rejected { background:#ffe6e6; color:#f00; }
+.my-item .reason { color:#f55; font-size:12px; margin-top:4px; }
+
+.empty { padding:60px 20px; text-align:center; color:#9499a0; font-size:14px; }
+.empty .emoji { font-size:36px; display:block; margin-bottom:10px; }
+.empty .sub { font-size:12px; color:#b5b9bf; margin-top:6px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+    <a class="logo" href="./index.html">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l7 4.5-7 4.5z"/></svg>
+        櫻花动漫
+    </a>
+    <a class="back-link" href="./index.html">← 返回首页</a>
+    <div class="spacer"></div>
+    <div class="user-area" id="userArea"></div>
+</div>
+
+<div class="wrap" id="wrap">
+    <div class="empty"><span class="emoji">⏳</span>加载中...</div>
+</div>
+
+<script>
+const API_BASE = 'https://api.imomoe.dpdns.org';
+
+const $ = s => document.querySelector(s);
+
+function escapeHtml(str) {
+    return String(str || '').replace(/[&<>"']/g, m => ({
+        '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+    }[m]));
+}
+
+function getCurrentUser() {
+    try {
+        const raw = localStorage.getItem('imomoe_user');
+        return raw ? JSON.parse(raw) : null;
+    } catch { return null; }
+}
+
+let seasonsState = [{ name: '第一季', source: 'direct', url: '', eps: [{ p: 1, title: '', url: '' }] }];
+let currentSeasonIdx = 0;
+
+// ============================================================
+// 用户区
+// ============================================================
+function renderUserArea() {
+    const area = $('#userArea');
+    const user = getCurrentUser();
+    if (user) {
+        area.innerHTML = '<div class="avatar">' + escapeHtml(user.username[0].toUpperCase()) + '</div>' +
+                         '<span class="username">' + escapeHtml(user.username) + '</span>';
+    } else {
+        area.innerHTML = '<a href="./index.html" style="color:#fb7299;font-weight:600;">去登录</a>';
+    }
+}
+
+// ============================================================
+// 主渲染
+// ============================================================
+function render() {
+    const user = getCurrentUser();
+    if (!user) {
+        $('#wrap').innerHTML = '<div class="empty"><span class="emoji">🔒</span>请先登录后再投稿<br><br>' +
+            '<a href="./index.html" style="color:#fb7299;font-weight:600;">→ 去登录</a></div>';
+        return;
+    }
+
+    const html = `
+        <div class="page-title">
+            <h1>投稿视频</h1>
+            <div class="actions">
+                <button class="btn btn-secondary" id="refreshMineBtn">刷新我的投稿</button>
+            </div>
+        </div>
+
+        <div class="form-card">
+            <div class="form-msg" id="formMsg"></div>
+
+            <div class="form-row">
+                <label>标题 <span class="req">*</span></label>
+                <input type="text" id="f-title" placeholder="视频标题" maxlength="100">
+            </div>
+
+            <div class="form-row form-row-flex">
+                <div>
+                    <label>竖版封面链接 <span class="req">*</span></label>
+                    <input type="text" id="f-coverV" placeholder="https://...jpg">
+                </div>
+                <div>
+                    <label>横版封面链接（可空）</label>
+                    <input type="text" id="f-coverH" placeholder="https://...jpg">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <label>简介</label>
+                <textarea id="f-description" placeholder="介绍一下视频内容..."></textarea>
+            </div>
+
+            <div class="form-row">
+                <label>标签（英文逗号分隔）</label>
+                <input type="text" id="f-tags" placeholder="例如：4K, 悬疑, 科幻">
+            </div>
+
+            <div class="form-row form-row-flex">
+                <div><label>年份</label><input type="text" id="f-year" placeholder="2026"></div>
+                <div><label>月份</label><input type="text" id="f-month" placeholder="4月"></div>
+                <div><label>总集数</label><input type="number" id="f-totalEp" placeholder="12"></div>
+                <div><label>评分</label><input type="text" id="f-score" placeholder="9.7"></div>
+            </div>
+
+            <div class="season-section">
+                <div class="season-section-title">
+                    <span>分季 / 分组</span>
+                    <button type="button" class="btn btn-primary btn-mini" id="addSeasonBtn">+ 添加季</button>
+                </div>
+                <div class="season-tabs" id="seasonTabs"></div>
+                <div class="season-editor" id="seasonEditor"></div>
+            </div>
+
+            <div style="text-align:right;">
+                <button class="btn btn-primary" id="submitBtn">提交审核</button>
+            </div>
+        </div>
+
+        <div class="my-list" id="myList">
+            <div class="my-list-head">我的投稿</div>
+            <div class="empty"><span class="emoji">⏳</span>加载中...</div>
+        </div>
+    `;
+
+    $('#wrap').innerHTML = html;
+
+    renderSeasonTabs();
+    renderSeasonEditor();
+    loadMyList();
+
+    $('#addSeasonBtn').onclick = () => {
+        seasonsState.push({ name: '第' + (seasonsState.length + 1) + '季', source: 'direct', url: '', eps: [{ p: 1, title: '', url: '' }] });
+        currentSeasonIdx = seasonsState.length - 1;
+        renderSeasonTabs();
+        renderSeasonEditor();
+    };
+
+    $('#submitBtn').onclick = submitUpload;
+    $('#refreshMineBtn').onclick = loadMyList;
+}
+
+// ============================================================
+// 季 tabs
+// ============================================================
+function renderSeasonTabs() {
+    const box = $('#seasonTabs');
+    if (!box) return;
+    box.innerHTML = seasonsState.map((s, i) =>
+        '<div class="season-tab' + (i === currentSeasonIdx ? ' on' : '') + '" data-idx="' + i + '">' +
+            escapeHtml(s.name || ('第' + (i+1) + '季')) +
+            (seasonsState.length > 1 ? '<span class="del-x" data-del="' + i + '">×</span>' : '') +
+        '</div>'
+    ).join('');
+    box.querySelectorAll('.season-tab').forEach(el => {
+        el.onclick = (e) => {
+            if (e.target.classList.contains('del-x')) {
+                const di = parseInt(e.target.getAttribute('data-del'));
+                if (!confirm('删除「' + seasonsState[di].name + '」？')) return;
+                seasonsState.splice(di, 1);
+                if (currentSeasonIdx >= seasonsState.length) currentSeasonIdx = seasonsState.length - 1;
+                renderSeasonTabs();
+                renderSeasonEditor();
+                return;
+            }
+            currentSeasonIdx = parseInt(el.getAttribute('data-idx'));
+            renderSeasonTabs();
+            renderSeasonEditor();
+        };
+    });
+}
+
+// ============================================================
+// 季编辑器
+// ============================================================
+function renderSeasonEditor() {
+    const box = $('#seasonEditor');
+    if (!box) return;
+    const s = seasonsState[currentSeasonIdx];
+    if (!s) { box.innerHTML = ''; return; }
+
+    let html = '';
+    html += '<div class="form-row">';
+    html += '  <label>季名 / 分组名</label>';
+    html += '  <input type="text" id="s-name" placeholder="例如：第一季 / 剧场版 / OVA" value="' + escapeHtml(s.name || '') + '">';
+    html += '</div>';
+
+    html += '<div class="eps-editor-head">';
+    html += '  <span>集数（只支持直链 mp4/m3u8）</span>';
+    html += '  <span class="count">（' + (s.eps?.length || 0) + ' 集）</span>';
+    html += '</div>';
+
+    html += '<div class="eps-editor-actions">';
+    html += '  <button type="button" class="btn btn-primary btn-mini" id="addEpBtn">+ 添加一集</button>';
+    html += '  <button type="button" class="btn btn-secondary btn-mini" id="batchAddEpBtn">批量添加</button>';
+    html += '  <button type="button" class="btn btn-secondary btn-mini" id="clearEpsBtn">清空所有集</button>';
+    html += '</div>';
+
+    html += '<div class="eps-list" id="epsList"></div>';
+
+    box.innerHTML = html;
+
+    $('#s-name').oninput = () => {
+        s.name = $('#s-name').value;
+        renderSeasonTabs();
+    };
+
+    $('#addEpBtn').onclick = () => {
+        if (!s.eps) s.eps = [];
+        s.eps.push({ p: s.eps.length + 1, title: '', url: '' });
+        renderEpsList(s);
+    };
+    $('#batchAddEpBtn').onclick = () => {
+        const n = parseInt(prompt('要一次添加几集？', '12'));
+        if (!n || n < 1 || n > 200) return;
+        if (!s.eps) s.eps = [];
+        const startP = s.eps.length + 1;
+        for (let i = 0; i < n; i++) s.eps.push({ p: startP + i, title: '', url: '' });
+        renderEpsList(s);
+    };
+    $('#clearEpsBtn').onclick = () => {
+        if (!confirm('清空所有集？')) return;
+        s.eps = [];
+        renderEpsList(s);
+    };
+
+    renderEpsList(s);
+}
+
+function renderEpsList(s) {
+    const box = $('#epsList');
+    if (!box) return;
+
+    if (!s.eps || s.eps.length === 0) {
+        box.innerHTML = '<div class="eps-empty">还没有添加任何集<br><span style="font-size:11px;color:#b5b9bf;">点"+ 添加一集"或"批量添加"开始</span></div>';
+        return;
+    }
+
+    const cntEl = document.querySelector('.eps-editor-head .count');
+    if (cntEl) cntEl.textContent = '（' + s.eps.length + ' 集）';
+
+    box.innerHTML = s.eps.map((ep, i) =>
+        '<div class="ep-row">' +
+            '<span class="ep-label">第' + (ep.p || (i + 1)) + '话</span>' +
+            '<input type="text" data-idx="' + i + '" data-field="url" value="' + escapeHtml(ep.url || '') + '" placeholder="https://...mp4" style="flex:2;">' +
+            '<input type="text" data-idx="' + i + '" data-field="title" value="' + escapeHtml(ep.title || '') + '" placeholder="标题（可空）" style="flex:1;">' +
+            '<button type="button" class="del-btn" data-del-idx="' + i + '">×</button>' +
+        '</div>'
+    ).join('');
+
+    box.querySelectorAll('input[data-idx]').forEach(inp => {
+        inp.oninput = () => {
+            const idx = parseInt(inp.getAttribute('data-idx'));
+            const field = inp.getAttribute('data-field');
+            if (s.eps[idx]) s.eps[idx][field] = inp.value.trim();
+        };
+    });
+    box.querySelectorAll('.del-btn').forEach(btn => {
+        btn.onclick = () => {
+            const idx = parseInt(btn.getAttribute('data-del-idx'));
+            if (!confirm('删除第' + (s.eps[idx].p || (idx+1)) + '话？')) return;
+            s.eps.splice(idx, 1);
+            s.eps.forEach((e, i) => { e.p = i + 1; });
+            renderEpsList(s);
+        };
+    });
+}
+
+// ============================================================
+// 提交投稿
+// ============================================================
+async function submitUpload() {
+    const user = getCurrentUser();
+    if (!user) { alert('请先登录'); return; }
+
+    const msg = $('#formMsg');
+    const btn = $('#submitBtn');
+
+    const title = $('#f-title').value.trim();
+    const coverV = $('#f-coverV').value.trim();
+
+    if (!title) { msg.textContent = '标题必填'; msg.className = 'form-msg err'; return; }
+    if (!coverV || !/^https?:\/\//i.test(coverV)) { msg.textContent = '封面链接必须以 http(s):// 开头'; msg.className = 'form-msg err'; return; }
+
+    // 校验每一集
+    const cleanSeasons = [];
+    for (const s of seasonsState) {
+        const eps = (s.eps || []).filter(e => e.p && e.url && /^https?:\/\//i.test(e.url.trim()));
+        if (eps.length === 0) continue;
+        cleanSeasons.push({
+            name: (s.name || '第一季').trim(),
+            source: 'direct',
+            url: '',
+            eps: eps.map(e => ({ p: parseInt(e.p), title: (e.title || '').trim(), url: e.url.trim() }))
+        });
+    }
+    if (cleanSeasons.length === 0) {
+        msg.textContent = '至少需要一集有效直链（http(s):// 开头）';
+        msg.className = 'form-msg err';
+        return;
+    }
+
+    const payload = {
+        title,
+        coverV,
+        coverH: $('#f-coverH').value.trim(),
+        description: $('#f-description').value.trim(),
+        tags: $('#f-tags').value.trim() ? $('#f-tags').value.split(',').map(s => s.trim()).filter(Boolean) : [],
+        year: $('#f-year').value.trim(),
+        month: $('#f-month').value.trim(),
+        score: parseFloat($('#f-score').value) || 0,
+        totalEp: parseInt($('#f-totalEp').value) || 0,
+        seasons: cleanSeasons
+    };
+
+    btn.disabled = true;
+    btn.textContent = '提交中...';
+
+    try {
+        const res = await fetch(`${API_BASE}/api/upload`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + user.token },
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.ok) {
+            msg.textContent = '提交成功！等待管理员审核';
+            msg.className = 'form-msg ok';
+            // 重置表单
+            seasonsState = [{ name: '第一季', source: 'direct', url: '', eps: [{ p: 1, title: '', url: '' }] }];
+            currentSeasonIdx = 0;
+            $('#f-title').value = '';
+            $('#f-coverV').value = '';
+            $('#f-coverH').value = '';
+            $('#f-description').value = '';
+            $('#f-tags').value = '';
+            $('#f-year').value = '';
+            $('#f-month').value = '';
+            $('#f-totalEp').value = '';
+            $('#f-score').value = '';
+            renderSeasonTabs();
+            renderSeasonEditor();
+            loadMyList();
+        } else {
+            msg.textContent = data.error || '提交失败';
+            msg.className = 'form-msg err';
+        }
+    } catch (e) {
+        msg.textContent = '网络错误：' + e.message;
+        msg.className = 'form-msg err';
+    } finally {
+        btn.disabled = false;
+        btn.textContent = '提交审核';
+    }
+}
+
+// ============================================================
+// 我的投稿列表
+// ============================================================
+async function loadMyList() {
+    const user = getCurrentUser();
+    if (!user) return;
+    const box = $('#myList');
+    if (!box) return;
+
+    try {
+        const res = await fetch(`${API_BASE}/api/upload/mine`, {
+            headers: { 'Authorization': 'Bearer ' + user.token }
+        });
+        const data = await res.json();
+        if (!data.ok) { box.innerHTML = '<div class="my-list-head">我的投稿</div><div class="empty">加载失败</div>'; return; }
+
+        const list = data.list || [];
+        let html = '<div class="my-list-head">我的投稿（' + list.length + '）</div>';
+        if (list.length === 0) {
+            html += '<div class="empty"><span class="emoji">📺</span>还没有投稿<span class="sub">填上面的表单提交吧</span></div>';
+        } else {
+            const statusMap = { pending: '待审核', approved: '已通过', rejected: '已拒绝' };
+            list.forEach(item => {
+                const st = item.status || 'pending';
+                html += '<div class="my-item">' +
+                    '<div class="cover"><img src="' + escapeHtml(item.cover_v || '') + '" onerror="this.style.display=\'none\'"></div>' +
+                    '<div class="info">' +
+                        '<div class="title">' + escapeHtml(item.title) + '</div>' +
+                        '<div class="meta">' +
+                            '<span class="badge ' + st + '">' + (statusMap[st] || st) + '</span>' +
+                            '<span>' + (item.created_at || '') + '</span>' +
+                            (st === 'approved' && item.anime_id ? '<span>→ iv' + item.anime_id + '</span>' : '') +
+                        '</div>' +
+                        (st === 'rejected' && item.reject_reason ? '<div class="reason">拒绝原因：' + escapeHtml(item.reject_reason) + '</div>' : '') +
+                    '</div>' +
+                '</div>';
+            });
+        }
+        box.innerHTML = html;
+    } catch (e) {
+        box.innerHTML = '<div class="my-list-head">我的投稿</div><div class="empty">加载失败</div>';
+    }
+}
+
+renderUserArea();
+render();
+</script>
+
+</body>
+</html>
