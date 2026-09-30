@@ -58,7 +58,7 @@ input, textarea, select { font-family:inherit; outline:none; border:none; }
 .btn-danger { background:#f55; color:#fff; }
 .btn-danger:hover { background:#d44; }
 .btn-sm { padding:4px 10px; font-size:12px; }
-.btn-mini { padding:2px 8px; font-size:11px; border-radius:4px; }
+.btn-mini { padding:4px 10px; font-size:12px; border-radius:4px; }
 
 .list-card { background:#fff; border-radius:8px; overflow:hidden; }
 .list-item {
@@ -93,6 +93,7 @@ input, textarea, select { font-family:inherit; outline:none; border:none; }
 .list-item .meta .badge.acfun { background:#e5f4ff; color:#00aeec; }
 .list-item .meta .badge.bili { background:#ffe6ee; color:#fb7299; }
 .list-item .meta .badge.mfuns { background:#e6f7ee; color:#22aa55; }
+.list-item .meta .badge.direct { background:#f0e6ff; color:#8800ff; }
 .list-item .meta .badge.none { background:#f1f2f3; color:#9499a0; }
 .list-item .meta .badge.ongoing { background:#fff0e6; color:#ff8800; }
 .list-item .meta .badge.finished { background:#e6f7ee; color:#22aa55; }
@@ -104,7 +105,6 @@ input, textarea, select { font-family:inherit; outline:none; border:none; }
 }
 .empty .emoji { font-size:36px; display:block; margin-bottom:10px; }
 
-/* 模态框 */
 .modal-mask {
     position:fixed; inset:0;
     background:rgba(0,0,0,.5);
@@ -172,9 +172,7 @@ input, textarea, select { font-family:inherit; outline:none; border:none; }
 .form-msg.err { background:#ffe6e6; color:#f00; display:block; }
 .form-msg.ok { background:#e6f7e6; color:#22aa55; display:block; }
 
-/* ============================================================
-   分季管理
-   ============================================================ */
+/* 分季 */
 .season-section {
     border: 1px solid #e3e5e7;
     border-radius: 8px;
@@ -231,8 +229,12 @@ input, textarea, select { font-family:inherit; outline:none; border:none; }
     margin-bottom: 8px; font-size: 13px; font-weight: 600;
 }
 .eps-editor-head .count { font-weight:normal; color:#9499a0; font-size:12px; }
+.eps-editor-actions {
+    display: flex; gap: 8px; flex-wrap: wrap;
+    margin-bottom: 10px;
+}
 .eps-list {
-    max-height: 260px; overflow-y:auto;
+    max-height: 320px; overflow-y:auto;
     border: 1px solid #f1f2f3; border-radius:6px;
     padding: 8px;
     background:#fff;
@@ -260,11 +262,26 @@ input, textarea, select { font-family:inherit; outline:none; border:none; }
     font-size: 12px;
 }
 .ep-row input:focus { border-color:#00aeec; background:#fff; }
+.ep-row .del-btn {
+    flex-shrink:0;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    color: #9499a0;
+    font-size: 14px; line-height: 1;
+    display: inline-flex; align-items: center; justify-content: center;
+}
+.ep-row .del-btn:hover { background: #f55; color: #fff; }
 .eps-empty {
-    padding: 20px;
+    padding: 24px;
     text-align: center;
     color: #9499a0;
     font-size: 12px;
+    line-height: 1.8;
+}
+.eps-empty .sub {
+    font-size: 11px;
+    color: #b5b9bf;
+    margin-top: 4px;
 }
 </style>
 </head>
@@ -307,13 +324,9 @@ function getCurrentUser() {
 }
 
 let myAnimes = [];
-// 全局保存当前编辑中的分季状态
 let seasonsState = [];
 let currentSeasonIdx = 0;
 
-// ============================================================
-// 渲染用户区
-// ============================================================
 function renderUserArea() {
     const area = $('#userArea');
     const user = getCurrentUser();
@@ -330,9 +343,6 @@ function renderUserArea() {
     }
 }
 
-// ============================================================
-// 加载我的番剧
-// ============================================================
 async function loadMyAnimes() {
     const user = getCurrentUser();
     if (!user) { renderNoLogin(); return; }
@@ -363,7 +373,7 @@ function getSourceBadge(anime) {
         if (s.source === 'acfun') badges.push('<span class="badge acfun">A站</span>');
         if (s.source === 'bili') badges.push('<span class="badge bili">B站</span>');
         if (s.source === 'mfuns') badges.push('<span class="badge mfuns">MFuns</span>');
-        if (s.source === 'direct') badges.push('<span class="badge">直链</span>');
+        if (s.source === 'direct') badges.push('<span class="badge direct">直链</span>');
     });
     if (badges.length === 0) badges.push('<span class="badge none">无源</span>');
     return badges.join(' ');
@@ -441,9 +451,6 @@ function renderNoLogin() {
         '</div>';
 }
 
-// ============================================================
-// 打开表单
-// ============================================================
 function openForm(editId) {
     const isEdit = editId !== null && editId !== undefined;
     let anime = { links: {}, seasons: [] };
@@ -452,12 +459,15 @@ function openForm(editId) {
         if (found) anime = found;
     }
 
-    // 初始化 seasons 状态
     seasonsState = [];
     if (Array.isArray(anime.seasons) && anime.seasons.length > 0) {
         seasonsState = JSON.parse(JSON.stringify(anime.seasons));
+        // 补全 eps 的 url 字段
+        seasonsState.forEach(s => {
+            if (!Array.isArray(s.eps)) s.eps = [];
+            s.eps.forEach(e => { if (typeof e.url !== 'string') e.url = ''; });
+        });
     } else {
-        // 从老 links 兼容
         const l = anime.links || {};
         if (l.a) seasonsState.push({ name: '第一季', source: 'acfun', url: l.a, eps: [] });
         if (l.mfuns) seasonsState.push({ name: 'MFuns', source: 'mfuns', url: l.mfuns, eps: [] });
@@ -550,7 +560,6 @@ function openForm(editId) {
                     '<textarea id="f-description" placeholder="番剧简介...">' + escapeHtml(anime.description || '') + '</textarea>' +
                 '</div>' +
 
-                // ========== 分季管理 ==========
                 '<div class="season-section">' +
                     '<div class="season-section-title">' +
                         '<span>分季 / 视频源</span>' +
@@ -591,9 +600,6 @@ function openForm(editId) {
     }
 }
 
-// ============================================================
-// 分季 tabs 渲染
-// ============================================================
 function renderSeasonTabs() {
     const box = $('#seasonTabs');
     if (!box) return;
@@ -631,6 +637,8 @@ function renderSeasonEditor() {
     const s = seasonsState[currentSeasonIdx];
     if (!s) { box.innerHTML = ''; return; }
 
+    const isDirect = s.source === 'direct';
+
     let html = '';
     html += '<div class="form-row">';
     html += '  <label>季名 / 分组名</label>';
@@ -642,51 +650,107 @@ function renderSeasonEditor() {
     html += '  <label>来源</label>';
     html += '  <select id="s-source">';
     ['acfun', 'mfuns', 'bili', 'direct'].forEach(src => {
-        const names = { acfun: 'AcFun（合集或单视频）', mfuns: 'MFuns', bili: 'B站（外链）', direct: '直链（mp4/m3u8）' };
+        const names = { acfun: 'AcFun（合集或单视频）', mfuns: 'MFuns', bili: 'B站（外链）', direct: '直链（mp4/m3u8，可多集）' };
         html += '<option value="' + src + '"' + (s.source === src ? ' selected' : '') + '>' + names[src] + '</option>';
     });
     html += '  </select>';
     html += '</div>';
 
-    html += '<div class="form-row">';
-    html += '  <label>链接</label>';
-    html += '  <input type="text" id="s-url" placeholder="https://www.acfun.cn/a/aaXXXXXXX" value="' + escapeHtml(s.url || '') + '">';
-    html += '  <div class="hint" id="urlHint">AcFun 支持合集（/a/aa开头）和单视频（/v/ac开头）</div>';
-    html += '</div>';
+    // 非直链：单个链接输入框
+    if (!isDirect) {
+        html += '<div class="form-row">';
+        html += '  <label>链接</label>';
+        html += '  <input type="text" id="s-url" placeholder="https://www.acfun.cn/a/aaXXXXXXX" value="' + escapeHtml(s.url || '') + '">';
+        html += '  <div class="hint" id="urlHint"></div>';
+        html += '</div>';
+    }
 
-    // 集数编辑区
+    // 集数区
     html += '<div class="eps-editor-head">';
-    html += '  <span>集数标题</span>';
-    html += '  <span class="count">（' + (s.eps?.length || 0) + ' 集已自定义）</span>';
+    html += '  <span>集数</span>';
+    html += '  <span class="count">（' + (s.eps?.length || 0) + ' 集）</span>';
     html += '</div>';
 
-    html += '<div class="eps-editor-head" style="margin-bottom:10px;">';
-    html += '  <button type="button" class="btn btn-secondary btn-mini" id="loadEpsBtn">从 AcFun 自动拉取集数</button>';
-    html += '  <button type="button" class="btn btn-secondary btn-mini" id="clearEpsBtn">清空所有自定义标题</button>';
+    html += '<div class="eps-editor-actions">';
+    if (isDirect) {
+        html += '  <button type="button" class="btn btn-primary btn-mini" id="addEpBtn">+ 添加一集</button>';
+        html += '  <button type="button" class="btn btn-secondary btn-mini" id="batchAddEpBtn">批量添加</button>';
+        html += '  <button type="button" class="btn btn-secondary btn-mini" id="clearEpsBtn">清空所有集</button>';
+    } else {
+        html += '  <button type="button" class="btn btn-secondary btn-mini" id="loadEpsBtn">从 AcFun 自动拉取集数</button>';
+        html += '  <button type="button" class="btn btn-secondary btn-mini" id="addEpBtn">+ 手动加一集</button>';
+        html += '  <button type="button" class="btn btn-secondary btn-mini" id="clearEpsBtn">清空所有自定义标题</button>';
+    }
     html += '</div>';
 
     html += '<div class="eps-list" id="epsList"></div>';
 
     box.innerHTML = html;
 
-    // 事件
     $('#s-name').oninput = () => {
         s.name = $('#s-name').value;
         renderSeasonTabs();
     };
     $('#s-source').onchange = () => {
+        const oldSource = s.source;
         s.source = $('#s-source').value;
-        updateUrlHint();
-    };
-    $('#s-url').oninput = () => { s.url = $('#s-url').value; };
-    $('#loadEpsBtn').onclick = () => loadAcfunEps(s);
-    $('#clearEpsBtn').onclick = () => {
-        if (!confirm('清空所有自定义标题？所有集会恢复默认"第N话"')) return;
-        s.eps = [];
-        renderEpsList(s);
+        // 从非直链切到直链，或反之：清理不相干数据
+        if (s.source === 'direct' && oldSource !== 'direct') {
+            s.url = '';
+            // 如果 eps 里没 url，保留标题，清空 url
+            s.eps = (s.eps || []).map(e => ({ p: e.p, title: e.title || '', url: '' }));
+        }
+        if (s.source !== 'direct' && oldSource === 'direct') {
+            s.eps = (s.eps || []).map(e => ({ p: e.p, title: e.title || '' }));
+        }
+        renderSeasonEditor();
     };
 
-    updateUrlHint();
+    if (!isDirect) {
+        const urlInput = $('#s-url');
+        if (urlInput) {
+            urlInput.oninput = () => { s.url = urlInput.value; };
+        }
+        updateUrlHint();
+    }
+
+    if (isDirect) {
+        $('#addEpBtn').onclick = () => {
+            const nextP = (s.eps?.length || 0) + 1;
+            if (!s.eps) s.eps = [];
+            s.eps.push({ p: nextP, title: '', url: '' });
+            renderEpsList(s);
+        };
+        $('#batchAddEpBtn').onclick = () => {
+            const n = parseInt(prompt('要一次添加几集？（例如 12）', '12'));
+            if (!n || n < 1 || n > 200) return;
+            if (!s.eps) s.eps = [];
+            const startP = s.eps.length + 1;
+            for (let i = 0; i < n; i++) {
+                s.eps.push({ p: startP + i, title: '', url: '' });
+            }
+            renderEpsList(s);
+        };
+        $('#clearEpsBtn').onclick = () => {
+            if (!confirm('清空所有集？')) return;
+            s.eps = [];
+            renderEpsList(s);
+        };
+    } else {
+        $('#loadEpsBtn').onclick = () => loadAcfunEps(s);
+        $('#addEpBtn').onclick = () => {
+            const nextP = (s.eps?.length || 0) + 1;
+            if (!s.eps) s.eps = [];
+            s.eps.push({ p: nextP, title: '' });
+            renderEpsList(s);
+        };
+        $('#clearEpsBtn').onclick = () => {
+            if (!confirm('清空所有自定义标题？所有集会恢复默认"第N话"')) return;
+            s.eps = [];
+            renderEpsList(s);
+        };
+    }
+
     renderEpsList(s);
 }
 
@@ -698,7 +762,6 @@ function updateUrlHint() {
         acfun: 'AcFun 支持合集（/a/aa开头）和单视频（/v/ac开头）',
         mfuns: 'MFuns 视频链接，例如 https://www.mfuns.net/video/12345',
         bili: 'B站链接，会以外链新窗口打开',
-        direct: '直链 URL，例如 https://cdn.com/video.mp4 或 .m3u8',
     };
     hint.textContent = hints[s.source] || '';
 }
@@ -706,31 +769,57 @@ function updateUrlHint() {
 function renderEpsList(s) {
     const box = $('#epsList');
     if (!box) return;
+    const isDirect = s.source === 'direct';
+
     if (!s.eps || s.eps.length === 0) {
-        box.innerHTML = '<div class="eps-empty">还没有自定义集数，点上方按钮自动拉取，或直接按默认"第N话"显示</div>';
+        if (isDirect) {
+            box.innerHTML = '<div class="eps-empty">还没有添加任何集<br><span class="sub">点上方"+ 添加一集"或"批量添加"开始</span></div>';
+        } else {
+            box.innerHTML = '<div class="eps-empty">还没有自定义集数<br><span class="sub">点"+ 手动加一集"补充标题，或点"自动拉取集数"从 AcFun 拉</span></div>';
+        }
         return;
     }
-    box.innerHTML = s.eps.map((ep, i) =>
-        '<div class="ep-row">' +
-            '<span class="ep-label">第' + (ep.p || (i + 1)) + '话</span>' +
-            '<input type="text" data-p="' + (ep.p || (i + 1)) + '" value="' + escapeHtml(ep.title || '') + '" placeholder="留空则显示 第' + (ep.p || (i + 1)) + '话">' +
-        '</div>'
-    ).join('');
 
-    box.querySelectorAll('input[data-p]').forEach(inp => {
+    // 更新计数
+    const cntEl = document.querySelector('.eps-editor-head .count');
+    if (cntEl) cntEl.textContent = '（' + s.eps.length + ' 集）';
+
+    box.innerHTML = s.eps.map((ep, i) => {
+        if (isDirect) {
+            return '<div class="ep-row">' +
+                '<span class="ep-label">第' + (ep.p || (i + 1)) + '话</span>' +
+                '<input type="text" data-idx="' + i + '" data-field="url" value="' + escapeHtml(ep.url || '') + '" placeholder="直链 URL（mp4/m3u8）" style="flex:2;">' +
+                '<input type="text" data-idx="' + i + '" data-field="title" value="' + escapeHtml(ep.title || '') + '" placeholder="标题（可空）" style="flex:1;">' +
+                '<button type="button" class="del-btn" data-del-idx="' + i + '">×</button>' +
+            '</div>';
+        } else {
+            return '<div class="ep-row">' +
+                '<span class="ep-label">第' + (ep.p || (i + 1)) + '话</span>' +
+                '<input type="text" data-idx="' + i + '" data-field="title" value="' + escapeHtml(ep.title || '') + '" placeholder="留空则显示 第' + (ep.p || (i + 1)) + '话">' +
+                '<button type="button" class="del-btn" data-del-idx="' + i + '">×</button>' +
+            '</div>';
+        }
+    }).join('');
+
+    box.querySelectorAll('input[data-idx]').forEach(inp => {
         inp.oninput = () => {
-            const p = parseInt(inp.getAttribute('data-p'));
-            const val = inp.value.trim();
-            const found = s.eps.find(e => e.p === p);
-            if (found) found.title = val;
-            else s.eps.push({ p, title: val });
+            const idx = parseInt(inp.getAttribute('data-idx'));
+            const field = inp.getAttribute('data-field');
+            if (s.eps[idx]) s.eps[idx][field] = inp.value.trim();
+        };
+    });
+    box.querySelectorAll('.del-btn').forEach(btn => {
+        btn.onclick = () => {
+            const idx = parseInt(btn.getAttribute('data-del-idx'));
+            if (!confirm('删除第' + (s.eps[idx].p || (idx+1)) + '话？')) return;
+            s.eps.splice(idx, 1);
+            // 重排 p
+            s.eps.forEach((e, i) => { e.p = i + 1; });
+            renderEpsList(s);
         };
     });
 }
 
-// ============================================================
-// 从 AcFun 拉取集数（调用 Worker 现成的合集/单视频接口）
-// ============================================================
 async function loadAcfunEps(s) {
     if (s.source !== 'acfun') {
         alert('只有 AcFun 源支持自动拉取集数');
@@ -746,7 +835,6 @@ async function loadAcfunEps(s) {
     btn.textContent = '拉取中...';
 
     try {
-        // 合集
         const collectionMatch = s.url.match(/acfun\.cn\/a\/aa(\d+)/);
         if (collectionMatch) {
             const res = await fetch(`${API_BASE}/api/acfun-collection/${collectionMatch[1]}`);
@@ -755,7 +843,6 @@ async function loadAcfunEps(s) {
                 alert('拉取失败：' + (data.error || '无返回集数'));
                 return;
             }
-            // 保留用户已填的标题
             const oldEps = s.eps || [];
             s.eps = data.list.map(item => {
                 const prev = oldEps.find(e => e.p === item.p);
@@ -767,7 +854,6 @@ async function loadAcfunEps(s) {
             return;
         }
 
-        // 单视频
         const singleMatch = s.url.match(/acfun\.cn\/v\/ac(\d+)/);
         if (singleMatch) {
             s.eps = [{ p: 1, title: '' }];
@@ -785,9 +871,6 @@ async function loadAcfunEps(s) {
     }
 }
 
-// ============================================================
-// 提交
-// ============================================================
 async function submitForm(editId) {
     const user = getCurrentUser();
     if (!user) { alert('请先登录'); return; }
@@ -799,10 +882,16 @@ async function submitForm(editId) {
     if (!title) { msg.textContent = '标题必填'; msg.className = 'form-msg err'; return; }
     if (!coverV) { msg.textContent = '竖版封面必填'; msg.className = 'form-msg err'; return; }
 
-    // 校验至少一个季有链接
-    const validSeasons = seasonsState.filter(s => s.url && s.url.trim());
+    // 校验
+    const validSeasons = seasonsState.filter(s => {
+        if (s.source === 'direct') {
+            // 直链：至少有一集带 url
+            return (s.eps || []).some(e => e.url && e.url.trim());
+        }
+        return s.url && s.url.trim();
+    });
     if (validSeasons.length === 0) {
-        msg.textContent = '至少要填一个季/源的链接'; msg.className = 'form-msg err'; return;
+        msg.textContent = '至少要填一个有内容的季/源'; msg.className = 'form-msg err'; return;
     }
 
     const payload = {
@@ -821,12 +910,19 @@ async function submitForm(editId) {
         duration: $('#f-duration').value.trim() || '24:00',
         score: parseFloat($('#f-score').value) || 0,
         description: $('#f-description').value.trim(),
-        seasons: validSeasons.map(s => ({
-            name: s.name || '第一季',
-            source: s.source || 'acfun',
-            url: s.url.trim(),
-            eps: (s.eps || []).filter(e => e.p)
-        }))
+        seasons: validSeasons.map(s => {
+            const cleanEps = (s.eps || []).filter(e => e.p).map(e => {
+                const out = { p: parseInt(e.p), title: (e.title || '').trim() };
+                if (s.source === 'direct') out.url = (e.url || '').trim();
+                return out;
+            });
+            return {
+                name: s.name || '第一季',
+                source: s.source || 'acfun',
+                url: s.source === 'direct' ? '' : (s.url || '').trim(),
+                eps: cleanEps
+            };
+        })
     };
 
     const submitBtn = $('#formSubmit');
@@ -871,9 +967,6 @@ async function submitForm(editId) {
     }
 }
 
-// ============================================================
-// 删除番剧
-// ============================================================
 async function deleteAnime(id) {
     const user = getCurrentUser();
     if (!user) { alert('请先登录'); return; }
