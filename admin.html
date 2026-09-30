@@ -50,7 +50,6 @@ input, textarea, select { font-family:inherit; outline:none; border:none; }
     font-size:13px; font-weight:600;
     transition:all .15s;
     display:inline-flex; align-items:center; gap:6px;
-    position:relative;
 }
 .btn-primary { background:#fb7299; color:#fff; }
 .btn-primary:hover { background:#fc8bab; }
@@ -98,6 +97,11 @@ input, textarea, select { font-family:inherit; outline:none; border:none; }
 .list-item .meta .badge.none { background:#f1f2f3; color:#9499a0; }
 .list-item .meta .badge.ongoing { background:#fff0e6; color:#ff8800; }
 .list-item .meta .badge.finished { background:#e6f7ee; color:#22aa55; }
+.list-item .meta .owner {
+    color:#00aeec; font-weight:600;
+    background:#e5f4ff;
+    padding:1px 8px; border-radius:3px;
+}
 .list-item .ops { display:flex; gap:6px; flex-shrink:0; }
 
 .empty {
@@ -303,9 +307,7 @@ input, textarea, select { font-family:inherit; outline:none; border:none; }
     margin-bottom:12px;
     background:#fff;
 }
-.review-item .row {
-    display:flex; gap:12px;
-}
+.review-item .row { display:flex; gap:12px; }
 .review-item .cover {
     width:80px; height:107px;
     object-fit:cover;
@@ -314,10 +316,7 @@ input, textarea, select { font-family:inherit; outline:none; border:none; }
     flex-shrink:0;
 }
 .review-item .info { flex:1; min-width:0; }
-.review-item .title {
-    font-size:15px; font-weight:600; margin-bottom:6px;
-    word-break:break-word;
-}
+.review-item .title { font-size:15px; font-weight:600; margin-bottom:6px; word-break:break-word; }
 .review-item .meta-line {
     font-size:12px; color:#9499a0;
     margin-bottom:6px;
@@ -330,19 +329,12 @@ input, textarea, select { font-family:inherit; outline:none; border:none; }
     overflow:hidden;
     margin-bottom:8px;
 }
-.review-item .season-summary {
-    font-size:12px; color:#61666d;
-    margin-bottom:10px;
-}
+.review-item .season-summary { font-size:12px; color:#61666d; margin-bottom:10px; }
 .review-item .ops { display:flex; gap:8px; flex-wrap:wrap; }
-.review-item .status-badge {
-    font-size:12px; color:#9499a0;
-    padding:4px 0;
-}
+.review-item .status-badge { font-size:12px; color:#9499a0; padding:4px 0; }
 .review-item .status-badge.ok { color:#22aa55; }
 .review-item .status-badge.err { color:#f00; }
 
-/* 详情展开 */
 .review-detail {
     margin-top:12px;
     padding:12px 14px;
@@ -355,20 +347,24 @@ input, textarea, select { font-family:inherit; outline:none; border:none; }
     display:none;
 }
 .review-detail.open { display:block; }
-.review-detail .season-title {
-    font-weight:600; color:#18191c;
-    margin-top:6px; margin-bottom:4px;
+.review-detail .season-title { font-weight:600; color:#18191c; margin-top:6px; margin-bottom:4px; }
+.review-detail .ep-line { color:#61666d; padding-left:12px; word-break:break-all; }
+.review-detail .ep-url { color:#00aeec; font-size:11px; padding-left:24px; word-break:break-all; }
+
+/* 拒绝访问 */
+.denied {
+    max-width:480px; margin:80px auto;
+    background:#fff; border-radius:10px;
+    padding:40px 32px; text-align:center;
+    box-shadow:0 2px 12px rgba(0,0,0,.06);
 }
-.review-detail .ep-line {
-    color:#61666d;
-    padding-left:12px;
-    word-break:break-all;
-}
-.review-detail .ep-url {
-    color:#00aeec;
-    font-size:11px;
-    padding-left:24px;
-    word-break:break-all;
+.denied .emoji { font-size:48px; display:block; margin-bottom:16px; }
+.denied h2 { font-size:20px; font-weight:600; margin-bottom:12px; }
+.denied p { color:#9499a0; font-size:13px; line-height:1.8; margin-bottom:20px; }
+.denied a {
+    display:inline-block; padding:8px 24px;
+    background:#fb7299; color:#fff; border-radius:6px;
+    font-size:13px; font-weight:600;
 }
 </style>
 </head>
@@ -393,9 +389,9 @@ input, textarea, select { font-family:inherit; outline:none; border:none; }
 
 <script>
 const API_BASE = 'https://api.imomoe.dpdns.org';
+const ADMIN_UID = 1;
 
 const $ = s => document.querySelector(s);
-const $$ = s => Array.from(document.querySelectorAll(s));
 
 function escapeHtml(str) {
     return String(str || '').replace(/[&<>"']/g, m => ({
@@ -412,10 +408,10 @@ function getCurrentUser() {
 
 function isAdmin() {
     const u = getCurrentUser();
-    return u && u.uid === 1;
+    return u && Number(u.uid) === ADMIN_UID;
 }
 
-let myAnimes = [];
+let allAnimes = [];
 let seasonsState = [];
 let currentSeasonIdx = 0;
 
@@ -439,22 +435,52 @@ function renderUserArea() {
 }
 
 // ============================================================
-// 加载我的番剧
+// 拒绝访问
 // ============================================================
-async function loadMyAnimes() {
-    const user = getCurrentUser();
-    if (!user) { renderNoLogin(); return; }
+function renderDenied(reason) {
+    $('#wrap').innerHTML =
+        '<div class="denied">' +
+            '<span class="emoji">🔒</span>' +
+            '<h2>无权访问</h2>' +
+            '<p>' + escapeHtml(reason) + '</p>' +
+            '<a href="./index.html">返回首页</a>' +
+        '</div>';
+}
 
+// ============================================================
+// 启动
+// ============================================================
+function boot() {
+    renderUserArea();
+
+    const user = getCurrentUser();
+    if (!user) {
+        renderDenied('请先登录管理员账号');
+        return;
+    }
+
+    if (!isAdmin()) {
+        renderDenied('此页面仅管理员可访问。你的 UID 是 ' + user.uid + '，管理员 UID 是 ' + ADMIN_UID + '。');
+        return;
+    }
+
+    loadAllAnimes();
+}
+
+// ============================================================
+// 加载全部番剧（管理员视角）
+// ============================================================
+async function loadAllAnimes() {
     $('#wrap').innerHTML = '<div class="empty"><span class="emoji">⏳</span>加载中...</div>';
 
     try {
-        const res = await fetch(`${API_BASE}/api/user/${user.uid}/animes`);
+        const res = await fetch(`${API_BASE}/api/animes?scope=all`);
         const data = await res.json();
         if (!data.ok) {
             $('#wrap').innerHTML = '<div class="empty"><span class="emoji">😢</span>加载失败：' + escapeHtml(data.error || '未知错误') + '</div>';
             return;
         }
-        myAnimes = data.list || [];
+        allAnimes = data.list || [];
         renderList();
     } catch (e) {
         $('#wrap').innerHTML = '<div class="empty"><span class="emoji">😢</span>网络错误：' + escapeHtml(e.message) + '</div>';
@@ -484,26 +510,25 @@ function getAirBadge(anime) {
 
 function renderList() {
     const user = getCurrentUser();
-    if (!user) { renderNoLogin(); return; }
+    if (!user || !isAdmin()) { boot(); return; }
 
     let html = '';
     html += '<div class="toolbar">';
-    html += '  <h1>我的番剧 <span style="font-size:14px;color:#9499a0;font-weight:normal;">（共 ' + myAnimes.length + ' 部）</span></h1>';
+    html += '  <h1>全部番剧 <span style="font-size:14px;color:#9499a0;font-weight:normal;">（共 ' + allAnimes.length + ' 部）</span></h1>';
     html += '  <div class="actions">';
-    if (isAdmin()) {
-        html += '    <button class="btn btn-secondary" id="reviewBtn">审核投稿 <span id="pendingCount" style="display:none;background:#f00;color:#fff;border-radius:10px;padding:0 6px;font-size:11px;margin-left:4px;line-height:16px;"></span></button>';
-    }
+    html += '    <button class="btn btn-secondary" id="reviewBtn">审核投稿 <span id="pendingCount" style="display:none;background:#f00;color:#fff;border-radius:10px;padding:0 6px;font-size:11px;margin-left:4px;line-height:16px;"></span></button>';
     html += '    <button class="btn btn-primary" id="newBtn">+ 添加番剧</button>';
     html += '  </div>';
     html += '</div>';
 
-    if (myAnimes.length === 0) {
+    if (allAnimes.length === 0) {
         html += '<div class="list-card"><div class="empty">';
-        html += '<span class="emoji">📺</span>还没有添加任何番剧，点上方按钮开始吧~';
+        html += '<span class="emoji">📺</span>还没有任何番剧';
         html += '</div></div>';
     } else {
         html += '<div class="list-card">';
-        myAnimes.forEach(a => {
+        allAnimes.forEach(a => {
+            const ownerLabel = a.ownerName ? escapeHtml(a.ownerName) : ('UID ' + a.ownerUid);
             html += '<div class="list-item">';
             html += '  <div class="cover"><img src="' + escapeHtml(a.coverH || a.coverV) + '" onerror="this.src=\'data:image/svg+xml;utf8,' +
                 encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="80" height="50"><rect width="80" height="50" fill="#e2e2e2"/></svg>') + '\'"></div>';
@@ -514,6 +539,7 @@ function renderList() {
             html += '      <span>' + getSourceBadge(a) + '</span>';
             html += '      <span>' + getAirBadge(a) + '</span>';
             html += '      <span>' + (a.year || '') + '年' + (a.month || '') + '</span>';
+            html += '      <span class="owner">👤 ' + ownerLabel + '</span>';
             html += '      <span>' + ((a.seasons?.length || 0)) + ' 个季/源</span>';
             html += '    </div>';
             html += '  </div>';
@@ -530,10 +556,8 @@ function renderList() {
     $('#wrap').innerHTML = html;
 
     $('#newBtn').onclick = () => openForm(null);
-    if (isAdmin()) {
-        $('#reviewBtn').onclick = openReviewPanel;
-        loadPendingCount();
-    }
+    $('#reviewBtn').onclick = openReviewPanel;
+    loadPendingCount();
 
     document.querySelectorAll('[data-action]').forEach(btn => {
         const action = btn.getAttribute('data-action');
@@ -548,14 +572,6 @@ function renderList() {
     });
 }
 
-function renderNoLogin() {
-    $('#wrap').innerHTML = '<div class="empty">' +
-        '<span class="emoji">🔒</span>' +
-        '请先登录后再访问管理后台<br><br>' +
-        '<a href="./index.html" style="color:#fb7299;font-weight:600;">→ 去登录</a>' +
-        '</div>';
-}
-
 // ============================================================
 // 表单
 // ============================================================
@@ -563,7 +579,7 @@ function openForm(editId) {
     const isEdit = editId !== null && editId !== undefined;
     let anime = { links: {}, seasons: [] };
     if (isEdit) {
-        const found = myAnimes.find(x => x.id === editId);
+        const found = allAnimes.find(x => x.id === editId);
         if (found) anime = found;
     }
 
@@ -960,7 +976,7 @@ async function loadAcfunEps(s) {
 
 async function submitForm(editId) {
     const user = getCurrentUser();
-    if (!user) { alert('请先登录'); return; }
+    if (!user || !isAdmin()) { alert('无权操作'); return; }
 
     const title = $('#f-title').value.trim();
     const coverV = $('#f-coverV').value.trim();
@@ -1034,7 +1050,7 @@ async function submitForm(editId) {
             setTimeout(() => {
                 const m = document.getElementById('formModal');
                 if (m) m.remove();
-                loadMyAnimes();
+                loadAllAnimes();
             }, 800);
         } else {
             msg.textContent = data.error || '操作失败';
@@ -1052,10 +1068,10 @@ async function submitForm(editId) {
 
 async function deleteAnime(id) {
     const user = getCurrentUser();
-    if (!user) { alert('请先登录'); return; }
-    const anime = myAnimes.find(x => x.id === id);
+    if (!user || !isAdmin()) { alert('无权操作'); return; }
+    const anime = allAnimes.find(x => x.id === id);
     if (!anime) return;
-    if (!confirm('确定删除「' + anime.title + '」？\n\n删除后不会立即从数据库清除，但网站上将不再显示。')) return;
+    if (!confirm('确定删除「' + anime.title + '」？\n\n（管理员可删除任何用户的番剧）')) return;
 
     try {
         const res = await fetch(`${API_BASE}/api/anime/${id}`, {
@@ -1063,7 +1079,7 @@ async function deleteAnime(id) {
             headers: { 'Authorization': 'Bearer ' + user.token }
         });
         const data = await res.json();
-        if (data.ok) loadMyAnimes();
+        if (data.ok) loadAllAnimes();
         else alert(data.error || '删除失败');
     } catch (e) {
         alert('网络错误：' + e.message);
@@ -1075,7 +1091,7 @@ async function deleteAnime(id) {
 // ============================================================
 async function loadPendingCount() {
     const user = getCurrentUser();
-    if (!user || user.uid !== 1) return;
+    if (!user || !isAdmin()) return;
     try {
         const res = await fetch(`${API_BASE}/api/upload/list?status=pending`, {
             headers: { 'Authorization': 'Bearer ' + user.token }
@@ -1096,8 +1112,7 @@ async function loadPendingCount() {
 // ============================================================
 async function openReviewPanel() {
     const user = getCurrentUser();
-    if (!user || user.uid !== 1) { alert('仅管理员可用'); return; }
-
+    if (!user || !isAdmin()) { alert('仅管理员可用'); return; }
     if (document.getElementById('reviewModal')) return;
 
     const modal = document.createElement('div');
@@ -1217,7 +1232,7 @@ async function loadReviewList(status) {
                         alert('已通过，iv' + d.animeId);
                         loadReviewList(status);
                         loadPendingCount();
-                        loadMyAnimes();
+                        loadAllAnimes();
                     } else alert(d.error || '操作失败');
                 } catch (e) { alert('网络错误：' + e.message); }
             };
@@ -1287,8 +1302,7 @@ async function loadReviewList(status) {
 // ============================================================
 // 启动
 // ============================================================
-renderUserArea();
-loadMyAnimes();
+boot();
 </script>
 
 </body>
