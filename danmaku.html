@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>弹幕批量发射器 - imomoe</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  .dm-wrap { max-width: 860px; margin: 40px auto; padding: 24px; }
+  .dm-wrap h1 { font-size: 24px; margin-bottom: 6px; }
+  .dm-sub { color: #888; font-size: 14px; margin-bottom: 20px; }
+  .dm-warn {
+    background: #fff8e1; border-left: 4px solid #ffb300;
+    padding: 12px 16px; border-radius: 6px; margin-bottom: 20px;
+    font-size: 13px; line-height: 1.7; color: #7a5c00;
+  }
+  .dm-field { margin-bottom: 16px; }
+  .dm-field label {
+    display: block; font-size: 13px; font-weight: 600;
+    margin-bottom: 6px; color: #444;
+  }
+  .dm-field input, .dm-field textarea, .dm-field select {
+    width: 100%; padding: 10px 12px; border: 1px solid #ddd;
+    border-radius: 8px; font-size: 14px; box-sizing: border-box;
+    transition: border-color .2s;
+  }
+  .dm-field input:focus, .dm-field textarea:focus, .dm-field select:focus {
+    outline: none; border-color: #4a90d9;
+    box-shadow: 0 0 0 3px rgba(74,144,217,.15);
+  }
+  .dm-field textarea { height: 180px; resize: vertical; font-family: monospace; font-size: 13px; }
+  .dm-row { display: flex; gap: 12px; }
+  .dm-row > * { flex: 1; }
+  .dm-btn {
+    width: 100%; padding: 14px; background: #4a90d9; color: #fff;
+    border: none; border-radius: 8px; font-size: 15px; font-weight: 600;
+    cursor: pointer; transition: background .2s;
+  }
+  .dm-btn:hover:not(:disabled) { background: #357abd; }
+  .dm-btn:disabled { background: #ccc; cursor: not-allowed; }
+  .dm-btn-sm {
+    padding: 8px 14px; font-size: 13px; width: auto;
+    background: #f0f0f0; color: #333; border: 1px solid #ddd;
+    border-radius: 6px; cursor: pointer;
+  }
+  .dm-btn-sm:hover { background: #e6e6e6; }
+  .dm-progress {
+    width: 100%; height: 8px; background: #eee;
+    border-radius: 4px; margin-top: 14px; overflow: hidden;
+  }
+  .dm-progress-bar {
+    height: 100%; background: linear-gradient(90deg,#4a90d9,#5eb0ff);
+    width: 0%; transition: width .3s;
+  }
+  .dm-log {
+    background: #1e1e1e; color: #d4d4d4; padding: 16px;
+    border-radius: 8px; height: 280px; overflow-y: auto;
+    margin-top: 20px; font-family: 'Consolas', monospace;
+    font-size: 13px; line-height: 1.65; white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .dm-stat { display: flex; gap: 12px; margin-top: 14px; }
+  .dm-stat > div {
+    flex: 1; background: #f7f7f7; padding: 12px;
+    border-radius: 8px; text-align: center;
+  }
+  .dm-stat b { display: block; font-size: 20px; color: #333; margin-bottom: 2px; }
+  .dm-stat span { font-size: 12px; color: #888; }
+  .dm-cid-info {
+    background: #e8f5e9; border-left: 4px solid #4caf50;
+    padding: 10px 14px; border-radius: 6px; margin-bottom: 14px;
+    font-size: 13px; color: #2e7d32; display: none;
+  }
+</style>
+</head>
+<body>
+<div class="dm-wrap">
+  <h1>🚀 弹幕批量发射器</h1>
+  <p class="dm-sub">批量发送弹幕到 B站视频 · 无条数上限 · 安全间隔发送</p>
+
+  <div class="dm-warn">
+    <b>⚠️ 使用须知</b><br>
+    1. SESSDATA / bili_jct 是你的 B站 登录凭证，本页面<b>不会上传到任何服务器</b>，仅通过 Worker 转发给 B站官方接口。<br>
+    2. 发送间隔已固定为 <b>6 秒</b>，请勿修改，否则账号极易被风控封禁。<br>
+    3. 你对自己的账号行为负责，请勿滥用。
+  </div>
+
+  <div class="dm-field">
+    <label>① 视频 BV 号（自动查询 cid）</label>
+    <div style="display:flex; gap:8px;">
+      <input type="text" id="bvid" placeholder="例如 BV1xx411c7mD">
+      <button class="dm-btn-sm" id="btnQueryCid" onclick="queryCid()" style="white-space:nowrap;">查询 cid</button>
+    </div>
+  </div>
+
+  <div class="dm-cid-info" id="cidInfo"></div>
+
+  <div class="dm-field" id="cidSelectWrap" style="display:none;">
+    <label>选择分P（cid）</label>
+    <select id="cidSelect"></select>
+  </div>
+
+  <div class="dm-row">
+    <div class="dm-field">
+      <label>② SESSDATA</label>
+      <input type="password" id="sessdata" placeholder="从 B站 Cookie 中获取">
+    </div>
+    <div class="dm-field">
+      <label>③ bili_jct</label>
+      <input type="password" id="bili_jct" placeholder="从 B站 Cookie 中获取">
+    </div>
+  </div>
+
+  <div class="dm-row">
+    <div class="dm-field">
+      <label>弹幕出现时间（毫秒，5000 = 第5秒）</label>
+      <input type="number" id="progress" value="5000" min="0">
+    </div>
+    <div class="dm-field">
+      <label>弹幕类型</label>
+      <select id="mode">
+        <option value="1">滚动（从右往左）</option>
+        <option value="5">顶部固定</option>
+        <option value="4">底部固定</option>
+      </select>
+    </div>
+    <div class="dm-field">
+      <label>颜色</label>
+      <select id="color">
+        <option value="16777215">白色</option>
+        <option value="16711680">红色</option>
+        <option value="16776960">黄色</option>
+        <option value="65280">绿色</option>
+        <option value="65535">青色</option>
+        <option value="255">蓝色</option>
+        <option value="16711935">紫色</option>
+        <option value="0">黑色</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="dm-field">
+    <label>④ 弹幕内容（每行一条，最多 100 字/条）</label>
+    <textarea id="msgList" placeholder="第一条弹幕&#10;第二条弹幕&#10;第三条弹幕&#10;..."></textarea>
+  </div>
+
+  <button class="dm-btn" id="btnSend" onclick="startSend()">开始发送</button>
+
+  <div class="dm-progress"><div class="dm-progress-bar" id="progressBar"></div></div>
+
+  <div class="dm-stat">
+    <div><b id="statTotal">0</b><span>总数</span></div>
+    <div><b id="statOk" style="color:#4caf50">0</b><span>成功</span></div>
+    <div><b id="statFail" style="color:#f44336">0</b><span>失败</span></div>
+    <div><b id="statTime">0s</b><span>已用时</span></div>
+  </div>
+
+  <div class="dm-log" id="log"></div>
+</div>
+
+<script>
+// ⚠️ 替换成你的 Worker 地址（末尾不要带 /）
+const WORKER_URL = 'https://你的worker子域名.workers.dev';
+
+// ⚠️ 发送间隔，绝对不要改小！B站风控非常严格
+const SEND_INTERVAL = 6000; // 6 秒
+
+let currentOid = null;
+let isSending = false;
+let startTime = 0;
+let timerInterval = null;
+
+function log(msg, color) {
+  const el = document.getElementById('log');
+  const colors = {
+    ok: '#4ec9b0', err: '#f44747', warn: '#dcdcaa',
+    info: '#569cd6', dim: '#808080'
+  };
+  const c = colors[color] || '#d4d4d4';
+  el.innerHTML += `<span style="color:${c}">${escapeHtml(msg)}</span>\n`;
+  el.scrollTop = el.scrollHeight;
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c =>
+    ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+}
+
+function setProgress(cur, total) {
+  const pct = total > 0 ? Math.round(cur / total * 100) : 0;
+  document.getElementById('progressBar').style.width = pct + '%';
+}
+
+function updateTimeStat() {
+  const s = Math.floor((Date.now() - startTime) / 1000);
+  document.getElementById('statTime').textContent = s + 's';
+}
+
+// ============ 通过 BV 号查询 cid ============
+async function queryCid() {
+  const bvid = document.getElementById('bvid').value.trim();
+  if (!bvid) { alert('请先填写 BV 号'); return; }
+
+  const btn = document.getElementById('btnQueryCid');
+  btn.disabled = true;
+  btn.textContent = '查询中...';
+  log(`🔍 正在查询 ${bvid} 的视频信息...`, 'info');
+
+  try {
+    const res = await fetch(`${WORKER_URL}/api/bili-danmaku/cid?bvid=${encodeURIComponent(bvid)}`);
+    const data = await res.json();
+
+    if (!data.ok) {
+      log(`❌ 查询失败: ${data.error || data.message || '未知错误'}`, 'err');
+      document.getElementById('cidInfo').style.display = 'none';
+      document.getElementById('cidSelectWrap').style.display = 'none';
+      return;
+    }
+
+    log(`✅ 视频标题: ${data.title}`, 'ok');
+    log(`   aid=${data.aid}, 共 ${data.pages.length} 个分P`, 'ok');
+
+    const info = document.getElementById('cidInfo');
+    info.style.display = 'block';
+    info.innerHTML = `✅ 已获取视频信息：<b>${escapeHtml(data.title)}</b> · aid=${data.aid} · ${data.pages.length} 个分P`;
+
+    const sel = document.getElementById('cidSelect');
+    sel.innerHTML = '';
+    data.pages.forEach(p => {
+      const opt = document.createElement('option');
+      opt.value = p.cid;
+      opt.textContent = `P${p.page} - ${p.part} (cid=${p.cid}, ${p.duration}s)`;
+      sel.appendChild(opt);
+    });
+    document.getElementById('cidSelectWrap').style.display = 'block';
+
+    currentOid = data.pages[0].cid;
+    log(`📌 已默认选择 P1，cid=${currentOid}`, 'info');
+
+    sel.onchange = () => {
+      currentOid = sel.value;
+      log(`📌 已切换到 cid=${currentOid}`, 'info');
+    };
+  } catch (e) {
+    log(`❌ 网络错误: ${e.message}`, 'err');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '查询 cid';
+  }
+}
+
+// ============ 批量发送 ============
+async function startSend() {
+  if (isSending) { alert('正在发送中，请等待完成'); return; }
+
+  const sessdata = document.getElementById('sessdata').value.trim();
+  const bili_jct = document.getElementById('bili_jct').value.trim();
+  const progress = parseInt(document.getElementById('progress').value) || 0;
+  const mode = parseInt(document.getElementById('mode').value) || 1;
+  const color = parseInt(document.getElementById('color').value) || 16777215;
+
+  if (!currentOid) { alert('请先通过 BV 号查询 cid'); return; }
+  if (!sessdata || !bili_jct) { alert('请填写 SESSDATA 和 bili_jct'); return; }
+
+  const msgs = document.getElementById('msgList').value
+    .split('\n').map(m => m.trim()).filter(m => m !== '');
+
+  if (msgs.length === 0) { alert('请至少输入一条弹幕'); return; }
+  if (msgs.some(m => m.length > 100)) { alert('有弹幕超过 100 字，请检查'); return; }
+
+  if (!confirm(`即将发送 ${msgs.length} 条弹幕，预计耗时约 ${Math.round(msgs.length * SEND_INTERVAL / 60000)} 分钟。\n\n每条约 ${SEND_INTERVAL/1000} 秒间隔。\n\n确认开始吗？`)) return;
+
+  isSending = true;
+  startTime = Date.now();
+  timerInterval = setInterval(updateTimeStat, 1000);
+
+  document.getElementById('btnSend').disabled = true;
+  document.getElementById('log').innerHTML = '';
+  document.getElementById('statTotal').textContent = msgs.length;
+  document.getElementById('statOk').textContent = '0';
+  document.getElementById('statFail').textContent = '0';
+  document.getElementById('statTime').textContent = '0s';
+
+  log(`📋 共 ${msgs.length} 条弹幕，cid=${currentOid}`, 'info');
+  log(`⏱️ 每条间隔 ${SEND_INTERVAL/1000} 秒，预计耗时约 ${Math.round(msgs.length * SEND_INTERVAL / 60000)} 分钟`, 'info');
+  log('─'.repeat(50), 'dim');
+
+  let ok = 0, fail = 0;
+
+  for (let i = 0; i < msgs.length; i++) {
+    const msg = msgs[i];
+    log(`[${i+1}/${msgs.length}] 发送: ${msg.substring(0, 40)}${msg.length > 40 ? '...' : ''}`, 'info');
+
+    try {
+      const res = await fetch(`${WORKER_URL}/api/bili-danmaku/send`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sessdata, bili_jct,
+          oid: currentOid,
+          msg, progress, color,
+          fontsize: 25,
+          mode
+        })
+      });
+      const data = await res.json();
+
+      if (data.ok) {
+        ok++;
+        document.getElementById('statOk').textContent = ok;
+        log(`  ✅ 成功`, 'ok');
+      } else {
+        fail++;
+        document.getElementById('statFail').textContent = fail;
+        log(`  ❌ 失败 (code=${data.code}): ${data.message || data.error}`, 'err');
+
+        // 严重错误直接停止
+        if ([-101, -111, -400, -403].includes(data.code)) {
+          log(`  ⛔ 检测到严重错误（cookie失效/被风控），已自动停止`, 'err');
+          break;
+        }
+        // 频率限制等，额外多等一会
+        if (data.code === -509 || data.code === 10030) {
+          log(`  ⏳ 被限流，额外等待 30 秒...`, 'warn');
+          await new Promise(r => setTimeout(r, 30000));
+        }
+      }
+    } catch (e) {
+      fail++;
+      document.getElementById('statFail').textContent = fail;
+      log(`  ⚠️ 网络错误: ${e.message}`, 'err');
+    }
+
+    setProgress(i + 1, msgs.length);
+
+    // 最后一条不用等
+    if (i < msgs.length - 1) {
+      log(`  ⏳ 等待 ${SEND_INTERVAL/1000} 秒...`, 'warn');
+      await new Promise(r => setTimeout(r, SEND_INTERVAL));
+    }
+  }
+
+  clearInterval(timerInterval);
+  log('─'.repeat(50), 'dim');
+  log(`🎉 发送完成！成功 ${ok} 条 / 失败 ${fail} 条 / 共 ${msgs.length} 条`, ok > 0 ? 'ok' : 'err');
+
+  isSending = false;
+  document.getElementById('btnSend').disabled = false;
+}
+</script>
+</body>
+</html>
